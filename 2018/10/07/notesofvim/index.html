@@ -8,14 +8,14 @@
 
 
     <meta name="description" content="Vim的学习笔记">
-<meta name="keywords" content="Vim">
+<meta name="keywords" content="Vim,笔记">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Vim学习笔记">
 <meta property="og:url" content="http://yoursite.com/2018/10/07/notesofvim/index.html">
 <meta property="og:site_name" content="Lhc_fl Home">
 <meta property="og:description" content="Vim的学习笔记">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-03-15T04:25:07.392Z">
+<meta property="og:updated_time" content="2020-03-26T06:17:25.712Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Vim学习笔记">
 <meta name="twitter:description" content="Vim的学习笔记">
@@ -299,6 +299,7 @@
 </tbody>
 </table>
 <h2 id="vimrc设置"><a href="#vimrc设置" class="headerlink" title=".vimrc设置"></a>.vimrc设置</h2><figure class="highlight vim hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-comment">"注释</span></span><br><span class="line"><span class="hljs-keyword">set</span> <span class="hljs-keyword">ts</span>=<span class="hljs-number">4</span>                    <span class="hljs-comment">"设置tab为4空格</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">set</span> expandtab               <span class="hljs-comment">"用空格替代tab</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">set</span> nocompatible            <span class="hljs-comment">" 关闭 vi 兼容模式</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">syntax</span> <span class="hljs-keyword">on</span>                   <span class="hljs-comment">" 自动语法高亮</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">colorscheme</span> molokai         <span class="hljs-comment">" 设定配色方案</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">set</span> <span class="hljs-keyword">number</span>                  <span class="hljs-comment">" 显示行号</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">set</span> cursorline              <span class="hljs-comment">" 突出显示当前行</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">set</span> ruler                   <span class="hljs-comment">" 打开状态栏标尺</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">set</span> <span class="hljs-built_in">shiftwidth</span>=<span class="hljs-number">4</span>            <span class="hljs-comment">" 设定 &lt;&lt; 和 &gt;&gt; 命令移动时的宽度为 4</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">set</span> softtabstop=<span class="hljs-number">4</span>           <span class="hljs-comment">" 使得按退格键时可以一次删掉 4 个空格</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">set</span> nobackup                <span class="hljs-comment">" 覆盖文件时不备份</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">set</span> autochdir               <span class="hljs-comment">" 自动切换当前目录为当前文件所在的目录</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">filetype</span> plugin <span class="hljs-built_in">indent</span> <span class="hljs-keyword">on</span>   <span class="hljs-comment">" 开启插件</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">set</span> backupcopy=yes          <span class="hljs-comment">" 设置备份时的行为为覆盖</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">set</span> ignorecase smartcase    <span class="hljs-comment">" 搜索时忽略大小写，但在有一个或以上大写字母时仍保持对大小写敏感</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">set</span> nowrapscan              <span class="hljs-comment">" 禁止在搜索到文件两端时重新搜索</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">set</span> incsearch               <span class="hljs-comment">" 输入搜索内容时就显示搜索结果</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">set</span> hlsearch                <span class="hljs-comment">" 搜索时高亮显示被找到的文本</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">set</span> noerrorbells            <span class="hljs-comment">" 关闭错误信息响铃</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">set</span> novisualbell            <span class="hljs-comment">" 关闭使用可视响铃代替呼叫</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">set</span> t_vb=                   <span class="hljs-comment">" 置空错误铃声的终端代码</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">set</span> magic                   <span class="hljs-comment">" 设置魔术</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">set</span> hidden                  <span class="hljs-comment">" 允许在有未保存的修改时切换缓冲区，此时的修改由 vim 负责保存</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">set</span> guioptions-=T           <span class="hljs-comment">" 隐藏工具栏</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">set</span> guioptions-=<span class="hljs-keyword">m</span>           <span class="hljs-comment">" 隐藏菜单栏</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">set</span> smartindent             <span class="hljs-comment">" 开启新行时使用智能自动缩进</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">set</span> backspace=<span class="hljs-built_in">indent</span>,eol,start</span><br><span class="line"></span><br><span class="line">                            <span class="hljs-comment">" 不设定在插入状态无法用退格键和 Delete 键删除回车符</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">set</span> cmdheight=<span class="hljs-number">1</span>             <span class="hljs-comment">" 设定命令行的行数为 1</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">set</span> laststatus=<span class="hljs-number">2</span>            <span class="hljs-comment">" 显示状态栏 (默认值为 1, 无法显示状态栏)</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">set</span> statusline=\ %&lt;%F[%<span class="hljs-number">1</span>*%M%*%n%R%H]%=\ %<span class="hljs-keyword">y</span>\ %<span class="hljs-number">0</span>(%&#123;&amp;fileformat&#125;\ %&#123;&amp;encoding&#125;\ %<span class="hljs-keyword">c</span>:%<span class="hljs-keyword">l</span>/%L%)\ </span><br><span class="line"></span><br><span class="line">                            <span class="hljs-comment">" 设置在状态行显示的信息</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">set</span> foldenable              <span class="hljs-comment">" 开始折叠</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">set</span> foldmethod=<span class="hljs-keyword">syntax</span>       <span class="hljs-comment">" 设置语法折叠</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">set</span> foldcolumn=<span class="hljs-number">0</span>            <span class="hljs-comment">" 设置折叠区域的宽度</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">setlocal</span> <span class="hljs-built_in">foldlevel</span>=<span class="hljs-number">1</span>        <span class="hljs-comment">" 设置折叠层数为</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">set</span> <span class="hljs-keyword">foldclose</span>=<span class="hljs-keyword">all</span>           <span class="hljs-comment">" 设置为自动关闭折叠                            </span></span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">" nnoremap &lt;space&gt; @=((foldclosed(line('.')) &lt; 0) ? 'zc' : 'zo')&lt;CR&gt;</span></span><br><span class="line"></span><br><span class="line">                            <span class="hljs-comment">" 用空格键来开关折叠</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">"括号自动匹配添加</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">inoremap</span> ( ()<span class="hljs-symbol">&lt;LEFT&gt;</span></span><br><span class="line"><span class="hljs-keyword">inoremap</span> &#123; &#123;&#125;<span class="hljs-symbol">&lt;LEFT&gt;</span></span><br><span class="line"><span class="hljs-keyword">inoremap</span> [ []<span class="hljs-symbol">&lt;LEFT&gt;</span></span><br></pre></td></tr></table></figure>
+
         </div>
         
         
@@ -306,7 +307,7 @@
             <div class="level-start">
                 <div class="level-item">
                     <span class="is-size-6 has-text-grey has-mr-7">#</span>
-                    <a class="has-link-grey -link" href="/tags/Vim/">Vim</a>
+                    <a class="has-link-grey -link" href="/tags/Vim/">Vim</a>, <a class="has-link-grey -link" href="/tags/笔记/">笔记</a>
                 </div>
             </div>
         </div>
@@ -416,7 +417,7 @@
                         文章
                     </p>
                     <p class="title has-text-weight-normal">
-                        18
+                        20
                     </p>
                 </div>
             </div>
@@ -436,7 +437,7 @@
                         标签
                     </p>
                     <p class="title has-text-weight-normal">
-                        12
+                        19
                     </p>
                 </div>
             </div>
@@ -552,7 +553,7 @@
                     <span class="level-item">三月 2020</span>
                 </span>
                 <span class="level-end">
-                    <span class="level-item tag">1</span>
+                    <span class="level-item tag">3</span>
                 </span>
             </a>
         </li>
@@ -673,9 +674,47 @@
         
         <article class="media">
             
+            <a href="/2020/03/26/ubuntu-deepin-wine-config/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="https://i.loli.net/2020/03/26/Jgptk4FdzBluNVK.jpg" alt="Ubuntu deepin-wine配置">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-03-26T03:31:00.000Z">2020-03-26</time></div>
+                    <a href="/2020/03/26/ubuntu-deepin-wine-config/" class="has-link-black-ter is-size-6">Ubuntu deepin-wine配置</a>
+                    <p class="is-size-7 is-uppercase">
+                        
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2020/03/26/Ubuntu-WiFi-unable-use/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="https://i.loli.net/2020/03/26/PADd1Rty4qflV7B.jpg" alt="Ubuntu wifi问题">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-03-26T03:31:00.000Z">2020-03-26</time></div>
+                    <a href="/2020/03/26/Ubuntu-WiFi-unable-use/" class="has-link-black-ter is-size-6">Ubuntu wifi问题</a>
+                    <p class="is-size-7 is-uppercase">
+                        
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
             <a href="/2020/03/15/Scales/" class="media-left">
                 <p class="image is-64x64">
-                    <img class="thumbnail" src="https://i.loli.net/2020/03/15/Mez3m9t6UrLxJqG.png" alt="各种量表收藏（缓慢更新）">
+                    <img class="thumbnail" src="https://i.loli.net/2020/03/26/JH9q4FPXWfx3LZK.png" alt="各种量表收藏（缓慢更新）">
                 </p>
             </a>
             
@@ -721,44 +760,6 @@
                 <div class="content">
                     <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-10-13T06:46:20.000Z">2019-10-13</time></div>
                     <a href="/2019/10/13/Alittlepost/" class="has-link-black-ter is-size-6">小更新</a>
-                    <p class="is-size-7 is-uppercase">
-                        
-                    </p>
-                </div>
-            </div>
-        </article>
-        
-        <article class="media">
-            
-            <a href="/2019/07/21/summer-holidays/" class="media-left">
-                <p class="image is-64x64">
-                    <img class="thumbnail" src="https://gitee.com/lhcfl/photobed/raw/master/ACG/57.jpg" alt="暑假">
-                </p>
-            </a>
-            
-            <div class="media-content">
-                <div class="content">
-                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-07-21T03:50:41.000Z">2019-07-21</time></div>
-                    <a href="/2019/07/21/summer-holidays/" class="has-link-black-ter is-size-6">暑假</a>
-                    <p class="is-size-7 is-uppercase">
-                        
-                    </p>
-                </div>
-            </div>
-        </article>
-        
-        <article class="media">
-            
-            <a href="/2019/05/02/wall/" class="media-left">
-                <p class="image is-64x64">
-                    <img class="thumbnail" src="https://i.loli.net/2019/07/21/5d33f589679a875964.jpg" alt="科学上网教程">
-                </p>
-            </a>
-            
-            <div class="media-content">
-                <div class="content">
-                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-05-02T14:38:30.000Z">2019-05-02</time></div>
-                    <a href="/2019/05/02/wall/" class="has-link-black-ter is-size-6">科学上网教程</a>
                     <p class="is-size-7 is-uppercase">
                         
                     </p>
@@ -807,6 +808,13 @@
                 </div>
                 
                 <div class="control">
+                    <a class="tags has-addons" href="/tags/Linux/">
+                        <span class="tag">Linux</span>
+                        <span class="tag is-grey">2</span>
+                    </a>
+                </div>
+                
+                <div class="control">
                     <a class="tags has-addons" href="/tags/OI/">
                         <span class="tag">OI</span>
                         <span class="tag is-grey">5</span>
@@ -814,8 +822,22 @@
                 </div>
                 
                 <div class="control">
+                    <a class="tags has-addons" href="/tags/Ubuntu/">
+                        <span class="tag">Ubuntu</span>
+                        <span class="tag is-grey">2</span>
+                    </a>
+                </div>
+                
+                <div class="control">
                     <a class="tags has-addons" href="/tags/Vim/">
                         <span class="tag">Vim</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/wine/">
+                        <span class="tag">wine</span>
                         <span class="tag is-grey">1</span>
                     </a>
                 </div>
@@ -828,6 +850,13 @@
                 </div>
                 
                 <div class="control">
+                    <a class="tags has-addons" href="/tags/已失效/">
+                        <span class="tag">已失效</span>
+                        <span class="tag is-grey">2</span>
+                    </a>
+                </div>
+                
+                <div class="control">
                     <a class="tags has-addons" href="/tags/心理/">
                         <span class="tag">心理</span>
                         <span class="tag is-grey">1</span>
@@ -835,16 +864,23 @@
                 </div>
                 
                 <div class="control">
+                    <a class="tags has-addons" href="/tags/教程/">
+                        <span class="tag">教程</span>
+                        <span class="tag is-grey">5</span>
+                    </a>
+                </div>
+                
+                <div class="control">
                     <a class="tags has-addons" href="/tags/无聊/">
                         <span class="tag">无聊</span>
-                        <span class="tag is-grey">1</span>
+                        <span class="tag is-grey">4</span>
                     </a>
                 </div>
                 
                 <div class="control">
                     <a class="tags has-addons" href="/tags/杂项/">
                         <span class="tag">杂项</span>
-                        <span class="tag is-grey">9</span>
+                        <span class="tag is-grey">6</span>
                     </a>
                 </div>
                 
@@ -852,6 +888,20 @@
                     <a class="tags has-addons" href="/tags/游记/">
                         <span class="tag">游记</span>
                         <span class="tag is-grey">2</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/笔记/">
+                        <span class="tag">笔记</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/转帖/">
+                        <span class="tag">转帖</span>
+                        <span class="tag is-grey">1</span>
                     </a>
                 </div>
                 
@@ -887,9 +937,47 @@
         
         <article class="media">
             
+            <a href="/2020/03/26/ubuntu-deepin-wine-config/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="https://i.loli.net/2020/03/26/Jgptk4FdzBluNVK.jpg" alt="Ubuntu deepin-wine配置">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-03-26T03:31:00.000Z">2020-03-26</time></div>
+                    <a href="/2020/03/26/ubuntu-deepin-wine-config/" class="has-link-black-ter is-size-6">Ubuntu deepin-wine配置</a>
+                    <p class="is-size-7 is-uppercase">
+                        
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2020/03/26/Ubuntu-WiFi-unable-use/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="https://i.loli.net/2020/03/26/PADd1Rty4qflV7B.jpg" alt="Ubuntu wifi问题">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-03-26T03:31:00.000Z">2020-03-26</time></div>
+                    <a href="/2020/03/26/Ubuntu-WiFi-unable-use/" class="has-link-black-ter is-size-6">Ubuntu wifi问题</a>
+                    <p class="is-size-7 is-uppercase">
+                        
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
             <a href="/2020/03/15/Scales/" class="media-left">
                 <p class="image is-64x64">
-                    <img class="thumbnail" src="https://i.loli.net/2020/03/15/Mez3m9t6UrLxJqG.png" alt="各种量表收藏（缓慢更新）">
+                    <img class="thumbnail" src="https://i.loli.net/2020/03/26/JH9q4FPXWfx3LZK.png" alt="各种量表收藏（缓慢更新）">
                 </p>
             </a>
             
@@ -942,44 +1030,6 @@
             </div>
         </article>
         
-        <article class="media">
-            
-            <a href="/2019/07/21/summer-holidays/" class="media-left">
-                <p class="image is-64x64">
-                    <img class="thumbnail" src="https://gitee.com/lhcfl/photobed/raw/master/ACG/57.jpg" alt="暑假">
-                </p>
-            </a>
-            
-            <div class="media-content">
-                <div class="content">
-                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-07-21T03:50:41.000Z">2019-07-21</time></div>
-                    <a href="/2019/07/21/summer-holidays/" class="has-link-black-ter is-size-6">暑假</a>
-                    <p class="is-size-7 is-uppercase">
-                        
-                    </p>
-                </div>
-            </div>
-        </article>
-        
-        <article class="media">
-            
-            <a href="/2019/05/02/wall/" class="media-left">
-                <p class="image is-64x64">
-                    <img class="thumbnail" src="https://i.loli.net/2019/07/21/5d33f589679a875964.jpg" alt="科学上网教程">
-                </p>
-            </a>
-            
-            <div class="media-content">
-                <div class="content">
-                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-05-02T14:38:30.000Z">2019-05-02</time></div>
-                    <a href="/2019/05/02/wall/" class="has-link-black-ter is-size-6">科学上网教程</a>
-                    <p class="is-size-7 is-uppercase">
-                        
-                    </p>
-                </div>
-            </div>
-        </article>
-        
     </div>
 </div>
 
@@ -1021,6 +1071,13 @@
                 </div>
                 
                 <div class="control">
+                    <a class="tags has-addons" href="/tags/Linux/">
+                        <span class="tag">Linux</span>
+                        <span class="tag is-grey">2</span>
+                    </a>
+                </div>
+                
+                <div class="control">
                     <a class="tags has-addons" href="/tags/OI/">
                         <span class="tag">OI</span>
                         <span class="tag is-grey">5</span>
@@ -1028,8 +1085,22 @@
                 </div>
                 
                 <div class="control">
+                    <a class="tags has-addons" href="/tags/Ubuntu/">
+                        <span class="tag">Ubuntu</span>
+                        <span class="tag is-grey">2</span>
+                    </a>
+                </div>
+                
+                <div class="control">
                     <a class="tags has-addons" href="/tags/Vim/">
                         <span class="tag">Vim</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/wine/">
+                        <span class="tag">wine</span>
                         <span class="tag is-grey">1</span>
                     </a>
                 </div>
@@ -1042,6 +1113,13 @@
                 </div>
                 
                 <div class="control">
+                    <a class="tags has-addons" href="/tags/已失效/">
+                        <span class="tag">已失效</span>
+                        <span class="tag is-grey">2</span>
+                    </a>
+                </div>
+                
+                <div class="control">
                     <a class="tags has-addons" href="/tags/心理/">
                         <span class="tag">心理</span>
                         <span class="tag is-grey">1</span>
@@ -1049,16 +1127,23 @@
                 </div>
                 
                 <div class="control">
+                    <a class="tags has-addons" href="/tags/教程/">
+                        <span class="tag">教程</span>
+                        <span class="tag is-grey">5</span>
+                    </a>
+                </div>
+                
+                <div class="control">
                     <a class="tags has-addons" href="/tags/无聊/">
                         <span class="tag">无聊</span>
-                        <span class="tag is-grey">1</span>
+                        <span class="tag is-grey">4</span>
                     </a>
                 </div>
                 
                 <div class="control">
                     <a class="tags has-addons" href="/tags/杂项/">
                         <span class="tag">杂项</span>
-                        <span class="tag is-grey">9</span>
+                        <span class="tag is-grey">6</span>
                     </a>
                 </div>
                 
@@ -1066,6 +1151,20 @@
                     <a class="tags has-addons" href="/tags/游记/">
                         <span class="tag">游记</span>
                         <span class="tag is-grey">2</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/笔记/">
+                        <span class="tag">笔记</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/转帖/">
+                        <span class="tag">转帖</span>
+                        <span class="tag is-grey">1</span>
                     </a>
                 </div>
                 
