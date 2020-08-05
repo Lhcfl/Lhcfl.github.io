@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>Javascript简单弹性碰撞模拟 - Lhc_fl Home</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+    <meta name="description" content="为什么这么久不更博？因为没时间+懒 效果如下所示～ 为了防止拖慢网页，点开more查看吧～">
+<meta name="keywords" content="Javascript,HTML">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Javascript简单弹性碰撞模拟">
+<meta property="og:url" content="http://yoursite.com/2020/08/05/PhysicalHit/index.html">
+<meta property="og:site_name" content="Lhc_fl Home">
+<meta property="og:description" content="为什么这么久不更博？因为没时间+懒 效果如下所示～ 为了防止拖慢网页，点开more查看吧～">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-08-05T09:28:13.631Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Javascript简单弹性碰撞模拟">
+<meta name="twitter:description" content="为什么这么久不更博？因为没时间+懒 效果如下所示～ 为了防止拖慢网页，点开more查看吧～">
+
+
+
+
+
+<link rel="icon" href="/images/favicon.png">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.7.2/css/bulma.css">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu:400,600|Source+Code+Pro">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.12.0/styles/atom-one-light.css">
+
+
+    
+    
+    
+    <style>body>.footer,body>.navbar,body>.section{opacity:0}</style>
+    
+
+    
+    
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/css/lightgallery.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/css/justifiedGallery.min.css">
+    
+
+    
+    
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/outdatedbrowser@1.1.5/outdatedbrowser/outdatedbrowser.min.css">
+
+
+    
+    
+    
+    
+
+<link rel="stylesheet" href="/css/back-to-top.css">
+
+
+    
+    
+
+    
+    
+    
+    
+
+    
+    
+<link rel="stylesheet" href="/css/progressbar.css">
+<script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
+
+    
+    
+    
+
+    
+    
+    
+
+
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="is-3-column">
+    <nav class="navbar navbar-main">
+    <div class="container">
+        <div class="navbar-brand is-flex-center">
+            <a class="navbar-item navbar-logo" href="/">
+            
+                Lhc_fl Home
+            
+            </a>
+        </div>
+        <div class="navbar-menu">
+            
+            <div class="navbar-start">
+                
+                <a class="navbar-item" href="/">主页</a>
+                
+                <a class="navbar-item" href="/archives">归档</a>
+                
+                <a class="navbar-item" href="/tags">标签</a>
+                
+                <a class="navbar-item" href="/about">关于</a>
+                
+                <a class="navbar-item" href="/links">友链</a>
+                
+            </div>
+            
+            <div class="navbar-end">
+                
+                    
+                    
+                    <a class="navbar-item" target="_blank" title="View me on GitHub" href="http://github.com/lhcfl">
+                        
+                        <i class="fab fa-github"></i>
+                        
+                    </a>
+                    
+                
+                
+                <a class="navbar-item is-hidden-tablet catalogue" title="目录" href="javascript:;">
+                    <i class="fas fa-list-ul"></i>
+                </a>
+                
+                
+                <a class="navbar-item search" title="搜索" href="javascript:;">
+                    <i class="fas fa-search"></i>
+                </a>
+                
+            </div>
+        </div>
+    </div>
+</nav>
+    
+    <section class="section">
+        <div class="container">
+            <div class="columns">
+                <div class="column is-8-tablet is-8-desktop is-6-widescreen has-order-2 column-main"><div class="card">
+    
+    <div class="card-image">
+        <span class="image is-7by1">
+            <img class="thumbnail" src="https://i.loli.net/2020/08/05/TWlGKSUw3kVz9sF.jpg" alt="Javascript简单弹性碰撞模拟">
+        </span>
+    </div>
+    
+    <div class="card-content article ">
+        
+        <div class="level article-meta is-size-7 is-uppercase is-mobile is-overflow-x-auto">
+            <div class="level-left">
+                <time class="level-item has-text-grey" datetime="2020-08-05T08:39:08.000Z">2020-08-05</time>
+                
+                
+                <span class="level-item has-text-grey">
+                    
+                    
+                    30 分钟 读完 (大约 4509 个字)
+                </span>
+                
+            </div>
+        </div>
+        
+        <h1 class="title is-size-3 is-size-4-mobile has-text-weight-normal">
+            
+                Javascript简单弹性碰撞模拟
+            
+        </h1>
+        <div class="content">
+            <p><del>为什么这么久不更博？因为没时间+懒</del></p>
+<p>效果如下所示～</p>
+<p>为了防止拖慢网页，点开more查看吧～</p>
+<a id="more"></a>
+<canvas id="myCanvas" width="500" height="500" style="border:1px solid #c3c3c3;"><br>Your browser does not support the canvas element.<br></canvas>
+
+<script type="text/javascript">
+"use strict";
+var c=document.getElementById("myCanvas");
+var cxt=c.getContext("2d");
+cxt.fillStyle="#FF0000";
+
+var WIDTH = c.width, HEIGHT = c.height;
+var FPS = 30;
+
+var Balls = []
+
+var mouse_var = {
+    mousedown: false,
+    x: 0,
+    y: 0,
+    paused_ballid: 'NaN'
+
+}
+
+function draw_ball(id) {
+    cxt.beginPath();
+    cxt.arc(Balls[id].pos.x,Balls[id].pos.y,Balls[id].r,0,Math.PI*2,true);
+    cxt.closePath();
+    cxt.fill();
+}
+
+function creat_ball(x,y,r=20,m=1,vx=0,vy=0, e=0) {
+    //创建球
+    Balls.push({
+        pos: {
+            x: x,
+            y: y
+        },    // 直角坐标位置
+        r: r, // 半径
+        m: m, // 质量
+        v: {
+            x: vx,
+            y: vy
+        },    //速度（分解后）
+        move: function(){
+            // 单次移动函数
+            this.pos.x += this.v.x;
+            this.pos.y += this.v.y;
+        },
+        e: e,
+        paused: false
+    });
+}
+
+function clear_screen() {
+    // 清屏
+    cxt.clearRect(0,0,WIDTH,HEIGHT);
+}
+
+function update() {
+    //更新画布
+    clear_screen();
+    for (var ball_id = 0; ball_id < Balls.length; ball_id++) {
+        draw_ball(ball_id);
+    }
+}
+
+function solvefunc(a, b, c) {
+    // 求解二次函数
+    var delta = Math.sqrt(b*b-4*a*c);
+    return [(-b+delta)/(2*a), (-b-delta)/(2*a)];
+}
+
+function force(b1, b2, pro) {
+    // b1,b2传入id, pro传入字符串表示属性，例如：force(1,2,"m")
+    // 解形如k*q1*q2/R^2的受力
+    var x = Balls[b1].pos.x - Balls[b2].pos.x;
+    var y = Balls[b1].pos.y - Balls[b2].pos.y;
+    var distance = x*x + y*y;
+    if (dis == 0){
+        return [0,0];
+    }
+    var f = Balls[b1][pro] * Balls[b2][pro] / distance;
+    var fx = f / Math.sqrt(distance) * x;
+    var fy = f / Math.sqrt(distance) * y;
+    return [-fx, -fy];
+}
+
+function dis(p1, p2) {
+    //传入{x:x,y:y}
+    return Math.sqrt((p1.x-p2.x)*(p1.x-p2.x)+(p1.y-p2.y)*(p1.y-p2.y));
+}
+
+function hited(b1, b2) {
+    // 是否碰撞
+
+    if (b1 >= Balls.length || b2 > Balls.length) return false;
+    var dv_x = Balls[b1].v.x-Balls[b2].v.x;
+    var dv_y = Balls[b1].v.y-Balls[b2].v.y;
+    return (dv_x*dv_x+dv_y*dv_y!=0) && dis(Balls[b1].pos, Balls[b2].pos) <= Balls[b1].r + Balls[b2].r - 1e-8;
+    //1e-8是为了防止浮点数计算误差，下同。
+}
+
+function hit(b1, b2) {
+    // 基于pyton3代码修改，可读性极差建议直接看py3源码...
+    // 运算符重载一时爽, Javascript重写火葬场
+    // 弹性碰撞处理
+    var dv_x = Balls[b1].v.x-Balls[b2].v.x;
+    var dv_y = Balls[b1].v.y-Balls[b2].v.y;
+
+    if (dv_x*dv_x+dv_y*dv_y==0) {
+        // 速度差为0
+        return;
+    }
+    if (hited(b1,b2) == false){
+        return;
+    }
+
+    var dp_x = Balls[b2].pos.x-Balls[b1].pos.x;
+    var dp_y = Balls[b2].pos.y-Balls[b1].pos.y;
+    // 位置差
+    var dt = 0;
+    // 当前时间与碰撞确切时间差
+
+    if (Math.sqrt(dp_x*dp_x + dp_y*dp_y) < Balls[b1].r+Balls[b2].r) {
+        var a = dv_x*dv_x + dv_y*dv_y;
+        var b = -2 * (dv_x * dp_x + dv_y * dp_y);
+        var c = dp_x**2 + dp_y**2 - (Balls[b1].r+Balls[b2].r)**2;
+        dt = solvefunc(a, b, c)[1];
+        Balls[b1].pos.x += dt * Balls[b1].v.x;
+        Balls[b1].pos.y += dt * Balls[b1].v.y;
+        Balls[b2].pos.x += dt * Balls[b2].v.x;
+        Balls[b2].pos.y += dt * Balls[b2].v.y;
+        //一堆乱七八糟的公式自己推吧
+    }
+    // 球恢复到“碰撞瞬间”
+
+    Balls[b1].v.x-=Balls[b2].v.x;
+    Balls[b1].v.y-=Balls[b2].v.y;
+
+    dp_x = Balls[b2].pos.x-Balls[b1].pos.x;
+    dp_y = Balls[b2].pos.y-Balls[b1].pos.y;
+
+    var alpha = 0;
+    // 角度
+    if (Math.abs(dp_x) <= 1e-8) {
+        if (dp.y > 0) {
+            alpha = Math.asin(1);
+        } else {
+            alpha = Math.asin(-1);
+        }
+    } else {
+        alpha = Math.atan(dp_y/dp_x);
+    }
+
+    function mul(a,b) {
+        return a.x*b.x + a.y*b.y;
+        // 向量点积
+    }
+    function imul(a,b) {
+        //向量数量积
+        return {x:b.x*a, y:b.y*a};
+    }
+    function add(a,b) {
+        //向量和
+        return {x:b.x+a.x, y:b.y+a.y};
+    }
+
+    var v0 = mul(Balls[b1].v , {x:Math.cos(alpha), y: Math.sin(alpha)});
+    var v0c = add(Balls[b1].v, imul(-v0, {x:Math.cos(alpha), y:Math.sin(alpha)}));
+
+    //下面这段可读性实在太差了……
+    Balls[b1].v = Balls[b2].v;
+    Balls[b2].v = add(Balls[b2].v, imul(((2*Balls[b1].m)/(Balls[b1].m+Balls[b2].m)), imul(v0, {x:Math.cos(alpha), y:Math.sin(alpha)})));
+    Balls[b1].v = add(add(Balls[b1].v, imul(((Balls[b1].m-Balls[b2].m)/(Balls[b1].m+Balls[b2].m)), imul(v0, {x:Math.cos(alpha), y:Math.sin(alpha)}))), v0c);
+    // 球弹开
+    dt = -dt
+    Balls[b1].pos = add(Balls[b1].pos, imul(dt, Balls[b1].v));
+    Balls[b2].pos = add(Balls[b2].pos, imul(dt, Balls[b2].v));
+}
+
+function move_all() {
+    // 初次计算移动
+    for (var ball_id = 0; ball_id < Balls.length; ball_id++) {
+        if (Balls[ball_id].paused == true) continue;
+        Balls[ball_id].move();
+        if (Balls[ball_id].pos.x - Balls[ball_id].r <= 0) {
+            Balls[ball_id].v.x *= -1;
+            Balls[ball_id].pos.x = 1 + Balls[ball_id].r;
+        }
+        if (Balls[ball_id].pos.x + Balls[ball_id].r >= WIDTH) {
+            Balls[ball_id].v.x *= -1;
+            Balls[ball_id].pos.x = WIDTH - 1 - Balls[ball_id].r;
+        }
+        if (Balls[ball_id].pos.y - Balls[ball_id].r <= 0) {
+            Balls[ball_id].v.y *= -1;
+            Balls[ball_id].pos.y = 1 + Balls[ball_id].r;
+        }
+        if (Balls[ball_id].pos.y + Balls[ball_id].r >= HEIGHT) {
+            Balls[ball_id].v.y *= -1;
+            Balls[ball_id].pos.y = HEIGHT - 1 - Balls[ball_id].r;
+        }
+    }
+}
+
+function count_hit() {
+    var hits = [];
+    for (var i = 0; i < Balls.length; i++) {
+        if (Balls[i].paused == true) continue;
+        for (var j = i + 1; j < Balls.length; j++) {
+            if (Balls[j].paused == true) continue;
+            if (hited(i,j)) {
+                hits.push({deep: Balls[i].r + Balls[j].r - dis(Balls[i].pos, Balls[j].pos), a:i, b:j});
+            }
+        }
+    }
+    hits.sort(function(a,b){return a.r-b.r});
+    return hits;
+}
+
+function make_fouce(pro, k) {
+    // 受力统一计算
+    for (var i = 0; i < Balls.length; i++) {
+        if (Balls[i].paused == true) continue;
+        for (var j = 0; j < Balls.length; j++) {
+            if (i != j) {
+                if (Balls[j].paused == true) continue;
+                if (Balls[i][pro] == 0) continue;
+                if (Balls[j][pro] == 0) continue;
+
+                var fc = force(i, j, pro);
+                Balls[i].v.x += 1/Balls[i][pro] * fc[0] * k;
+                Balls[i].v.y += 1/Balls[i][pro] * fc[1] * k;
+
+            }
+        }
+    }
+}
+
+function main_function(){
+    move_all();
+    var hitlist = count_hit() 
+    while (hitlist.length != 0) {
+        for (var i = 0; i < hitlist.length; i++){
+            hit(hitlist[i].a, hitlist[i].b);
+        }
+        hitlist = count_hit();
+    }
+    make_fouce("m", 1000); //重力场， 1000为引力常数
+    update();
+    //main_loop
+    setTimeout(function(){main_function()},1000/FPS);
+}
+
+creat_ball(100,200,20,1,1,2);
+creat_ball(200,300,20,1,-2,-1);
+
+function c_mousedown() {
+    mouse_var.mousedown = true;
+    mouse_var.x = event.offsetX;
+    mouse_var.y = event.offsetY;
+    mouse_var.paused_ballid = 'NaN';
+    var mouse_hited = false;
+    for (var ball_id = 0; ball_id < Balls.length; ball_id++) {
+        if (dis(Balls[ball_id].pos, {x:event.offsetX,y:event.offsetY}) < Balls[ball_id].r) {
+            Balls[ball_id].paused = true;
+            mouse_var.paused_ballid = ball_id;
+            mouse_hited = true;
+            break;
+        } 
+    }
+    if (event.button == 0) {
+        if (!mouse_hited) creat_ball(event.offsetX, event.offsetY);
+    } else if (event.button == 2) {
+        if (mouse_var.paused_ballid != 'NaN') Balls.splice(mouse_var.paused_ballid, 1);
+    }
+
+
+}
+function c_mousemove() {
+    if (event.button == 0) {
+        if (mouse_var.paused_ballid != 'NaN') {
+            Balls[mouse_var.paused_ballid].pos.x = event.offsetX;
+            Balls[mouse_var.paused_ballid].pos.y = event.offsetY;
+
+        }
+    }
+}
+
+function c_mouseup() {
+    if (mouse_var.paused_ballid != 'NaN') {
+        Balls[mouse_var.paused_ballid].paused = false;
+        Balls[mouse_var.paused_ballid].v={x:0, y:0}
+    }
+    mouse_var.mousedown = false;
+    mouse_var.x = event.offsetX;
+    mouse_var.y = event.offsetY;
+    mouse_var.paused_ballid = 'NaN';
+}
+
+c.addEventListener('mousedown', c_mousedown);
+c.addEventListener('mouseup', c_mouseup);
+c.addEventListener('mousemove', c_mousemove);
+c.oncontextmenu = function(){return false;};  
+
+
+main_function();
+</script>
+
+
+
+<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>其实这是寒假时的老项目了，后来改成了Javascript版本 <del>而且代码风格十分混乱</del></p>
+<p>大概就是花了两天推了一堆公式，找出了球体弹性碰撞的公式，然后就拿コンピュータ实现了一下ww</p>
+<p>虽然有很多混乱的地方，和极其低下的效率（毕竟我还是高一诶写不出高级的也正常吧）</p>
+<p>为了分享Javascript代码，先把python代码（原始代码）拿出来</p>
+<h3 id="python代码"><a href="#python代码" class="headerlink" title="python代码"></a>python代码</h3><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/python3</span><br><span class="line"># -*- coding: UTF-8 -*- </span><br><span class="line"></span><br><span class="line"># 这是原始Python代码，看不懂js版本的可以参考</span><br><span class="line">import tkinter as tk           # 导入 Tkinter 库</span><br><span class="line">import math</span><br><span class="line">import random</span><br><span class="line"></span><br><span class="line">class Pair():</span><br><span class="line">    # 数据组</span><br><span class="line">    def __init__(self, x, y):</span><br><span class="line">        self.x = x</span><br><span class="line">        self.y = y</span><br><span class="line">    def __lt__(self, b):</span><br><span class="line">        if isinstance(b, Pair):</span><br><span class="line">            return self.x &lt; b.x</span><br><span class="line">        else:</span><br><span class="line">            return NotImplemented</span><br><span class="line"></span><br><span class="line">class Group(Pair):</span><br><span class="line">    # 浮点数据组类</span><br><span class="line">    def __init__(self, x, y):</span><br><span class="line">        super().__init__(x, y)</span><br><span class="line">        self.x = float(self.x)</span><br><span class="line">        self.y = float(self.y)</span><br><span class="line">    def __add__(self, b):</span><br><span class="line">        if isinstance(b, Group):</span><br><span class="line">            return type(self)(self.x + b.x, self.y + b.y)</span><br><span class="line">        else:</span><br><span class="line">            return NotImplemented</span><br><span class="line">    def __sub__(self, b):</span><br><span class="line">        if isi</span><br><span class="line">        nstance(b, Group):</span><br><span class="line">            return type(self)(self.x - b.x, self.y - b.y)</span><br><span class="line">        else:</span><br><span class="line">            return NotImplemented</span><br><span class="line">    def mod(self):</span><br><span class="line">        return math.sqrt(self.x*self.x+self.y*self.y)</span><br><span class="line">    def __lt__(self, b):</span><br><span class="line">        if isinstance(b, Group):</span><br><span class="line">            return self.x &lt; b.x</span><br><span class="line">        else:</span><br><span class="line">            return NotImplemented</span><br><span class="line"></span><br><span class="line">class Vect(Group):</span><br><span class="line">    # 向量 子类</span><br><span class="line">    def __init__(self, x, y):</span><br><span class="line">        super().__init__(x, y)</span><br><span class="line">    def __mul__(self, b):</span><br><span class="line">        if isinstance(b, Group):</span><br><span class="line">            return self.x*b.x+self.y*b.y</span><br><span class="line">        else:</span><br><span class="line">            return type(self)(self.x * b, self.y * b)</span><br><span class="line">    def __rmul__(self, a):</span><br><span class="line">        return type(self)(self.x * a, self.y * a)</span><br><span class="line"></span><br><span class="line">class Pos(Group):</span><br><span class="line">    # 坐标 子类</span><br><span class="line">    def __init__(self, x, y):</span><br><span class="line">        super().__init__(x, y)</span><br><span class="line"></span><br><span class="line">class Vel(Vect):</span><br><span class="line">    # 速度 子类</span><br><span class="line">    def __init__(self, x, y):</span><br><span class="line">        super().__init__(x, y)</span><br><span class="line"></span><br><span class="line">class Ball():</span><br><span class="line">    def __init__(self, ID, pos, r=10, v = Vel(0,0), m = 50000, fill = &quot;&quot;, locked = False):</span><br><span class="line">        self.ID=ID</span><br><span class="line">        self.pos=pos</span><br><span class="line">        self.r=r</span><br><span class="line">        self.v=v</span><br><span class="line">        self.m=m</span><br><span class="line">        self.fill = fill</span><br><span class="line">        self.locked=locked</span><br><span class="line">    def moveto(self, pos):</span><br><span class="line">        self.pos=pos</span><br><span class="line">    def move(self):</span><br><span class="line">        self.pos += self.v</span><br><span class="line"></span><br><span class="line">class Timer():</span><br><span class="line">    # 计时器</span><br><span class="line">    def __init__(self, root, func, time, enabled):</span><br><span class="line">        self.rt = root</span><br><span class="line">        self.func = func</span><br><span class="line">        self.t=int(time)</span><br><span class="line">        self.enabled=enabled</span><br><span class="line">        if enabled:</span><br><span class="line">            self.enable()</span><br><span class="line">    def timeup(self):</span><br><span class="line">        self.func()</span><br><span class="line">        self.ti = self.rt.after(self.t, self.timeup)</span><br><span class="line">    def enable(self):</span><br><span class="line">        self.enabled = True</span><br><span class="line">        self.timeup()</span><br><span class="line">    def unable(self):</span><br><span class="line">        self.enabled = False</span><br><span class="line">        self.rt.after_cancel(self.ti)</span><br><span class="line">    def reset_time(self, t):</span><br><span class="line">        self.unable()</span><br><span class="line">        self.t=int(t)</span><br><span class="line">        self.enable()</span><br><span class="line"></span><br><span class="line">class ID_Pool():</span><br><span class="line">    # ID池</span><br><span class="line">    def __init__(self):</span><br><span class="line">        self.pool=[]</span><br><span class="line">        self.topid=0</span><br><span class="line">    def getid(self):</span><br><span class="line">        if len(self.pool) == 0:</span><br><span class="line">            self.topid+=1</span><br><span class="line">            return self.topid</span><br><span class="line">        else:</span><br><span class="line">            return self.pool.pop()</span><br><span class="line">    def back(self, p):</span><br><span class="line">        self.pool.append(p)</span><br><span class="line"></span><br><span class="line">Balls = []</span><br><span class="line">id_pool = ID_Pool()</span><br><span class="line">FPS = 60</span><br><span class="line">DeadTime = 1e9</span><br><span class="line">CountNum = 0</span><br><span class="line"></span><br><span class="line">def draw_ball(ball):</span><br><span class="line">    if ball.fill != &quot;&quot;:</span><br><span class="line">        cv.create_oval(ball.pos.x - ball.r, ball.pos.y - ball.r, ball.pos.x + ball.r, ball.pos.y + ball.r, fill = ball.fill)</span><br><span class="line">    else:</span><br><span class="line">        cv.create_oval(ball.pos.x - ball.r, ball.pos.y - ball.r, ball.pos.x + ball.r, ball.pos.y + ball.r)</span><br><span class="line"></span><br><span class="line">def creat_ball(p, r=3, v=Vel(0,0), m=500, fill = &quot;&quot;, locked = False):</span><br><span class="line">    ball_t = Ball(id_pool.getid(), p, r, v, m, fill, locked)</span><br><span class="line">    Balls.append(ball_t)</span><br><span class="line">    draw_ball(ball_t)</span><br><span class="line"></span><br><span class="line">def del_ball(ball):</span><br><span class="line">    Balls.remove(ball)</span><br><span class="line"></span><br><span class="line">def update(cv):</span><br><span class="line">    #更新整个画布</span><br><span class="line">    cv.delete(&quot;all&quot;)</span><br><span class="line">    for ball in Balls:</span><br><span class="line">        draw_ball(ball)</span><br><span class="line"></span><br><span class="line">def solvefunc(a, b, c):</span><br><span class="line">    delta = math.sqrt(b*b-4*a*c)</span><br><span class="line">    return [(-b+delta)/(2*a), (-b-delta)/(2*a)]</span><br><span class="line"></span><br><span class="line">def force(b1, b2):</span><br><span class="line">    plus = -1</span><br><span class="line">    x = b1.pos.x - b2.pos.x</span><br><span class="line">    y = b1.pos.y - b2.pos.y</span><br><span class="line">    dis = x*x + y*y</span><br><span class="line">    if dis == 0:</span><br><span class="line">        return</span><br><span class="line">    if math.sqrt(dis) &lt; b1.r + b2.r :</span><br><span class="line">        plus = (b1.r + b2.r) / math.sqrt(dis)</span><br><span class="line">        dis = (b1.r + b2.r) ** 2</span><br><span class="line">    f = 0.05 * b1.m * b2.m / dis</span><br><span class="line">    fx = f / math.sqrt(dis) * x</span><br><span class="line">    fy = f / math.sqrt(dis) * y</span><br><span class="line">    return Vect(fx * plus, fy * plus)</span><br><span class="line"></span><br><span class="line">def hit(b1, b2):</span><br><span class="line">    # 碰撞计算</span><br><span class="line">    global CountNum</span><br><span class="line">    CountNum += 100</span><br><span class="line">    dv = b1.v-b2.v</span><br><span class="line">    if dv.mod()==0:</span><br><span class="line">        return</span><br><span class="line">    if hited(b1,b2) == False:</span><br><span class="line">        return</span><br><span class="line">    dp = b2.pos-b1.pos</span><br><span class="line">    dt=0</span><br><span class="line">    if dp.mod() &lt; b1.r+b2.r:</span><br><span class="line">        #print(&quot;dis = &quot;, dp.mod(), &quot;dv=&quot;, dv.x,&quot;,&quot;,dv.y)</span><br><span class="line">        a = dv.x**2 + dv.y**2</span><br><span class="line">        b = -2 * (dv.x * dp.x + dv.y * dp.y)</span><br><span class="line">        c = dp.x**2 + dp.y**2 - (b1.r+b2.r) **2</span><br><span class="line">        dt = solvefunc(a, b, c)[1]</span><br><span class="line">        b1.pos += dt * b1.v</span><br><span class="line">        b2.pos += dt * b2.v</span><br><span class="line">        #print(&quot;dt=&quot;, dt)</span><br><span class="line">    # 球恢复到“碰撞瞬间”</span><br><span class="line">    </span><br><span class="line">    b1.v-=b2.v</span><br><span class="line">    dp = b2.pos-b1.pos</span><br><span class="line">    alpha = 0</span><br><span class="line">    </span><br><span class="line">    #print(&quot;now dis = &quot;, dp.mod(), &quot;dv=&quot;, dv.x,&quot;,&quot;,dv.y)</span><br><span class="line">    if dp.x == 0:</span><br><span class="line">        if dp.y &gt; 0:</span><br><span class="line">            alpha = math.asin(1)</span><br><span class="line">        else:</span><br><span class="line">            alpha = math.asin(-1)</span><br><span class="line">    else:</span><br><span class="line">        alpha = math.atan(dp.y/dp.x)</span><br><span class="line">    v0 = b1.v * Vel(math.cos(alpha), math.sin(alpha))</span><br><span class="line">    v0c = b1.v - (v0 * Vel(math.cos(alpha), math.sin(alpha)))</span><br><span class="line">    #print(&quot;v0=&quot; , v0, &quot;vel=&quot;, Vel(math.cos(alpha), math.sin(alpha)).x, Vel(math.cos(alpha), math.sin(alpha)).y)</span><br><span class="line">    b1.v=b2.v</span><br><span class="line">    b2.v += float((2*b1.m)/(b1.m+b2.m)) * (v0 * Vel(math.cos(alpha), math.sin(alpha)))</span><br><span class="line">    b1.v += float((b1.m-b2.m)/(b1.m+b2.m)) * (v0 * Vel(math.cos(alpha), math.sin(alpha))) + v0c</span><br><span class="line">    # 球弹开</span><br><span class="line">    dt = -dt</span><br><span class="line">    b1.pos += dt * b1.v</span><br><span class="line">    b2.pos += dt * b2.v</span><br><span class="line"></span><br><span class="line">    #弹性系数</span><br><span class="line">    #b1.v=b1.v*0.9</span><br><span class="line">    #b2.v=b2.v*0.9</span><br><span class="line"></span><br><span class="line">def hited(b1, b2):</span><br><span class="line">    # 是否碰撞</span><br><span class="line">    return (b1.v-b2.v).mod() != 0 and dis(b1.pos, b2.pos) &lt;= b1.r + b2.r - 0.00001</span><br><span class="line"></span><br><span class="line">def count_hit():</span><br><span class="line">    global CountNum</span><br><span class="line">    stp = len(Balls)</span><br><span class="line">    hits = []</span><br><span class="line">    for i in range(0, stp - 1):</span><br><span class="line">        for j in range(i + 1, stp):</span><br><span class="line">            CountNum += 2</span><br><span class="line">            if hited(Balls[i], Balls[j]):</span><br><span class="line">                hits.append(Pair(Balls[i].r + Balls[j].r - dis(Balls[i].pos, Balls[j].pos), [Balls[i], Balls[j]]))</span><br><span class="line">    hits.sort()</span><br><span class="line">    #if len(hits):</span><br><span class="line">    #    print(str(len(hits)))</span><br><span class="line">    return hits</span><br><span class="line"></span><br><span class="line">def dis(p1, p2):</span><br><span class="line">    return (p1-p2).mod()</span><br><span class="line"></span><br><span class="line">def move():</span><br><span class="line">    # 初次计算</span><br><span class="line">    energy=0</span><br><span class="line">    for ball in Balls:</span><br><span class="line">        energy+=ball.v*ball.v*ball.m</span><br><span class="line">        global CountNum</span><br><span class="line">        CountNum += 1</span><br><span class="line">        # ball.v.y+=1</span><br><span class="line">        ball.move()</span><br><span class="line">        if ball.pos.x &lt;= 0:</span><br><span class="line">            ball.v.x *= -1</span><br><span class="line">            ball.pos.x = 1</span><br><span class="line">        if ball.pos.x &gt;= WIDTH:</span><br><span class="line">            ball.v.x *= -1</span><br><span class="line">            ball.pos.x = WIDTH - 1</span><br><span class="line">        if ball.pos.y &lt;= 0:</span><br><span class="line">            ball.v.y *= -1</span><br><span class="line">            ball.pos.y = 1</span><br><span class="line">        if ball.pos.y &gt;= HEIGHT:</span><br><span class="line">            ball.v.y *= -1</span><br><span class="line">            ball.pos.y = HEIGHT - 1</span><br><span class="line">    #print(energy)</span><br><span class="line">def main_loop():</span><br><span class="line">    # 主循环</span><br><span class="line">    global CountNum</span><br><span class="line">    CountNum = 0</span><br><span class="line">    move()</span><br><span class="line">    while CountNum &lt; DeadTime:</span><br><span class="line">        hitlist = count_hit()</span><br><span class="line">        if len(hitlist) == 0:</span><br><span class="line">            break</span><br><span class="line">        for hits in hitlist:</span><br><span class="line">            hit((hits.y)[0], (hits.y)[1])</span><br><span class="line">    for ball in Balls:</span><br><span class="line">        for oth in Balls:</span><br><span class="line">            if ball.ID != oth.ID:</span><br><span class="line">                ball.v += 1/ball.m * force(ball, oth)</span><br><span class="line">    update(cv)</span><br><span class="line"></span><br><span class="line">def mouse_press(event):</span><br><span class="line">    global mouseball</span><br><span class="line">    mouseball = creat_ball(Pos(event.x,event.y), 20, Vel(0,0), 50000,  fill = &quot;yellow&quot;)</span><br><span class="line"></span><br><span class="line">def mouse_up(event):</span><br><span class="line">    global mouseball</span><br><span class="line">    del_ball(mouseball)</span><br><span class="line"></span><br><span class="line">def cmd_click():</span><br><span class="line">    if timer.enabled:</span><br><span class="line">        timer.unable()</span><br><span class="line">    else:</span><br><span class="line">        timer.enable()</span><br><span class="line"></span><br><span class="line">WIDTH = 500</span><br><span class="line">HEIGHT = 500</span><br><span class="line"></span><br><span class="line">root = tk.Tk()                 </span><br><span class="line">root.title(&quot;Test&quot;)</span><br><span class="line">root.geometry(&apos;630x520&apos;)</span><br><span class="line"></span><br><span class="line">timer = Timer(root, main_loop, 1000/FPS, False)</span><br><span class="line"></span><br><span class="line">cv = tk.Canvas(root, bg=&apos;skyblue&apos;, height=HEIGHT, width=WIDTH)</span><br><span class="line">cmd = tk.Button(root, text=&quot;Start move!&quot;, width=int(100/7), height=int(20/17), command=cmd_click)</span><br><span class="line">#tst = tk.Button(root, text=&quot;Kill Velocity&quot;, width=15, height=2, command=stopall)</span><br><span class="line"></span><br><span class="line">#for i in [60*x for x in range(1,2)]:</span><br><span class="line">#    for j in [60*x for x in range(int(i/60),9)]:</span><br><span class="line">#        creat_ball(Pos(i,j), 20, Vel(0,0), fill = &quot;red&quot;)</span><br><span class="line"># creat_ball(Pos(200,230), 20, Vel(0,6), 500000, fill = &quot;blue&quot;)</span><br><span class="line"># creat_ball(Pos(300,270), 20, Vel(0,-6), 5000,  fill = &quot;red&quot;)</span><br><span class="line"></span><br><span class="line">cv.bind(&quot;&lt;ButtonRelease-1&gt;&quot;, mouse_press)</span><br><span class="line">cv.bind(&quot;&lt;Double-Button-1&gt;&quot;, mouse_up)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">cv.place(x=5, y=5)</span><br><span class="line">cmd.place(x=505 + 10, y=5)</span><br><span class="line">#tst.place(x=505 + 10, y=55)</span><br><span class="line"></span><br><span class="line">root.mainloop()</span><br></pre></td></tr></table></figure>
+<h3 id="Js代码"><a href="#Js代码" class="headerlink" title="Js代码"></a>Js代码</h3><p>Javascript不可以重载运算符真是恶心死了改了半天</p>
+<p>嗯，比起python代码稍微变动了一点</p>
+<p>首先当然是造一个Canvas<br><figure class="highlight html hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-tag">&lt;<span class="hljs-name">canvas</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"myCanvas"</span> <span class="hljs-attr">width</span>=<span class="hljs-string">"500"</span> <span class="hljs-attr">height</span>=<span class="hljs-string">"500"</span> <span class="hljs-attr">style</span>=<span class="hljs-string">"border:1px solid #c3c3c3;"</span>&gt;</span></span><br><span class="line">Your browser does not support the canvas element.</span><br><span class="line"><span class="hljs-tag">&lt;/<span class="hljs-name">canvas</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>之后……</p>
+<figure class="highlight javascript hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-meta">"use strict"</span>;</span><br><span class="line"><span class="hljs-keyword">var</span> c=<span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">"myCanvas"</span>);</span><br><span class="line"><span class="hljs-keyword">var</span> cxt=c.getContext(<span class="hljs-string">"2d"</span>);</span><br><span class="line">cxt.fillStyle=<span class="hljs-string">"#FF0000"</span>;</span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">var</span> WIDTH = c.width, HEIGHT = c.height;</span><br><span class="line"><span class="hljs-keyword">var</span> FPS = <span class="hljs-number">30</span>;</span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">var</span> Balls = []</span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">var</span> mouse_var = &#123;</span><br><span class="line">    mousedown: <span class="hljs-literal">false</span>,</span><br><span class="line">    x: <span class="hljs-number">0</span>,</span><br><span class="line">    y: <span class="hljs-number">0</span>,</span><br><span class="line">    paused_ballid: <span class="hljs-string">'NaN'</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">draw_ball</span>(<span class="hljs-params">id</span>) </span>&#123;</span><br><span class="line">	cxt.beginPath();</span><br><span class="line">	cxt.arc(Balls[id].pos.x,Balls[id].pos.y,Balls[id].r,<span class="hljs-number">0</span>,<span class="hljs-built_in">Math</span>.PI*<span class="hljs-number">2</span>,<span class="hljs-literal">true</span>);</span><br><span class="line">	cxt.closePath();</span><br><span class="line">	cxt.fill();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">creat_ball</span>(<span class="hljs-params">x,y,r=<span class="hljs-number">20</span>,m=<span class="hljs-number">1</span>,vx=<span class="hljs-number">0</span>,vy=<span class="hljs-number">0</span>, e=<span class="hljs-number">0</span></span>) </span>&#123;</span><br><span class="line">	<span class="hljs-comment">//创建球</span></span><br><span class="line">	Balls.push(&#123;</span><br><span class="line">		pos: &#123;</span><br><span class="line">			x: x,</span><br><span class="line">			y: y</span><br><span class="line">		&#125;,    <span class="hljs-comment">// 直角坐标位置</span></span><br><span class="line">		r: r, <span class="hljs-comment">// 半径</span></span><br><span class="line">		m: m, <span class="hljs-comment">// 质量</span></span><br><span class="line">		v: &#123;</span><br><span class="line">			x: vx,</span><br><span class="line">			y: vy</span><br><span class="line">		&#125;,    <span class="hljs-comment">//速度（分解后）</span></span><br><span class="line">		move: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>&#123;</span><br><span class="line">			<span class="hljs-comment">// 单次移动函数</span></span><br><span class="line">			<span class="hljs-keyword">this</span>.pos.x += <span class="hljs-keyword">this</span>.v.x;</span><br><span class="line">			<span class="hljs-keyword">this</span>.pos.y += <span class="hljs-keyword">this</span>.v.y;</span><br><span class="line">		&#125;,</span><br><span class="line">        e: e,</span><br><span class="line">        paused: <span class="hljs-literal">false</span></span><br><span class="line">	&#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">clear_screen</span>(<span class="hljs-params"></span>) </span>&#123;</span><br><span class="line">	<span class="hljs-comment">// 清屏</span></span><br><span class="line">	cxt.clearRect(<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,WIDTH,HEIGHT);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">update</span>(<span class="hljs-params"></span>) </span>&#123;</span><br><span class="line">	<span class="hljs-comment">//更新画布</span></span><br><span class="line">	clear_screen();</span><br><span class="line">	<span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> ball_id = <span class="hljs-number">0</span>; ball_id &lt; Balls.length; ball_id++) &#123;</span><br><span class="line">		draw_ball(ball_id);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">solvefunc</span>(<span class="hljs-params">a, b, c</span>) </span>&#123;</span><br><span class="line">	<span class="hljs-comment">// 求解二次函数</span></span><br><span class="line">    <span class="hljs-keyword">var</span> delta = <span class="hljs-built_in">Math</span>.sqrt(b*b<span class="hljs-number">-4</span>*a*c);</span><br><span class="line">    <span class="hljs-keyword">return</span> [(-b+delta)/(<span class="hljs-number">2</span>*a), (-b-delta)/(<span class="hljs-number">2</span>*a)];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">force</span>(<span class="hljs-params">b1, b2, pro</span>) </span>&#123;</span><br><span class="line">	<span class="hljs-comment">// b1,b2传入id, pro传入字符串表示属性，例如：force(1,2,"m")</span></span><br><span class="line">	<span class="hljs-comment">// 解形如k*q1*q2/R^2的受力</span></span><br><span class="line">    <span class="hljs-keyword">var</span> x = Balls[b1].pos.x - Balls[b2].pos.x;</span><br><span class="line">    <span class="hljs-keyword">var</span> y = Balls[b1].pos.y - Balls[b2].pos.y;</span><br><span class="line">    <span class="hljs-keyword">var</span> distance = x*x + y*y;</span><br><span class="line">    <span class="hljs-keyword">if</span> (dis == <span class="hljs-number">0</span>)&#123;</span><br><span class="line">        <span class="hljs-keyword">return</span> [<span class="hljs-number">0</span>,<span class="hljs-number">0</span>];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="hljs-keyword">var</span> f = Balls[b1][pro] * Balls[b2][pro] / distance;</span><br><span class="line">    <span class="hljs-keyword">var</span> fx = f / <span class="hljs-built_in">Math</span>.sqrt(distance) * x;</span><br><span class="line">    <span class="hljs-keyword">var</span> fy = f / <span class="hljs-built_in">Math</span>.sqrt(distance) * y;</span><br><span class="line">    <span class="hljs-keyword">return</span> [-fx, -fy];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">dis</span>(<span class="hljs-params">p1, p2</span>) </span>&#123;</span><br><span class="line">	<span class="hljs-comment">//传入&#123;x:x,y:y&#125;</span></span><br><span class="line">    <span class="hljs-keyword">return</span> <span class="hljs-built_in">Math</span>.sqrt((p1.x-p2.x)*(p1.x-p2.x)+(p1.y-p2.y)*(p1.y-p2.y));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">hited</span>(<span class="hljs-params">b1, b2</span>) </span>&#123;</span><br><span class="line">    <span class="hljs-comment">// 是否碰撞</span></span><br><span class="line">    </span><br><span class="line">    <span class="hljs-keyword">if</span> (b1 &gt;= Balls.length || b2 &gt; Balls.length) <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;</span><br><span class="line">    <span class="hljs-keyword">var</span> dv_x = Balls[b1].v.x-Balls[b2].v.x;</span><br><span class="line">    <span class="hljs-keyword">var</span> dv_y = Balls[b1].v.y-Balls[b2].v.y;</span><br><span class="line">    <span class="hljs-keyword">return</span> (dv_x*dv_x+dv_y*dv_y!=<span class="hljs-number">0</span>) &amp;&amp; dis(Balls[b1].pos, Balls[b2].pos) &lt;= Balls[b1].r + Balls[b2].r - <span class="hljs-number">1e-8</span>;</span><br><span class="line">    <span class="hljs-comment">//1e-8是为了防止浮点数计算误差，下同。</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">hit</span>(<span class="hljs-params">b1, b2</span>) </span>&#123;</span><br><span class="line">    <span class="hljs-comment">// 基于pyton3代码修改，可读性极差建议直接看py3源码...</span></span><br><span class="line">    <span class="hljs-comment">// 运算符重载一时爽, Javascript重写火葬场</span></span><br><span class="line">    <span class="hljs-comment">// 弹性碰撞处理</span></span><br><span class="line">    <span class="hljs-keyword">var</span> dv_x = Balls[b1].v.x-Balls[b2].v.x;</span><br><span class="line">    <span class="hljs-keyword">var</span> dv_y = Balls[b1].v.y-Balls[b2].v.y;</span><br><span class="line"></span><br><span class="line">    <span class="hljs-keyword">if</span> (dv_x*dv_x+dv_y*dv_y==<span class="hljs-number">0</span>) &#123;</span><br><span class="line">        <span class="hljs-comment">// 速度差为0</span></span><br><span class="line">        <span class="hljs-keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="hljs-keyword">if</span> (hited(b1,b2) == <span class="hljs-literal">false</span>)&#123;</span><br><span class="line">        <span class="hljs-keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="hljs-keyword">var</span> dp_x = Balls[b2].pos.x-Balls[b1].pos.x;</span><br><span class="line">    <span class="hljs-keyword">var</span> dp_y = Balls[b2].pos.y-Balls[b1].pos.y;</span><br><span class="line">    <span class="hljs-comment">// 位置差</span></span><br><span class="line">    <span class="hljs-keyword">var</span> dt = <span class="hljs-number">0</span>;</span><br><span class="line">    <span class="hljs-comment">// 当前时间与碰撞确切时间差</span></span><br><span class="line"></span><br><span class="line">    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">Math</span>.sqrt(dp_x*dp_x + dp_y*dp_y) &lt; Balls[b1].r+Balls[b2].r) &#123;</span><br><span class="line">        <span class="hljs-keyword">var</span> a = dv_x*dv_x + dv_y*dv_y;</span><br><span class="line">        <span class="hljs-keyword">var</span> b = <span class="hljs-number">-2</span> * (dv_x * dp_x + dv_y * dp_y);</span><br><span class="line">        <span class="hljs-keyword">var</span> c = dp_x**<span class="hljs-number">2</span> + dp_y**<span class="hljs-number">2</span> - (Balls[b1].r+Balls[b2].r)**<span class="hljs-number">2</span>;</span><br><span class="line">        dt = solvefunc(a, b, c)[<span class="hljs-number">1</span>];</span><br><span class="line">        Balls[b1].pos.x += dt * Balls[b1].v.x;</span><br><span class="line">        Balls[b1].pos.y += dt * Balls[b1].v.y;</span><br><span class="line">        Balls[b2].pos.x += dt * Balls[b2].v.x;</span><br><span class="line">        Balls[b2].pos.y += dt * Balls[b2].v.y;</span><br><span class="line">        <span class="hljs-comment">//一堆乱七八糟的公式自己推吧</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="hljs-comment">// 球恢复到“碰撞瞬间”</span></span><br><span class="line">    </span><br><span class="line">    Balls[b1].v.x-=Balls[b2].v.x;</span><br><span class="line">    Balls[b1].v.y-=Balls[b2].v.y;</span><br><span class="line"></span><br><span class="line">    dp_x = Balls[b2].pos.x-Balls[b1].pos.x;</span><br><span class="line">    dp_y = Balls[b2].pos.y-Balls[b1].pos.y;</span><br><span class="line"></span><br><span class="line">    <span class="hljs-keyword">var</span> alpha = <span class="hljs-number">0</span>;</span><br><span class="line">    <span class="hljs-comment">// 角度</span></span><br><span class="line">    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">Math</span>.abs(dp_x) &lt;= <span class="hljs-number">1e-8</span>) &#123;</span><br><span class="line">        <span class="hljs-keyword">if</span> (dp.y &gt; <span class="hljs-number">0</span>) &#123;</span><br><span class="line">            alpha = <span class="hljs-built_in">Math</span>.asin(<span class="hljs-number">1</span>);</span><br><span class="line">        &#125; <span class="hljs-keyword">else</span> &#123;</span><br><span class="line">            alpha = <span class="hljs-built_in">Math</span>.asin(<span class="hljs-number">-1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="hljs-keyword">else</span> &#123;</span><br><span class="line">        alpha = <span class="hljs-built_in">Math</span>.atan(dp_y/dp_x);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">mul</span>(<span class="hljs-params">a,b</span>) </span>&#123;</span><br><span class="line">    	<span class="hljs-keyword">return</span> a.x*b.x + a.y*b.y;</span><br><span class="line">    	<span class="hljs-comment">// 向量点积</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">imul</span>(<span class="hljs-params">a,b</span>) </span>&#123;</span><br><span class="line">        <span class="hljs-comment">//向量数量积</span></span><br><span class="line">        <span class="hljs-keyword">return</span> &#123;<span class="hljs-attr">x</span>:b.x*a, <span class="hljs-attr">y</span>:b.y*a&#125;;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">add</span>(<span class="hljs-params">a,b</span>) </span>&#123;</span><br><span class="line">        <span class="hljs-comment">//向量和</span></span><br><span class="line">        <span class="hljs-keyword">return</span> &#123;<span class="hljs-attr">x</span>:b.x+a.x, <span class="hljs-attr">y</span>:b.y+a.y&#125;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="hljs-keyword">var</span> v0 = mul(Balls[b1].v , &#123;<span class="hljs-attr">x</span>:<span class="hljs-built_in">Math</span>.cos(alpha), <span class="hljs-attr">y</span>: <span class="hljs-built_in">Math</span>.sin(alpha)&#125;);</span><br><span class="line">    <span class="hljs-keyword">var</span> v0c = add(Balls[b1].v, imul(-v0, &#123;<span class="hljs-attr">x</span>:<span class="hljs-built_in">Math</span>.cos(alpha), <span class="hljs-attr">y</span>:<span class="hljs-built_in">Math</span>.sin(alpha)&#125;));</span><br><span class="line">    </span><br><span class="line">    <span class="hljs-comment">//下面这段可读性实在太差了……</span></span><br><span class="line">    Balls[b1].v = Balls[b2].v;</span><br><span class="line">    Balls[b2].v = add(Balls[b2].v, imul(((<span class="hljs-number">2</span>*Balls[b1].m)/(Balls[b1].m+Balls[b2].m)), imul(v0, &#123;<span class="hljs-attr">x</span>:<span class="hljs-built_in">Math</span>.cos(alpha), <span class="hljs-attr">y</span>:<span class="hljs-built_in">Math</span>.sin(alpha)&#125;)));</span><br><span class="line">    Balls[b1].v = add(add(Balls[b1].v, imul(((Balls[b1].m-Balls[b2].m)/(Balls[b1].m+Balls[b2].m)), imul(v0, &#123;<span class="hljs-attr">x</span>:<span class="hljs-built_in">Math</span>.cos(alpha), <span class="hljs-attr">y</span>:<span class="hljs-built_in">Math</span>.sin(alpha)&#125;))), v0c);</span><br><span class="line">    <span class="hljs-comment">// 球弹开</span></span><br><span class="line">    dt = -dt</span><br><span class="line">    Balls[b1].pos = add(Balls[b1].pos, imul(dt, Balls[b1].v));</span><br><span class="line">    Balls[b2].pos = add(Balls[b2].pos, imul(dt, Balls[b2].v));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">move_all</span>(<span class="hljs-params"></span>) </span>&#123;</span><br><span class="line">    <span class="hljs-comment">// 初次计算移动</span></span><br><span class="line">    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> ball_id = <span class="hljs-number">0</span>; ball_id &lt; Balls.length; ball_id++) &#123;</span><br><span class="line">        <span class="hljs-keyword">if</span> (Balls[ball_id].paused == <span class="hljs-literal">true</span>) <span class="hljs-keyword">continue</span>;</span><br><span class="line">        Balls[ball_id].move();</span><br><span class="line">        <span class="hljs-keyword">if</span> (Balls[ball_id].pos.x - Balls[ball_id].r &lt;= <span class="hljs-number">0</span>) &#123;</span><br><span class="line">            Balls[ball_id].v.x *= <span class="hljs-number">-1</span>;</span><br><span class="line">            Balls[ball_id].pos.x = <span class="hljs-number">1</span> + Balls[ball_id].r;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="hljs-keyword">if</span> (Balls[ball_id].pos.x + Balls[ball_id].r &gt;= WIDTH) &#123;</span><br><span class="line">            Balls[ball_id].v.x *= <span class="hljs-number">-1</span>;</span><br><span class="line">            Balls[ball_id].pos.x = WIDTH - <span class="hljs-number">1</span> - Balls[ball_id].r;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="hljs-keyword">if</span> (Balls[ball_id].pos.y - Balls[ball_id].r &lt;= <span class="hljs-number">0</span>) &#123;</span><br><span class="line">            Balls[ball_id].v.y *= <span class="hljs-number">-1</span>;</span><br><span class="line">            Balls[ball_id].pos.y = <span class="hljs-number">1</span> + Balls[ball_id].r;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="hljs-keyword">if</span> (Balls[ball_id].pos.y + Balls[ball_id].r &gt;= HEIGHT) &#123;</span><br><span class="line">            Balls[ball_id].v.y *= <span class="hljs-number">-1</span>;</span><br><span class="line">            Balls[ball_id].pos.y = HEIGHT - <span class="hljs-number">1</span> - Balls[ball_id].r;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">count_hit</span>(<span class="hljs-params"></span>) </span>&#123;</span><br><span class="line">    <span class="hljs-keyword">var</span> hits = [];</span><br><span class="line">    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; Balls.length; i++) &#123;</span><br><span class="line">        <span class="hljs-keyword">if</span> (Balls[i].paused == <span class="hljs-literal">true</span>) <span class="hljs-keyword">continue</span>;</span><br><span class="line">        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> j = i + <span class="hljs-number">1</span>; j &lt; Balls.length; j++) &#123;</span><br><span class="line">            <span class="hljs-keyword">if</span> (Balls[j].paused == <span class="hljs-literal">true</span>) <span class="hljs-keyword">continue</span>;</span><br><span class="line">            <span class="hljs-keyword">if</span> (hited(i,j)) &#123;</span><br><span class="line">                hits.push(&#123;<span class="hljs-attr">deep</span>: Balls[i].r + Balls[j].r - dis(Balls[i].pos, Balls[j].pos), <span class="hljs-attr">a</span>:i, <span class="hljs-attr">b</span>:j&#125;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    hits.sort(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">a,b</span>)</span>&#123;<span class="hljs-keyword">return</span> a.r-b.r&#125;);</span><br><span class="line">    <span class="hljs-keyword">return</span> hits;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">make_fouce</span>(<span class="hljs-params">pro, k</span>) </span>&#123;</span><br><span class="line">    <span class="hljs-comment">// 受力统一计算</span></span><br><span class="line">    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; Balls.length; i++) &#123;</span><br><span class="line">        <span class="hljs-keyword">if</span> (Balls[i].paused == <span class="hljs-literal">true</span>) <span class="hljs-keyword">continue</span>;</span><br><span class="line">        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> j = <span class="hljs-number">0</span>; j &lt; Balls.length; j++) &#123;</span><br><span class="line">            <span class="hljs-keyword">if</span> (i != j) &#123;</span><br><span class="line">                <span class="hljs-keyword">if</span> (Balls[j].paused == <span class="hljs-literal">true</span>) <span class="hljs-keyword">continue</span>;</span><br><span class="line">                <span class="hljs-keyword">if</span> (Balls[i][pro] == <span class="hljs-number">0</span>) <span class="hljs-keyword">continue</span>;</span><br><span class="line">                <span class="hljs-keyword">if</span> (Balls[j][pro] == <span class="hljs-number">0</span>) <span class="hljs-keyword">continue</span>;</span><br><span class="line"></span><br><span class="line">                <span class="hljs-keyword">var</span> fc = force(i, j, pro);</span><br><span class="line">                Balls[i].v.x += <span class="hljs-number">1</span>/Balls[i][pro] * fc[<span class="hljs-number">0</span>] * k;</span><br><span class="line">                Balls[i].v.y += <span class="hljs-number">1</span>/Balls[i][pro] * fc[<span class="hljs-number">1</span>] * k;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">main_function</span>(<span class="hljs-params"></span>)</span>&#123;</span><br><span class="line">    move_all();</span><br><span class="line">    <span class="hljs-keyword">var</span> hitlist = count_hit() </span><br><span class="line">    <span class="hljs-keyword">while</span> (hitlist.length != <span class="hljs-number">0</span>) &#123;</span><br><span class="line">        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; hitlist.length; i++)&#123;</span><br><span class="line">            hit(hitlist[i].a, hitlist[i].b);</span><br><span class="line">        &#125;</span><br><span class="line">        hitlist = count_hit();</span><br><span class="line">    &#125;</span><br><span class="line">    make_fouce(<span class="hljs-string">"m"</span>, <span class="hljs-number">1000</span>); <span class="hljs-comment">//重力场， 1000为引力常数</span></span><br><span class="line">	update();</span><br><span class="line">    <span class="hljs-comment">//main_loop</span></span><br><span class="line">    setTimeout(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>&#123;main_function()&#125;,<span class="hljs-number">1000</span>/FPS);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">creat_ball(<span class="hljs-number">100</span>,<span class="hljs-number">200</span>,<span class="hljs-number">20</span>,<span class="hljs-number">1</span>,<span class="hljs-number">1</span>,<span class="hljs-number">2</span>);</span><br><span class="line">creat_ball(<span class="hljs-number">200</span>,<span class="hljs-number">300</span>,<span class="hljs-number">20</span>,<span class="hljs-number">1</span>,<span class="hljs-number">-2</span>,<span class="hljs-number">-1</span>);</span><br><span class="line"></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">c_mousedown</span>(<span class="hljs-params"></span>) </span>&#123;</span><br><span class="line">    mouse_var.mousedown = <span class="hljs-literal">true</span>;</span><br><span class="line">    mouse_var.x = event.offsetX;</span><br><span class="line">    mouse_var.y = event.offsetY;</span><br><span class="line">    mouse_var.paused_ballid = <span class="hljs-string">'NaN'</span>;</span><br><span class="line">    <span class="hljs-keyword">var</span> mouse_hited = <span class="hljs-literal">false</span>;</span><br><span class="line">    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> ball_id = <span class="hljs-number">0</span>; ball_id &lt; Balls.length; ball_id++) &#123;</span><br><span class="line">        <span class="hljs-keyword">if</span> (dis(Balls[ball_id].pos, &#123;<span class="hljs-attr">x</span>:event.offsetX,<span class="hljs-attr">y</span>:event.offsetY&#125;) &lt; Balls[ball_id].r) &#123;</span><br><span class="line">            Balls[ball_id].paused = <span class="hljs-literal">true</span>;</span><br><span class="line">            mouse_var.paused_ballid = ball_id;</span><br><span class="line">            mouse_hited = <span class="hljs-literal">true</span>;</span><br><span class="line">            <span class="hljs-keyword">break</span>;</span><br><span class="line">        &#125; </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="hljs-keyword">if</span> (event.button == <span class="hljs-number">0</span>) &#123;</span><br><span class="line">        <span class="hljs-keyword">if</span> (!mouse_hited) creat_ball(event.offsetX, event.offsetY);</span><br><span class="line">    &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (event.button == <span class="hljs-number">2</span>) &#123;</span><br><span class="line">        <span class="hljs-keyword">if</span> (mouse_var.paused_ballid != <span class="hljs-string">'NaN'</span>) Balls.splice(mouse_var.paused_ballid, <span class="hljs-number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">&#125;</span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">c_mousemove</span>(<span class="hljs-params"></span>) </span>&#123;</span><br><span class="line">    <span class="hljs-keyword">if</span> (event.button == <span class="hljs-number">0</span>) &#123;</span><br><span class="line">        <span class="hljs-keyword">if</span> (mouse_var.paused_ballid != <span class="hljs-string">'NaN'</span>) &#123;</span><br><span class="line">            Balls[mouse_var.paused_ballid].pos.x = event.offsetX;</span><br><span class="line">            Balls[mouse_var.paused_ballid].pos.y = event.offsetY;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">c_mouseup</span>(<span class="hljs-params"></span>) </span>&#123;</span><br><span class="line">    <span class="hljs-keyword">if</span> (mouse_var.paused_ballid != <span class="hljs-string">'NaN'</span>) &#123;</span><br><span class="line">        Balls[mouse_var.paused_ballid].paused = <span class="hljs-literal">false</span>;</span><br><span class="line">        Balls[mouse_var.paused_ballid].v=&#123;<span class="hljs-attr">x</span>:<span class="hljs-number">0</span>, <span class="hljs-attr">y</span>:<span class="hljs-number">0</span>&#125;</span><br><span class="line">    &#125;</span><br><span class="line">    mouse_var.mousedown = <span class="hljs-literal">false</span>;</span><br><span class="line">    mouse_var.x = event.offsetX;</span><br><span class="line">    mouse_var.y = event.offsetY;</span><br><span class="line">    mouse_var.paused_ballid = <span class="hljs-string">'NaN'</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">c.addEventListener(<span class="hljs-string">'mousedown'</span>, c_mousedown);</span><br><span class="line">c.addEventListener(<span class="hljs-string">'mouseup'</span>, c_mouseup);</span><br><span class="line">c.addEventListener(<span class="hljs-string">'mousemove'</span>, c_mousemove);</span><br><span class="line">c.oncontextmenu = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>&#123;<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;&#125;;  </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">main_function();</span><br></pre></td></tr></table></figure>
+<h3 id="物理原理"><a href="#物理原理" class="headerlink" title="物理原理"></a>物理原理</h3><p>高中知识直接推断而来</p>
+<p>有动量守恒（pa+pb=pa’+pb’)和能量守恒(Ea+Eb=Ea’+Eb’)</p>
+<p>按二维问题解出方程就好</p>
+<p>另外，注意由于是按“刻”来计算碰撞，圆心连线角度不是theta，应该要“倒回来”一定的时间恢复到碰撞临界状态再计算（即hit函数前半部分所作的），然后再“快进”一段时间让两球分离</p>
+<h3 id="遇到的坑"><a href="#遇到的坑" class="headerlink" title="遇到的坑"></a>遇到的坑</h3><ul>
+<li>从0开始推公式真是难推啊……其实也不难（</li>
+<li>乱七八糟的临界状态</li>
+<li>tan90度得分开求</li>
+<li><strong>运算符重载一时爽, Javascript重写火葬场</strong></li>
+</ul>
+<h3 id="已知Bug"><a href="#已知Bug" class="headerlink" title="已知Bug"></a>已知Bug</h3><p>太多了</p>
+<h3 id="后继"><a href="#后继" class="headerlink" title="后继"></a>后继</h3><p>可以在这个网页拿F12进行更多调试！<br>如：<br><figure class="highlight javascript hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">creat_ball(x,y) <span class="hljs-comment">//创造球</span></span><br></pre></td></tr></table></figure></p>
+
+        </div>
+        
+        
+        <div class="level is-size-7 is-uppercase">
+            <div class="level-start">
+                <div class="level-item">
+                    <span class="is-size-6 has-text-grey has-mr-7">#</span>
+                    <a class="has-link-grey -link" href="/tags/HTML/">HTML</a>, <a class="has-link-grey -link" href="/tags/Javascript/">Javascript</a>
+                </div>
+            </div>
+        </div>
+        
+        
+        
+        <div class="bdsharebuttonbox">
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_tqq" data-cmd="tqq" title="分享到腾讯微博"></a>
+    <a href="#" class="bds_renren" data-cmd="renren" title="分享到人人网"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+</div>
+<script>window._bd_share_config = { "common": { "bdSnsKey": {}, "bdText": "", "bdMini": "2", "bdPic": "", "bdStyle": "0", "bdSize": "16" }, "share": {} }; with (document) 0[(getElementsByTagName('head')[0] || body).appendChild(createElement('script')).src = 'http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion=' + ~(-new Date() / 36e5)];</script>
+        
+    </div>
+</div>
+
+
+
+
+
+<div class="card card-transparent">
+    <div class="level post-navigation is-flex-wrap is-mobile">
+        
+        
+        <div class="level-end">
+            <a class="level level-item has-link-grey  article-nav-next" href="/2020/03/26/ubuntu-deepin-wine-config/">
+                <span class="level-item">Ubuntu deepin-wine配置</span>
+                <i class="level-item fas fa-chevron-right"></i>
+            </a>
+        </div>
+        
+    </div>
+</div>
+
+
+
+<div class="card">
+    <div class="card-content">
+        <h3 class="title is-5 has-text-weight-normal">评论</h3>
+        
+<div id="valine-thread"></div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+<script>
+    new Valine({
+        el: '#valine-thread' ,
+        notify: false,
+        verify: false,
+        app_id: 'JdVTJ0XTbXs8urswUKC5g2iB-gzGzoHsz',
+        app_key: 'AwAfiIexXvQXV60Bv9BxasIs',
+        placeholder: 'Say something...'
+    });
+</script>
+
+    </div>
+</div>
+</div>
+                
+
+
+
+
+<div class="column is-4-tablet is-4-desktop is-3-widescreen  has-order-1 column-left ">
+    
+        
+<div class="card widget">
+    <div class="card-content">
+        <nav class="level">
+            <div class="level-item has-text-centered">
+                <div>
+                    
+                        <img class="image is-128x128 has-mb-6" src="/images/logo.png" alt="Lhc_fl">
+                    
+                    
+                    <p class="is-size-4 is-block">
+                        Lhc_fl
+                    </p>
+                    
+                    
+                    <p class="is-size-6 is-block">
+                        蒟蒻OIer
+                    </p>
+                    
+                    
+                    <p class="is-size-6 is-flex is-flex-center has-text-grey">
+                        <i class="fas fa-map-marker-alt has-mr-7"></i>
+                        <span>银河系的一颗蓝色星球</span>
+                    </p>
+                    
+                </div>
+            </div>
+        </nav>
+        <nav class="level is-mobile">
+            <div class="level-item has-text-centered is-marginless">
+                <div>
+                    <p class="heading">
+                        文章
+                    </p>
+                    <p class="title has-text-weight-normal">
+                        21
+                    </p>
+                </div>
+            </div>
+            <div class="level-item has-text-centered is-marginless">
+                <div>
+                    <p class="heading">
+                        分类
+                    </p>
+                    <p class="title has-text-weight-normal">
+                        0
+                    </p>
+                </div>
+            </div>
+            <div class="level-item has-text-centered is-marginless">
+                <div>
+                    <p class="heading">
+                        标签
+                    </p>
+                    <p class="title has-text-weight-normal">
+                        21
+                    </p>
+                </div>
+            </div>
+        </nav>
+        <div class="level">
+            <a class="level-item button is-link is-rounded" href="http://github.com/lhcfl">
+                关注我</a>
+        </div>
+        
+        
+        <div class="level is-mobile">
+            
+            <a class="level-item button is-white is-marginless" target="_blank" title="Github" href="http://github.com/lhcfl">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+            
+            <a class="level-item button is-white is-marginless" target="_blank" title="RSS" href="/">
+                
+                <i class="fas fa-rss"></i>
+                
+            </a>
+            
+        </div>
+        
+    </div>
+</div>
+    
+        
+<div class="card widget" id="toc">
+    <div class="card-content">
+        <div class="menu">
+            <h3 class="menu-label">
+                目录
+            </h3>
+            <ul class="menu-list"><li>
+        <a class="is-flex" href="#前言">
+        <span class="has-mr-6">1</span>
+        <span>前言</span>
+        </a></li><li>
+        <a class="is-flex" href="#python代码">
+        <span class="has-mr-6">2</span>
+        <span>python代码</span>
+        </a></li><li>
+        <a class="is-flex" href="#Js代码">
+        <span class="has-mr-6">3</span>
+        <span>Js代码</span>
+        </a></li><li>
+        <a class="is-flex" href="#物理原理">
+        <span class="has-mr-6">4</span>
+        <span>物理原理</span>
+        </a></li><li>
+        <a class="is-flex" href="#遇到的坑">
+        <span class="has-mr-6">5</span>
+        <span>遇到的坑</span>
+        </a></li><li>
+        <a class="is-flex" href="#已知Bug">
+        <span class="has-mr-6">6</span>
+        <span>已知Bug</span>
+        </a></li><li>
+        <a class="is-flex" href="#后继">
+        <span class="has-mr-6">7</span>
+        <span>后继</span>
+        </a></li></ul>
+        </div>
+    </div>
+</div>
+
+    
+        
+
+<div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+        <h3 class="menu-label">
+            链接
+        </h3>
+        <ul class="menu-list">
+        
+            <li>
+                <a class="level is-mobile" href="https://xgzc.github.io" target="_blank">
+                    <span class="level-left">
+                        <span class="level-item">xgzc大佬</span>
+                    </span>
+                    <span class="level-right">
+                        <span class="level-item tag">xgzc.github.io</span>
+                    </span>
+                </a>
+            </li>
+        
+            <li>
+                <a class="level is-mobile" href="https://www.luogu.org/space/show?uid=55684" target="_blank">
+                    <span class="level-left">
+                        <span class="level-item">洛谷空间</span>
+                    </span>
+                    <span class="level-right">
+                        <span class="level-item tag">www.luogu.org</span>
+                    </span>
+                </a>
+            </li>
+        
+        </ul>
+        </div>
+    </div>
+</div>
+
+
+    
+        <div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+        <h3 class="menu-label">
+            归档
+        </h3>
+        <ul class="menu-list">
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2020/08/">
+                <span class="level-start">
+                    <span class="level-item">八月 2020</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2020/03/">
+                <span class="level-start">
+                    <span class="level-item">三月 2020</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">3</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2019/11/">
+                <span class="level-start">
+                    <span class="level-item">十一月 2019</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2019/10/">
+                <span class="level-start">
+                    <span class="level-item">十月 2019</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2019/07/">
+                <span class="level-start">
+                    <span class="level-item">七月 2019</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2019/05/">
+                <span class="level-start">
+                    <span class="level-item">五月 2019</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2019/02/">
+                <span class="level-start">
+                    <span class="level-item">二月 2019</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2019/01/">
+                <span class="level-start">
+                    <span class="level-item">一月 2019</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2018/11/">
+                <span class="level-start">
+                    <span class="level-item">十一月 2018</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2018/10/">
+                <span class="level-start">
+                    <span class="level-item">十月 2018</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">5</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2018/08/">
+                <span class="level-start">
+                    <span class="level-item">八月 2018</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">5</span>
+                </span>
+            </a>
+        </li>
+        
+        </ul>
+        </div>
+    </div>
+</div>
+    
+    
+        <div class="column-right-shadow is-hidden-widescreen is-sticky">
+        
+            
+<div class="card widget">
+    <div class="card-content">
+        <h3 class="menu-label">
+            最新文章
+        </h3>
+        
+        <article class="media">
+            
+            <a href="/2020/08/05/PhysicalHit/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="https://i.loli.net/2020/08/05/TWlGKSUw3kVz9sF.jpg" alt="Javascript简单弹性碰撞模拟">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-08-05T08:39:08.000Z">2020-08-05</time></div>
+                    <a href="/2020/08/05/PhysicalHit/" class="has-link-black-ter is-size-6">Javascript简单弹性碰撞模拟</a>
+                    <p class="is-size-7 is-uppercase">
+                        
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2020/03/26/ubuntu-deepin-wine-config/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="https://i.loli.net/2020/03/26/Jgptk4FdzBluNVK.jpg" alt="Ubuntu deepin-wine配置">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-03-26T03:31:00.000Z">2020-03-26</time></div>
+                    <a href="/2020/03/26/ubuntu-deepin-wine-config/" class="has-link-black-ter is-size-6">Ubuntu deepin-wine配置</a>
+                    <p class="is-size-7 is-uppercase">
+                        
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2020/03/26/Ubuntu-WiFi-unable-use/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="https://i.loli.net/2020/03/26/PADd1Rty4qflV7B.jpg" alt="Ubuntu wifi问题">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-03-26T03:31:00.000Z">2020-03-26</time></div>
+                    <a href="/2020/03/26/Ubuntu-WiFi-unable-use/" class="has-link-black-ter is-size-6">Ubuntu wifi问题</a>
+                    <p class="is-size-7 is-uppercase">
+                        
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2020/03/15/Scales/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="https://gitee.com/lhcfl/photobed/raw/21488179384f5429b83c2de182cd39eebe147244/acg1.jpg" alt="各种量表收藏（缓慢更新）">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-03-15T14:48:56.000Z">2020-03-15</time></div>
+                    <a href="/2020/03/15/Scales/" class="has-link-black-ter is-size-6">各种量表收藏（缓慢更新）</a>
+                    <p class="is-size-7 is-uppercase">
+                        
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2019/11/17/CSP2019Trip/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="https://i.loli.net/2020/04/06/z4NV8E9LOpAaGBQ.png" alt="CSP2019-S组爆炸游记">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-11-17T07:56:01.000Z">2019-11-17</time></div>
+                    <a href="/2019/11/17/CSP2019Trip/" class="has-link-black-ter is-size-6">CSP2019-S组爆炸游记</a>
+                    <p class="is-size-7 is-uppercase">
+                        
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+    </div>
+</div>
+
+        
+            <div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+            <h3 class="menu-label">
+                标签
+            </h3>
+            <div class="field is-grouped is-grouped-multiline">
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/Blog/">
+                        <span class="tag">Blog</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/C/">
+                        <span class="tag">C++</span>
+                        <span class="tag is-grey">3</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/GitHub/">
+                        <span class="tag">GitHub</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/HTML/">
+                        <span class="tag">HTML</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/Hexo/">
+                        <span class="tag">Hexo</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/Javascript/">
+                        <span class="tag">Javascript</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/Linux/">
+                        <span class="tag">Linux</span>
+                        <span class="tag is-grey">2</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/OI/">
+                        <span class="tag">OI</span>
+                        <span class="tag is-grey">5</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/Ubuntu/">
+                        <span class="tag">Ubuntu</span>
+                        <span class="tag is-grey">2</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/Vim/">
+                        <span class="tag">Vim</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/wine/">
+                        <span class="tag">wine</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/墙/">
+                        <span class="tag">墙</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/已失效/">
+                        <span class="tag">已失效</span>
+                        <span class="tag is-grey">2</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/心理/">
+                        <span class="tag">心理</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/教程/">
+                        <span class="tag">教程</span>
+                        <span class="tag is-grey">5</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/无聊/">
+                        <span class="tag">无聊</span>
+                        <span class="tag is-grey">4</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/杂项/">
+                        <span class="tag">杂项</span>
+                        <span class="tag is-grey">6</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/游记/">
+                        <span class="tag">游记</span>
+                        <span class="tag is-grey">2</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/笔记/">
+                        <span class="tag">笔记</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/转帖/">
+                        <span class="tag">转帖</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/量表/">
+                        <span class="tag">量表</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+        
+        </div>
+    
+</div>
+
+                
+
+
+
+
+<div class="column is-4-tablet is-4-desktop is-3-widescreen is-hidden-touch is-hidden-desktop-only has-order-3 column-right is-sticky">
+    
+        
+<div class="card widget">
+    <div class="card-content">
+        <h3 class="menu-label">
+            最新文章
+        </h3>
+        
+        <article class="media">
+            
+            <a href="/2020/08/05/PhysicalHit/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="https://i.loli.net/2020/08/05/TWlGKSUw3kVz9sF.jpg" alt="Javascript简单弹性碰撞模拟">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-08-05T08:39:08.000Z">2020-08-05</time></div>
+                    <a href="/2020/08/05/PhysicalHit/" class="has-link-black-ter is-size-6">Javascript简单弹性碰撞模拟</a>
+                    <p class="is-size-7 is-uppercase">
+                        
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2020/03/26/ubuntu-deepin-wine-config/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="https://i.loli.net/2020/03/26/Jgptk4FdzBluNVK.jpg" alt="Ubuntu deepin-wine配置">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-03-26T03:31:00.000Z">2020-03-26</time></div>
+                    <a href="/2020/03/26/ubuntu-deepin-wine-config/" class="has-link-black-ter is-size-6">Ubuntu deepin-wine配置</a>
+                    <p class="is-size-7 is-uppercase">
+                        
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2020/03/26/Ubuntu-WiFi-unable-use/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="https://i.loli.net/2020/03/26/PADd1Rty4qflV7B.jpg" alt="Ubuntu wifi问题">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-03-26T03:31:00.000Z">2020-03-26</time></div>
+                    <a href="/2020/03/26/Ubuntu-WiFi-unable-use/" class="has-link-black-ter is-size-6">Ubuntu wifi问题</a>
+                    <p class="is-size-7 is-uppercase">
+                        
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2020/03/15/Scales/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="https://gitee.com/lhcfl/photobed/raw/21488179384f5429b83c2de182cd39eebe147244/acg1.jpg" alt="各种量表收藏（缓慢更新）">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-03-15T14:48:56.000Z">2020-03-15</time></div>
+                    <a href="/2020/03/15/Scales/" class="has-link-black-ter is-size-6">各种量表收藏（缓慢更新）</a>
+                    <p class="is-size-7 is-uppercase">
+                        
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2019/11/17/CSP2019Trip/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="https://i.loli.net/2020/04/06/z4NV8E9LOpAaGBQ.png" alt="CSP2019-S组爆炸游记">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-11-17T07:56:01.000Z">2019-11-17</time></div>
+                    <a href="/2019/11/17/CSP2019Trip/" class="has-link-black-ter is-size-6">CSP2019-S组爆炸游记</a>
+                    <p class="is-size-7 is-uppercase">
+                        
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+    </div>
+</div>
+
+    
+        <div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+            <h3 class="menu-label">
+                标签
+            </h3>
+            <div class="field is-grouped is-grouped-multiline">
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/Blog/">
+                        <span class="tag">Blog</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/C/">
+                        <span class="tag">C++</span>
+                        <span class="tag is-grey">3</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/GitHub/">
+                        <span class="tag">GitHub</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/HTML/">
+                        <span class="tag">HTML</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/Hexo/">
+                        <span class="tag">Hexo</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/Javascript/">
+                        <span class="tag">Javascript</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/Linux/">
+                        <span class="tag">Linux</span>
+                        <span class="tag is-grey">2</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/OI/">
+                        <span class="tag">OI</span>
+                        <span class="tag is-grey">5</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/Ubuntu/">
+                        <span class="tag">Ubuntu</span>
+                        <span class="tag is-grey">2</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/Vim/">
+                        <span class="tag">Vim</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/wine/">
+                        <span class="tag">wine</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/墙/">
+                        <span class="tag">墙</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/已失效/">
+                        <span class="tag">已失效</span>
+                        <span class="tag is-grey">2</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/心理/">
+                        <span class="tag">心理</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/教程/">
+                        <span class="tag">教程</span>
+                        <span class="tag is-grey">5</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/无聊/">
+                        <span class="tag">无聊</span>
+                        <span class="tag is-grey">4</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/杂项/">
+                        <span class="tag">杂项</span>
+                        <span class="tag is-grey">6</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/游记/">
+                        <span class="tag">游记</span>
+                        <span class="tag is-grey">2</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/笔记/">
+                        <span class="tag">笔记</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/转帖/">
+                        <span class="tag">转帖</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/量表/">
+                        <span class="tag">量表</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+    
+    
+</div>
+
+            </div>
+        </div>
+    </section>
+    <footer class="footer">
+    <div class="container">
+        <div class="level">
+            <div class="level-start has-text-centered-mobile">
+                <a class="footer-logo is-block has-mb-6" href="/">
+                
+                    Lhc_fl Home
+                
+                </a>
+                <p class="is-size-7">
+                &copy; 2020 锦心(Lhc_fl)&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-icarus" target="_blank">Icarus</a>
+                </p>
+                
+            </div>
+            <div class="level-end">
+            
+                <div class="field has-addons is-flex-center-mobile has-mt-5-mobile is-flex-wrap is-flex-middle">
+                
+                
+                <p class="control">
+                    <a class="button is-white is-large" target="_blank" title="View on GitHub" href="http://github.com/lhcfl">
+                        
+                        <i class="fab fa-github"></i>
+                        
+                    </a>
+                </p>
+                
+                </div>
+            
+            </div>
+        </div>
+    </div>
+</footer>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script>
+<script>moment.locale("zh-CN");</script>
+
+
+    
+    
+    
+    <script src="/js/animation.js"></script>
+    
+
+    
+    
+    
+    <script src="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/js/lightgallery.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js" defer></script>
+    <script src="/js/gallery.js" defer></script>
+    
+
+    
+    
+
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update
+            my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/outdatedbrowser@1.1.5/outdatedbrowser/outdatedbrowser.min.js" defer></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        });
+    });
+</script>
+
+
+    
+    
+<script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/unpacked/MathJax.js?config=TeX-MML-AM_CHTML" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    MathJax.Hub.Config({
+        'HTML-CSS': {matchFontHeight: false},
+        SVG: {matchFontHeight: false},
+        CommonHTML: {matchFontHeight: false}
+    });
+});
+</script>
+
+    
+    
+
+<a id="back-to-top" title="回到顶端" href="javascript:;">
+    <i class="fas fa-chevron-up"></i>
+</a>
+<script src="/js/back-to-top.js" defer></script>
+
+
+    
+    
+
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script>
+    <script src="/js/clipboard.js" defer></script>
+    
+
+    
+    
+    
+
+
+<script src="/js/main.js" defer></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="想要查找什么...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: '文章',
+                PAGES: '页面',
+                CATEGORIES: '分类',
+                TAGS: '标签',
+                UNTITLED: '(无标题)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js" defer></script>
+<link rel="stylesheet" href="/css/search.css">
+<link rel="stylesheet" href="/css/insight.css">
+    
+</body>
+</html>
