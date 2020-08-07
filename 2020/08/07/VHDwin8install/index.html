@@ -7,13 +7,13 @@
 
 
 
-    <meta name="description" content="看文章前啥都别说，先一起大喊：巨硬，巨硬，真**的硬！   本文同步发在我的知乎上 锦心的电脑上已经安装了Windows 10 [1st], Ubnntu[2nd], Phoenix OS[3rd], 突发奇想决定安装一个VHD Windows8.1，本文纯属记录如何用VHD安装Windows以及拿Grub引导两个Windwos系统的过程以及巨硬留下的天坑。 教程同样适用于只有单系统的情况。">
-<meta name="keywords" content="教程,VHD,Windows,Linux">
+    <meta name="description" content="看文章前啥都别说，先一起大喊：巨硬，巨硬，真**的硬！   本文同步发在我的知乎上 锦心的电脑上已经安装了Windows 10 [1st], Ubnntu[2nd], Phoenix OS[3rd], 突发奇想决定安装一个VHD Windows8.1，本文纯属记录如何用VHD安装Windows以及拿Grub引导两个Windows系统的过程以及巨硬留下的天坑。 教程同样适用于只有单系统的情况。">
+<meta name="keywords" content="教程,Linux,VHD,Windows">
 <meta property="og:type" content="article">
 <meta property="og:title" content="已有Ubuntu与Win10，纯命令行VHD装Windows8.1">
 <meta property="og:url" content="http://yoursite.com/2020/08/07/VHDwin8install/index.html">
 <meta property="og:site_name" content="Lhc_fl Home">
-<meta property="og:description" content="看文章前啥都别说，先一起大喊：巨硬，巨硬，真**的硬！   本文同步发在我的知乎上 锦心的电脑上已经安装了Windows 10 [1st], Ubnntu[2nd], Phoenix OS[3rd], 突发奇想决定安装一个VHD Windows8.1，本文纯属记录如何用VHD安装Windows以及拿Grub引导两个Windwos系统的过程以及巨硬留下的天坑。 教程同样适用于只有单系统的情况。">
+<meta property="og:description" content="看文章前啥都别说，先一起大喊：巨硬，巨硬，真**的硬！   本文同步发在我的知乎上 锦心的电脑上已经安装了Windows 10 [1st], Ubnntu[2nd], Phoenix OS[3rd], 突发奇想决定安装一个VHD Windows8.1，本文纯属记录如何用VHD安装Windows以及拿Grub引导两个Windows系统的过程以及巨硬留下的天坑。 教程同样适用于只有单系统的情况。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://pic4.zhimg.com/80/v2-27dbd07c3857722d22d07cbc6b2ed7b2_720w.png">
 <meta property="og:image" content="https://pic3.zhimg.com/80/v2-188685ada189e4ad95edaaecdf68349b_720w.png">
@@ -21,10 +21,10 @@
 <meta property="og:image" content="https://pic1.zhimg.com/80/v2-1081a342935899088fa247e805b88a15_720w.png">
 <meta property="og:image" content="https://pic2.zhimg.com/80/v2-30ca2d48609f734f596e89f2463913c7_720w.jpeg">
 <meta property="og:image" content="https://pic2.zhimg.com/80/v2-de658924fa816e1772f1cc18ef98349c_720w.png">
-<meta property="og:updated_time" content="2020-08-07T04:48:45.157Z">
+<meta property="og:updated_time" content="2020-08-07T05:05:19.152Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="已有Ubuntu与Win10，纯命令行VHD装Windows8.1">
-<meta name="twitter:description" content="看文章前啥都别说，先一起大喊：巨硬，巨硬，真**的硬！   本文同步发在我的知乎上 锦心的电脑上已经安装了Windows 10 [1st], Ubnntu[2nd], Phoenix OS[3rd], 突发奇想决定安装一个VHD Windows8.1，本文纯属记录如何用VHD安装Windows以及拿Grub引导两个Windwos系统的过程以及巨硬留下的天坑。 教程同样适用于只有单系统的情况。">
+<meta name="twitter:description" content="看文章前啥都别说，先一起大喊：巨硬，巨硬，真**的硬！   本文同步发在我的知乎上 锦心的电脑上已经安装了Windows 10 [1st], Ubnntu[2nd], Phoenix OS[3rd], 突发奇想决定安装一个VHD Windows8.1，本文纯属记录如何用VHD安装Windows以及拿Grub引导两个Windows系统的过程以及巨硬留下的天坑。 教程同样适用于只有单系统的情况。">
 <meta name="twitter:image" content="https://pic4.zhimg.com/80/v2-27dbd07c3857722d22d07cbc6b2ed7b2_720w.png">
 
 
@@ -176,7 +176,7 @@
 <big> <del>看文章前啥都别说，先一起大喊：<strong>巨硬，巨硬，真**的硬</strong>！</del> </big>
 </blockquote>
 <p>本文同步发在我的知乎上</p>
-<p>锦心的电脑上已经安装了Windows 10 [1st], Ubnntu[2nd], Phoenix OS[3rd], 突发奇想决定安装一个VHD Windows8.1，本文纯属记录如何用VHD安装Windows以及拿Grub引导两个Windwos系统的过程以及<strong>巨硬留下的天坑</strong>。</p>
+<p>锦心的电脑上已经安装了Windows 10 [1st], Ubnntu[2nd], Phoenix OS[3rd], 突发奇想决定安装一个VHD Windows8.1，本文纯属记录如何用VHD安装Windows以及拿Grub引导两个Windows系统的过程以及<strong>巨硬留下的天坑</strong>。</p>
 <p>教程同样适用于只有单系统的情况。</p>
 <a id="more"></a>
 <p><strong><big>数据无价，谨慎操作</big></strong></p>
@@ -190,7 +190,7 @@
 <h2 id="VHD-安装-Windows-8-1"><a href="#VHD-安装-Windows-8-1" class="headerlink" title="VHD 安装 Windows 8.1"></a>VHD 安装 Windows 8.1</h2><h3 id="创建VHD"><a href="#创建VHD" class="headerlink" title="创建VHD"></a>创建VHD</h3><p>打开Powershell（管理员)，键入diskpart命令进入diskpart：<br><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PS C:\WINDOWS\system32&gt; diskpart</span><br></pre></td></tr></table></figure></p>
 <p>使用<code>cre</code>命令创建一个vhd文件，名称自选<br>其中，maximum是vhd的大小（单位：MB）。创建后VHD为固定大小，因此用时较久<br><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">DISKPART&gt; cre vdi file=&quot;D:\vhds\win8.vhd&quot; maximum=51200</span><br><span class="line"></span><br><span class="line">  100 百分比已完成</span><br><span class="line"></span><br><span class="line">DiskPart 已成功创建虚拟磁盘文件。</span><br></pre></td></tr></table></figure></p>
 <p>连接虚拟磁盘文件，格式化，并分配驱动器号。<br><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">DISKPART&gt; attach</span><br><span class="line"></span><br><span class="line">Microsoft DiskPart 版本 10.0.18362.1</span><br><span class="line"></span><br><span class="line">VDISK       - 连接虚拟磁盘文件。</span><br><span class="line"></span><br><span class="line">DISKPART&gt; attach vdi</span><br><span class="line"></span><br><span class="line">  100 百分比已完成</span><br><span class="line"></span><br><span class="line">DiskPart 已成功连接虚拟磁盘文件。</span><br><span class="line"></span><br><span class="line">DISKPART&gt; cre par pri</span><br><span class="line"></span><br><span class="line">DiskPart 成功地创建了指定分区。</span><br><span class="line"></span><br><span class="line">DISKPART&gt; for quick fs=ntfs</span><br><span class="line"></span><br><span class="line">  100 百分比已完成</span><br><span class="line"></span><br><span class="line">DiskPart 成功格式化该卷。</span><br><span class="line"></span><br><span class="line">DISKPART&gt; ass</span><br><span class="line"></span><br><span class="line">DiskPart 成功地分配了驱动器号或装载点。</span><br><span class="line"></span><br><span class="line">DISKPART&gt; exit</span><br><span class="line"></span><br><span class="line">退出 DiskPart...</span><br></pre></td></tr></table></figure></p>
-<h2 id="安装Windows-8-1"><a href="#安装Windows-8-1" class="headerlink" title="安装Windows 8.1"></a>安装Windows 8.1</h2><p>首先把你的Windwos安装ISO挂载。如果你是Win8以上直接双击即可。<br>这里ISO被挂载在了E盘。</p>
+<h2 id="安装Windows-8-1"><a href="#安装Windows-8-1" class="headerlink" title="安装Windows 8.1"></a>安装Windows 8.1</h2><p>首先把你的Windows安装ISO挂载。如果你是Win8以上直接双击即可。<br>这里ISO被挂载在了E盘。</p>
 <figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">PS C:\WINDOWS\system32&gt;E:</span><br><span class="line">PS E:\&gt; cd sources</span><br></pre></td></tr></table></figure>
 <p>使用dism获取install.wim的信息<br><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">PS E:\sources&gt; dism /get-wiminfo /wimfile:install.wim</span><br><span class="line"></span><br><span class="line">部署映像服务和管理工具</span><br><span class="line">版本: 10.0.18362.900</span><br><span class="line"></span><br><span class="line">映像的详细信息: install.wim</span><br><span class="line"></span><br><span class="line">索引: 1</span><br><span class="line">名称: Windows 8.1 专业版</span><br><span class="line">描述: Windows 8.1 专业版</span><br><span class="line">大小: 12,855,928,858 个字节</span><br><span class="line"></span><br><span class="line">操作成功完成。</span><br></pre></td></tr></table></figure></p>
 <p>安装Windows 8.1<br>其中applydir是你的VHD挂载的盘符（这里是F）， index是你要安装的系统所处于install.wim的索引。<br><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">PS E:\sources&gt; dism /apply-image /imagefile:install.wim /index:1 /applydir:F:</span><br><span class="line"></span><br><span class="line">部署映像服务和管理工具</span><br><span class="line">版本: 10.0.18362.900</span><br><span class="line"></span><br><span class="line">正在应用映像</span><br><span class="line">[==========================100.0%==========================]</span><br><span class="line">操作成功完成。</span><br></pre></td></tr></table></figure></p>
@@ -199,8 +199,8 @@
 <p>注意bcdboot会默认把Windows 8.1作为默认系统，完成安装步骤时还好，要是对此不满了，请<code>win</code>+<code>R</code>运行<code>msconfig</code>把默认OS变为Windows 10</p>
 <p>如果看到这里的你没有安装Linux系统，可以直接关闭网页走入了。</p>
 <h2 id="Linux修复引导"><a href="#Linux修复引导" class="headerlink" title="Linux修复引导"></a>Linux修复引导</h2><p>嗯，在此之前的微软还是那个体贴的微软，安装非常方便，然而要是你安装了Linux，巨硬的硬才刚刚开始</p>
-<p>重启，熟悉的Windwos启动画面出现……Grub引导又没了。</p>
-<h3 id="恢复Grub引导"><a href="#恢复Grub引导" class="headerlink" title="恢复Grub引导"></a>恢复Grub引导</h3><p><del>巨硬：用了我家的Windwos你就是我家的人了，必须得用Windwos Boot Manager启动，Grub滚远点！</del></p>
+<p>重启，熟悉的Windows启动画面出现……Grub引导又没了。</p>
+<h3 id="恢复Grub引导"><a href="#恢复Grub引导" class="headerlink" title="恢复Grub引导"></a>恢复Grub引导</h3><p><del>巨硬：用了我家的Windows你就是我家的人了，必须得用Windows Boot Manager启动，Grub滚远点！</del></p>
 <p>进入BIOS，改启动顺序，把Windows Boot Manager调到后面，把ubuntu的Grub改回前面。重启，出现Grub引导界面，OK。</p>
 <p>要是没有……请自行百度“<a href="https://www.baidu.com/s?ie=UTF-8&amp;wd=ubuntu%E5%BC%95%E5%AF%BC%E4%BF%AE%E5%A4%8D" target="_blank" rel="noopener">ubuntu引导修复</a>”</p>
 <h2 id="优化Windows-Boot-Manager"><a href="#优化Windows-Boot-Manager" class="headerlink" title="优化Windows Boot Manager"></a>优化Windows Boot Manager</h2><p>现在出现了一个问题：你用上了Grub，Grub里只有一个Windows Boot Manager, 巨硬又非常贴心地在Windows Boot Manager里自动启动默认系统，启动第二系统需要重启：于是你想启动被放置在非默认系统位置的Windows 8.1需要：</p>
@@ -215,11 +215,11 @@
 <p>现在你拥有了两份Windows Boot Manager</p>
 <h2 id="更改grub"><a href="#更改grub" class="headerlink" title="更改grub"></a>更改grub</h2><p>首先，umonut掉两个EFI分区<br><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">lhcfl@lhcfl-Ubuntu-PC:~$ sudo umount /dev/sda1</span><br><span class="line">lhcfl@lhcfl-Ubuntu-PC:~$ sudo umount /dev/sda7</span><br></pre></td></tr></table></figure></p>
 <p>然后，更新grub<br><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lhcfl@lhcfl-Ubuntu-PC:~$ sudo update-grub</span><br></pre></td></tr></table></figure></p>
-<p>不出所料的话，你将拥有两个Windwos Boot Manager：<br><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Windwos Boot Manager (on /dev/sda1)</span><br><span class="line">Windwos Boot Manager (on /dev/sda7)</span><br></pre></td></tr></table></figure></p>
+<p>不出所料的话，你将拥有两个Windows Boot Manager：<br><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Windows Boot Manager (on /dev/sda1)</span><br><span class="line">Windows Boot Manager (on /dev/sda7)</span><br></pre></td></tr></table></figure></p>
 <p>在/boot/grub/grub.cfg里，找到形如这样的内容：<br><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">menuentry &apos;Windows Boot Manager (on /dev/sda1)&apos; --class windows --class os $menuentry_id_option &apos;osprober-efi-48AC-0E64&apos; &#123;</span><br><span class="line">	insmod part_gpt</span><br><span class="line">	insmod fat</span><br><span class="line">	set root=&apos;hd0,gpt1&apos;</span><br><span class="line">	if [ x$feature_platform_search_hint = xy ]; then</span><br><span class="line">	  search --no-floppy --fs-uuid --set=root --hint-bios=hd0,gpt1 --hint-efi=hd0,gpt1 --hint-baremetal=ahci0,gpt1  48AC-0E64</span><br><span class="line">	else</span><br><span class="line">	  search --no-floppy --fs-uuid --set=root 48AC-0E64</span><br><span class="line">	fi</span><br><span class="line">	chainloader /EFI/Microsoft/Boot/bootmgfw.efi</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>使用sudo身份强制编辑，把两个Windwos Boot Manager换成你想要的名字，如</p>
-<figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Windwos 10</span><br><span class="line">Windwos 8.1 (VHD)</span><br></pre></td></tr></table></figure>
-<p>重启，进入Grub界面，进入你的主Windwos系统</p>
+<p>使用sudo身份强制编辑，把两个Windows Boot Manager换成你想要的名字，如</p>
+<figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Windows 10</span><br><span class="line">Windows 8.1 (VHD)</span><br></pre></td></tr></table></figure>
+<p>重启，进入Grub界面，进入你的主Windows系统</p>
 <p><code>win</code>+<code>R</code>运行<code>msconfig</code>，在OS中删掉另一个系统。关机。</p>
 <p>巨硬这时候就体现了她·无·微·不·至·的关怀，如果你直接重启，恭喜你grub又没了……</p>
 <p>进BIOS把被巨硬放上第一的Windows Boot Manager调到下面。重启。进入另一个系统。</p>
