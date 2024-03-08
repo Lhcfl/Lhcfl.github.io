@@ -1,0 +1,76 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Lhcfl"><title>Hexo主题Anatolo发布 · Lhc_fl Home</title><meta name="description" content="hexo-theme-Anatolo
+demo
+博客样例
+国内镜像
+关于主题 ¶
+基于ben02的Anatole主题进行了大量修改，增添和优化。
+搜索框代码来自主题Icarus。二主题都采用MIT License，故本主题也采用之。
+部分代码参考了Anatole-core
+简约、美观、实用
+如果有任"><meta name="keywords" content="Blog,博客,Hexo"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta id="site_root_url" data="/"><meta id="default-theme" data="light"><meta name="renderer" content="webkit"><link rel="shortcut icon" type="image/x-icon" href="/images/logo.png"><link rel="stylesheet" href="/css/theme/light.css"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/insight.css"><link rel="stylesheet" href="/css/search.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><script src="/js/url_for.js"></script><script src="/js/friends-link-generator.js"></script><script src="/js/jquery.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/site.js"></script><script src="/js/router.js"></script><script src="/js/darkLightToggle.js"></script><script src="/js/add-bookmark.js"></script><link rel="stylesheet" href="/css/comments/gittalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script><script>function loadComment(retry = 3) { 
+  const id = site.getThis()?.title || 'Hexo主题Anatolo发布';
+  if (!id) {
+    if (retry > 0) {
+      setTimeout(() => loadComment(retry - 1), 1000);
+    }
+    return;
+  }
+  const gitalk = new Gitalk({
+    clientID: '12a250ac67f452906dd6',
+    clientSecret: '7422a9ecdc933d5e6facbc61d546bced40519f0b',
+    repo: 'Lhcfl.github.io',      // The repository of store comments,
+    owner: 'Lhcfl',
+    admin: ['Lhcfl'],
+    id,      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+  gitalk.render('gitalk_container')
+}
+</script><meta name="generator" content="Hexo 6.3.0"></head><body><main-outlet><div class="page-top animated"><div class="nav"><li> <a href="/">首页</a></li><li> <a href="/archives">归档</a></li><li> <a href="/tags">标签</a></li><li> <a href="/about">关于</a></li><li> <a href="/links">友链</a></li></div><div class="information"><div class="nav_right_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li><li><a class="fa fa-search" onclick="openWindow();"></a></li><li><a class="fa fa-sun-o" onclick="darkLightToggle();"></a></li></div><div class="avatar"><img src="/images/logo.png"></div></div></div><div class="toc-mobile"><div class="toc-button"><span>目录</span></div><div class="toc-container in-page animated fadeInDown"><div class="toclist-container"><div class="tocmenu"><ol class="toclist"><li class="toclist-item toclist-level-1"><a class="toclist-link"><span class="toclist-text">hexo-theme-Anatolo</span></a><ol class="toclist-child"><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#%E5%85%B3%E4%BA%8E%E4%B8%BB%E9%A2%98"><span class="toclist-text">关于主题</span></a></li><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#%E6%94%B9%E8%BF%9B"><span class="toclist-text">改进</span></a></li><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#%E5%B7%B2%E7%9F%A5bug%EF%BC%88feature%EF%BC%89"><span class="toclist-text">已知bug（feature）</span></a></li><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#%E4%BD%BF%E7%94%A8"><span class="toclist-text">使用</span></a><ol class="toclist-child"><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#%E5%AE%89%E8%A3%85"><span class="toclist-text">安装</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#%E9%85%8D%E7%BD%AE"><span class="toclist-text">配置</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#%E6%9B%B4%E6%96%B0"><span class="toclist-text">更新</span></a></li></ol></li></ol></li></ol></div></div></div></div><div class="sidebar animated"><div class="sidebar-top"><div class="logo-title"><div class="title"><img src="/images/logo.png" style="width:250px;" alt="favicon"><h3 title=""><a href="/">Lhc_fl Home</a></h3><div class="description"><p>欢迎来到Chelationland!</p></div></div><ul class="social-links"><li><a target="_blank" rel="noopener" href="https://github.com/Lhcfl"><i class="fa fa-github"></i></a></li><li><a href="mailto:lhcfl@outlook.com"><i class="fa fa-envelope"></i></a></li></ul></div><div class="toc-container in-sidebar animated fadeInDown"><details class="ltr" open><summary>目录</summary><div class="toclist-container"><div class="tocmenu"><ol class="toclist"><li class="toclist-item toclist-level-1"><a class="toclist-link"><span class="toclist-text">hexo-theme-Anatolo</span></a><ol class="toclist-child"><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#%E5%85%B3%E4%BA%8E%E4%B8%BB%E9%A2%98"><span class="toclist-text">关于主题</span></a></li><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#%E6%94%B9%E8%BF%9B"><span class="toclist-text">改进</span></a></li><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#%E5%B7%B2%E7%9F%A5bug%EF%BC%88feature%EF%BC%89"><span class="toclist-text">已知bug（feature）</span></a></li><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#%E4%BD%BF%E7%94%A8"><span class="toclist-text">使用</span></a><ol class="toclist-child"><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#%E5%AE%89%E8%A3%85"><span class="toclist-text">安装</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#%E9%85%8D%E7%BD%AE"><span class="toclist-text">配置</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#%E6%9B%B4%E6%96%B0"><span class="toclist-text">更新</span></a></li></ol></li></ol></li></ol></div></div></details></div></div><div class="footer"><div class="p"> <span> 如未声明则为CC-BY-SA-3.0 </span><i class="fa fa-star"></i><span> Lhcfl</span></div><div class="by_farbox"><span>Powered by </span><a href="https://hexo.io/zh-cn/" target="_blank">Hexo </a><span> & </span><a href="https://github.com/Lhcfl/hexo-theme-anatolo" target="_blank">Anatolo </a></div><div class="beian"></div></div></div><div class="main animated fadeInDown"><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated"><div class="post-title"><h3><a>Hexo主题Anatolo发布</a></h3></div><div class="post-content"><p><h1>hexo-theme-Anatolo</h1>
+<p><a href="https://lhcfl.github.io/Anatolodemo">demo</a><br>
+<a href="https://lhcfl.github.io">博客样例</a></p>
+<p><a target="_blank" rel="noopener" href="https://gitee.com/Lhcfl/hexo-theme-anatolo">国内镜像</a></p>
+<h2 id="关于主题">关于主题<a class="header-anchor" href="#关于主题"> ¶</a></h2>
+<p>基于ben02的<a target="_blank" rel="noopener" href="https://github.com/Ben02/hexo-theme-Anatole">Anatole主题</a>进行了大量修改，增添和优化。<br>
+搜索框代码来自主题Icarus。二主题都采用MIT License，故本主题也采用之。<br>
+部分代码参考了Anatole-core</p>
+<p>简约、美观、实用</p>
+<p>如果有任何建议欢迎issue，也可以提出pr。</p>
+<p>由于我不会css，pug和javascript，许多代码是能用就行，</p>
+<h2 id="改进">改进<a class="header-anchor" href="#改进"> ¶</a></h2>
+<ul>
+<li>我在学世界语所以主题改名为Anatolo（</li>
+<li>增加了文章概要的选项</li>
+<li>增加了英语支持</li>
+<li>增加了可选的搜索框</li>
+<li>增加了可选的标签页和标签云</li>
+<li>增加了可选的toc支持和深度调整</li>
+<li>优化了css文件，优化了主题的颜色等，将部分css改为stylus方便编译</li>
+<li>调整了部分选项的可选性</li>
+<li>增加了nav menu的编辑支持</li>
+<li>增加了文章底部的copyright栏</li>
+<li>增加了文章的字数统计</li>
+<li>增加了主题的debug支持</li>
+<li>优化了部分代码</li>
+<li>增加了部分社交账号支持</li>
+<li>增加了显示网站备案号功能和百度统计</li>
+</ul>
+<h2 id="已知bug（feature）">已知bug（feature）<a class="header-anchor" href="#已知bug（feature）"> ¶</a></h2>
+<ul>
+<li>原主题的葡萄牙语支持无法更新</li>
+<li>TOC放置可能不够美观</li>
+<li>当Nav栏放置过多链接时可能导致右侧按钮下移</li>
+</ul>
+<h2 id="使用">使用<a class="header-anchor" href="#使用"> ¶</a></h2>
+<h3 id="安装">安装<a class="header-anchor" href="#安装"> ¶</a></h3>
+<p>Clone:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git clone https://gitee.com/Lhcfl/hexo-theme-anatolo.git themes/Anatolo</span><br><span class="line"></span><br><span class="line">或者直接下载主题zip包解压至主题目录下，重命名为Anatolo</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>安装依赖</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-renderer-pug --save</span><br><span class="line">npm install hexo-renderer-stylus --save</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="配置">配置<a class="header-anchor" href="#配置"> ¶</a></h3>
+<p>复制<code>_config.example.yml</code>为<code>_config.yml</code><br>
+修改hexo根目录下的 <code>_config.yml</code> ： <code>theme: Anatolo</code></p>
+<h3 id="更新">更新<a class="header-anchor" href="#更新"> ¶</a></h3>
+<p>在Anatolo的目录下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git pull origin master</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+</p></div><div class="post-footer"><div class="tip">本文采用CC-BY-SA-3.0协议，转载请注明出处<br>作者: Lhcfl</div><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2022-08-04</span><i class="fa fa-tag"></i><a class="tag" href="/tags/Hexo/" title="Hexo">Hexo </a><i class="fa fa-tag"></i><a class="tag" href="/tags/主题/" title="主题">主题 </a><i class="fa fa-tag"></i><a class="tag" href="/tags/CSS/" title="CSS">CSS </a><span class="leancloud_visitors"></span><span>大约445个字, 1分钟29秒读完</span></div></div></div></div><div class="share"><div class="evernote"><a class="fa fa-bookmark" href="" onclick="javascript:join_favorite()" ref="sidebar"></a></div><div class="weibo"><a class="fa fa-weibo" href="javascript:void((function(s,d,e){try{}catch(e){}var f='http://service.weibo.com/share/share.php?',u=d.location.href,p=['url=',e(u),'&amp;title=',e(d.title),'&amp;appkey=2924220432'].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=620,height=450,left=',(s.width-620)/2,',top=',(s.height-450)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})(screen,document,encodeURIComponent));"></a></div><div class="twitter"><a class="fa fa-twitter" target="_blank" rel="noopener" href="http://twitter.com/intent/tweet?text=%E5%88%86%E4%BA%AB%E6%96%87%E7%AB%A0%EF%BC%9A%0A%0ALhc_fl%20Home%20%C2%B7%20Hexo%E4%B8%BB%E9%A2%98Anatolo%E5%8F%91%E5%B8%83%0Ahttp://lhcfl.github.io/2022/08/04/Anatolo/%0A"></a></div></div><div class="pagination"><ul class="clearfix"><li class="pre pagbuttons"><a class="btn" role="navigation" href="/2022/08/06/long-hair/" title="针对MtF的长发养成指南">上一篇</a></li><li class="next pagbuttons"><a class="btn" role="navigation" href="/2022/08/04/hitokoto/" title="一言">下一篇</a></li></ul></div><script src="/js/visitors.js"></script><a id="comments"></a><div id="gitalk_container" style="padding:10px"></div><script>loadComment();</script></div></div></div></div></main-outlet><script>(function(window){var INSIGHT_CONFIG={TRANSLATION:{POSTS:"文章",PAGES:"页面",CATEGORIES:"分类",TAGS:"标签",UNTITLED:"(无标题)",},CONTENT_URL:"/content.json",};window.INSIGHT_CONFIG=INSIGHT_CONFIG})(window);</script><script src="/js/insight.js" defer></script><div class="searchbox ins-search"><div class="searchbox-container ins-search-container"><div class="searchbox-input-wrapper"><input class="searchbox-input ins-search-input" type="text" placeholder="想要查找什么..."><span class="searchbox-close"><a class="fa fa-times-circle" onclick="closeWindow();"></a></span></div><div class="searchbox-result-wrapper ins-section-wrapper"><div class="ins-section-container"><p>Seraching...</p></div></div></div></div></body></html>

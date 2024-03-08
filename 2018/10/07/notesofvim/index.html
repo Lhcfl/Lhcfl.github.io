@@ -1,0 +1,217 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Lhcfl"><title>Vim学习笔记 · Lhc_fl Home</title><meta name="description" content="Vim的学习笔记
+
+
+基础按键 ¶
+
+
+
+按键
+作用
+
+
+
+
+什么都不按
+普通模式
+
+
+i
+输入模式
+
+
+Esc
+从输入模式退出
+
+
+：
+命令模式
+
+
+v
+可视模式
+
+
+↑
+上
+
+
+↓
+下
+
+
+←
+左
+
+
+→
+右
+
+
+
+基础命令 ¶
+普通模式 ¶
+
+
+
+命令
+作用
+
+
+
+
+:open [file]
+"><meta name="keywords" content="Blog,博客,Hexo"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta id="site_root_url" data="/"><meta id="default-theme" data="light"><meta name="renderer" content="webkit"><link rel="shortcut icon" type="image/x-icon" href="/images/logo.png"><link rel="stylesheet" href="/css/theme/light.css"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/insight.css"><link rel="stylesheet" href="/css/search.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><script src="/js/url_for.js"></script><script src="/js/friends-link-generator.js"></script><script src="/js/jquery.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/site.js"></script><script src="/js/router.js"></script><script src="/js/darkLightToggle.js"></script><script src="/js/add-bookmark.js"></script><link rel="stylesheet" href="/css/comments/gittalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script><script>function loadComment(retry = 3) { 
+  const id = site.getThis()?.title || 'Vim学习笔记';
+  if (!id) {
+    if (retry > 0) {
+      setTimeout(() => loadComment(retry - 1), 1000);
+    }
+    return;
+  }
+  const gitalk = new Gitalk({
+    clientID: '12a250ac67f452906dd6',
+    clientSecret: '7422a9ecdc933d5e6facbc61d546bced40519f0b',
+    repo: 'Lhcfl.github.io',      // The repository of store comments,
+    owner: 'Lhcfl',
+    admin: ['Lhcfl'],
+    id,      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+  gitalk.render('gitalk_container')
+}
+</script><meta name="generator" content="Hexo 6.3.0"></head><body><main-outlet><div class="page-top animated"><div class="nav"><li> <a href="/">首页</a></li><li> <a href="/archives">归档</a></li><li> <a href="/tags">标签</a></li><li> <a href="/about">关于</a></li><li> <a href="/links">友链</a></li></div><div class="information"><div class="nav_right_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li><li><a class="fa fa-search" onclick="openWindow();"></a></li><li><a class="fa fa-sun-o" onclick="darkLightToggle();"></a></li></div><div class="avatar"><img src="/images/logo.png"></div></div></div><div class="toc-mobile"><div class="toc-button"><span>目录</span></div><div class="toc-container in-page animated fadeInDown"><div class="toclist-container"><div class="tocmenu"><ol class="toclist"><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#%E5%9F%BA%E7%A1%80%E6%8C%89%E9%94%AE"><span class="toclist-text">基础按键</span></a></li><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#%E5%9F%BA%E7%A1%80%E5%91%BD%E4%BB%A4"><span class="toclist-text">基础命令</span></a><ol class="toclist-child"><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#%E6%99%AE%E9%80%9A%E6%A8%A1%E5%BC%8F"><span class="toclist-text">普通模式</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#%E5%8F%AF%E8%A7%86%E6%A8%A1%E5%BC%8F"><span class="toclist-text">可视模式</span></a></li></ol></li><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#%E4%B8%80%E4%B8%AA%E6%96%B9%E4%BE%BF%E7%9A%84-vimrc"><span class="toclist-text">一个方便的.vimrc</span></a></li></ol></div></div></div></div><div class="sidebar animated"><div class="sidebar-top"><div class="logo-title"><div class="title"><img src="/images/logo.png" style="width:250px;" alt="favicon"><h3 title=""><a href="/">Lhc_fl Home</a></h3><div class="description"><p>欢迎来到Chelationland!</p></div></div><ul class="social-links"><li><a target="_blank" rel="noopener" href="https://github.com/Lhcfl"><i class="fa fa-github"></i></a></li><li><a href="mailto:lhcfl@outlook.com"><i class="fa fa-envelope"></i></a></li></ul></div><div class="toc-container in-sidebar animated fadeInDown"><details class="ltr" open><summary>目录</summary><div class="toclist-container"><div class="tocmenu"><ol class="toclist"><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#%E5%9F%BA%E7%A1%80%E6%8C%89%E9%94%AE"><span class="toclist-text">基础按键</span></a></li><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#%E5%9F%BA%E7%A1%80%E5%91%BD%E4%BB%A4"><span class="toclist-text">基础命令</span></a><ol class="toclist-child"><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#%E6%99%AE%E9%80%9A%E6%A8%A1%E5%BC%8F"><span class="toclist-text">普通模式</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#%E5%8F%AF%E8%A7%86%E6%A8%A1%E5%BC%8F"><span class="toclist-text">可视模式</span></a></li></ol></li><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#%E4%B8%80%E4%B8%AA%E6%96%B9%E4%BE%BF%E7%9A%84-vimrc"><span class="toclist-text">一个方便的.vimrc</span></a></li></ol></div></div></details></div></div><div class="footer"><div class="p"> <span> 如未声明则为CC-BY-SA-3.0 </span><i class="fa fa-star"></i><span> Lhcfl</span></div><div class="by_farbox"><span>Powered by </span><a href="https://hexo.io/zh-cn/" target="_blank">Hexo </a><span> & </span><a href="https://github.com/Lhcfl/hexo-theme-anatolo" target="_blank">Anatolo </a></div><div class="beian"></div></div></div><div class="main animated fadeInDown"><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated"><div class="post-title"><h3><a>Vim学习笔记</a></h3></div><div class="post-content"><p><p>Vim的学习笔记</p>
+<span id="more"></span>
+<hr>
+<h2 id="基础按键">基础按键<a class="header-anchor" href="#基础按键"> ¶</a></h2>
+<table>
+<thead>
+<tr>
+<th>按键</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>什么都不按</td>
+<td>普通模式</td>
+</tr>
+<tr>
+<td><kbd>i</kbd></td>
+<td>输入模式</td>
+</tr>
+<tr>
+<td><kbd>Esc</kbd></td>
+<td>从输入模式退出</td>
+</tr>
+<tr>
+<td><kbd>：</kbd></td>
+<td>命令模式</td>
+</tr>
+<tr>
+<td><kbd>v</kbd></td>
+<td>可视模式</td>
+</tr>
+<tr>
+<td><kbd>↑</kbd></td>
+<td>上</td>
+</tr>
+<tr>
+<td><kbd>↓</kbd></td>
+<td>下</td>
+</tr>
+<tr>
+<td><kbd>←</kbd></td>
+<td>左</td>
+</tr>
+<tr>
+<td><kbd>→</kbd></td>
+<td>右</td>
+</tr>
+</tbody>
+</table>
+<h2 id="基础命令">基础命令<a class="header-anchor" href="#基础命令"> ¶</a></h2>
+<h3 id="普通模式">普通模式<a class="header-anchor" href="#普通模式"> ¶</a></h3>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>:open [file]</code></td>
+<td>打开文件</td>
+</tr>
+<tr>
+<td><code>:qa!</code></td>
+<td>强退</td>
+</tr>
+<tr>
+<td><code>:![command]</code></td>
+<td>在shell执行<code>[command]</code>这条命令</td>
+</tr>
+<tr>
+<td><code>:w</code></td>
+<td>保存</td>
+</tr>
+<tr>
+<td><code>:q</code></td>
+<td>退出</td>
+</tr>
+<tr>
+<td><code>:set</code></td>
+<td>设置</td>
+</tr>
+<tr>
+<td><code>:set guifont [font]</code></td>
+<td>设置字体为<code>[font]</code></td>
+</tr>
+<tr>
+<td><code>:set guifont [font]:h[number]</code></td>
+<td>设置字体为<code>[font]</code>，字号为<code>[number]</code></td>
+</tr>
+<tr>
+<td><code>dd</code></td>
+<td>删除整行</td>
+</tr>
+<tr>
+<td><code>[number]dd</code></td>
+<td>删除下<code>[number]</code>行</td>
+</tr>
+<tr>
+<td><code>u</code></td>
+<td>撤销</td>
+</tr>
+<tr>
+<td><code>[number]=[方向键]</code></td>
+<td>向<code>[方向键]</code>方向<code>[number]</code>行自动缩进</td>
+</tr>
+<tr>
+<td><code>r</code></td>
+<td>用你下一个输入的字符替换后面一个字符</td>
+</tr>
+</tbody>
+</table>
+<h3 id="可视模式">可视模式<a class="header-anchor" href="#可视模式"> ¶</a></h3>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>y</code></td>
+<td>复制</td>
+</tr>
+<tr>
+<td><code>p</code></td>
+<td>粘贴</td>
+</tr>
+</tbody>
+</table>
+<h2 id="一个方便的-vimrc">一个方便的.vimrc<a class="header-anchor" href="#一个方便的-vimrc"> ¶</a></h2>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span> <span class="keyword">ts</span>=<span class="number">4</span>                    <span class="comment">&quot;设置tab为4空格</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span> expandtab               <span class="comment">&quot;用空格替代tab</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span> nocompatible            <span class="comment">&quot; 关闭 vi 兼容模式</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">syntax</span> <span class="keyword">on</span>                   <span class="comment">&quot; 自动语法高亮</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span> <span class="keyword">number</span>                  <span class="comment">&quot; 显示行号</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span> cursorline              <span class="comment">&quot; 突出显示当前行</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span> ruler                   <span class="comment">&quot; 打开状态栏标尺</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span> <span class="built_in">shiftwidth</span>=<span class="number">4</span>            <span class="comment">&quot; 设定 &lt;&lt; 和 &gt;&gt; 命令移动时的宽度为 4</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span> softtabstop=<span class="number">4</span>           <span class="comment">&quot; 使得按退格键时可以一次删掉 4 个空格</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">colorscheme</span> molokai</span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span> nobackup                <span class="comment">&quot; 覆盖文件时不备份</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span> autochdir               <span class="comment">&quot; 自动切换当前目录为当前文件所在的目录</span></span><br><span class="line"></span><br><span class="line"><span class="string">&quot;filetype plugin indent on   &quot;</span> 开启插件</span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span> backupcopy=yes          <span class="comment">&quot; 设置备份时的行为为覆盖</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span> ignorecase smartcase    <span class="comment">&quot; 搜索时忽略大小写，但在有一个或以上大写字母时仍保持对大小写敏感</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span> nowrapscan              <span class="comment">&quot; 禁止在搜索到文件两端时重新搜索</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span> incsearch               <span class="comment">&quot; 输入搜索内容时就显示搜索结果</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span> hlsearch                <span class="comment">&quot; 搜索时高亮显示被找到的文本</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span> noerrorbells            <span class="comment">&quot; 关闭错误信息响铃</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span> novisualbell            <span class="comment">&quot; 关闭使用可视响铃代替呼叫</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span> t_vb=                   <span class="comment">&quot; 置空错误铃声的终端代码</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span> magic                   <span class="comment">&quot; 设置魔术</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span> hidden                  <span class="comment">&quot; 允许在有未保存的修改时切换缓冲区，此时的修改由 vim 负责保存</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span> guioptions-=T           <span class="comment">&quot; 隐藏工具栏</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span> guioptions-=<span class="keyword">m</span>           <span class="comment">&quot; 隐藏菜单栏</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span> smartindent             <span class="comment">&quot; 开启新行时使用智能自动缩进</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span> backspace=<span class="built_in">indent</span>,eol,start</span><br><span class="line"></span><br><span class="line">                            <span class="comment">&quot; 不设定在插入状态无法用退格键和 Delete 键删除回车符</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span> cmdheight=<span class="number">1</span>             <span class="comment">&quot; 设定命令行的行数为 1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span> laststatus=<span class="number">2</span>            <span class="comment">&quot; 显示状态栏 (默认值为 1, 无法显示状态栏)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span> statusline=\ %&lt;%F[%<span class="number">1</span>*%M%*%n%R%H]%=\ %<span class="keyword">y</span>\ %<span class="number">0</span>(%&#123;&amp;fileformat&#125;\ %&#123;&amp;encoding&#125;\ %<span class="keyword">c</span>:%<span class="keyword">l</span>/%L%)\ </span><br><span class="line"></span><br><span class="line">                            <span class="comment">&quot; 设置在状态行显示的信息</span></span><br><span class="line"></span><br><span class="line"><span class="string">&quot;set foldenable              &quot;</span> 开始折叠</span><br><span class="line"><span class="comment">&quot;</span></span><br><span class="line"><span class="string">&quot;set foldmethod=syntax       &quot;</span> 设置语法折叠</span><br><span class="line"><span class="comment">&quot;</span></span><br><span class="line"><span class="string">&quot;set foldcolumn=0            &quot;</span> 设置折叠区域的宽度</span><br><span class="line"><span class="comment">&quot;</span></span><br><span class="line"><span class="string">&quot;setlocal foldlevel=1        &quot;</span> 设置折叠层数为</span><br><span class="line"><span class="comment">&quot;</span></span><br><span class="line"><span class="string">&quot;set foldclose=all           &quot;</span> 设置为自动关闭折叠                            </span><br><span class="line"><span class="comment">&quot;</span></span><br><span class="line"><span class="comment">&quot;inoremap &lt;space&gt; @=((foldclosed(line(&#x27;.&#x27;)) &lt; 0) ? &#x27;zc&#x27; : &#x27;zo&#x27;)&lt;CR&gt;</span></span><br><span class="line"></span><br><span class="line">                            <span class="comment">&quot; 用空格键来开关折叠</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span> whichwrap+=&lt;,&gt;,[,]</span><br><span class="line"><span class="keyword">inoremap</span> ( ()<span class="symbol">&lt;LEFT&gt;</span></span><br><span class="line"><span class="keyword">inoremap</span> &#123; &#123;&#125;<span class="symbol">&lt;LEFT&gt;</span></span><br><span class="line"><span class="keyword">inoremap</span> [ []<span class="symbol">&lt;LEFT&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; 插件类快捷键</span></span><br><span class="line"><span class="keyword">map</span> <span class="symbol">&lt;c-b&gt;</span> :NERDTreeToggle<span class="symbol">&lt;CR&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">inoremap</span> <span class="symbol">&lt;silent&gt;</span><span class="symbol">&lt;expr&gt;</span><span class="symbol">&lt;Tab&gt;</span> <span class="built_in">pumvisible</span>() ? <span class="string">&quot;&lt;C-y&gt;&quot;</span> : coc#pum#visible() ? coc#_select_confirm() : <span class="string">&quot;&lt;Tab&gt;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; Use vim-plug</span></span><br><span class="line"><span class="comment">&quot; Plugged Start</span></span><br><span class="line"><span class="comment">&quot; Vim-Plug Start</span></span><br><span class="line"><span class="keyword">call</span> plug#begin(<span class="string">&#x27;~/.vim/plugged&#x27;</span>)</span><br><span class="line">Plug <span class="string">&#x27;itchyny/lightline.vim&#x27;</span>         <span class="comment">&quot; lightline插件底部状态栏</span></span><br><span class="line">Plug <span class="string">&#x27;scrooloose/nerdtree&#x27;</span>           <span class="comment">&quot; NERDTree</span></span><br><span class="line">Plug <span class="string">&#x27;Chiel92/vim-autoformat&#x27;</span></span><br><span class="line">Plug <span class="string">&#x27;dense-analysis/ale&#x27;</span></span><br><span class="line">Plug <span class="string">&#x27;neoclide/coc.nvim&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">call</span> plug#end()</span><br><span class="line"><span class="comment">&quot; Vim-Plug End</span></span><br><span class="line"><span class="comment">&quot; autocmd VimEnter * NERDTree</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; Plugged End</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+</p></div><div class="post-footer"><div class="tip">本文采用CC-BY-SA-3.0协议，转载请注明出处<br>作者: Lhcfl</div><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2018-10-07</span><i class="fa fa-tag"></i><a class="tag" href="/tags/笔记/" title="笔记">笔记 </a><i class="fa fa-tag"></i><a class="tag" href="/tags/Vim/" title="Vim">Vim </a><span class="leancloud_visitors"></span><span>大约855个字, 2分钟51秒读完</span></div></div></div></div><div class="share"><div class="evernote"><a class="fa fa-bookmark" href="" onclick="javascript:join_favorite()" ref="sidebar"></a></div><div class="weibo"><a class="fa fa-weibo" href="javascript:void((function(s,d,e){try{}catch(e){}var f='http://service.weibo.com/share/share.php?',u=d.location.href,p=['url=',e(u),'&amp;title=',e(d.title),'&amp;appkey=2924220432'].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=620,height=450,left=',(s.width-620)/2,',top=',(s.height-450)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})(screen,document,encodeURIComponent));"></a></div><div class="twitter"><a class="fa fa-twitter" target="_blank" rel="noopener" href="http://twitter.com/intent/tweet?text=%E5%88%86%E4%BA%AB%E6%96%87%E7%AB%A0%EF%BC%9A%0A%0ALhc_fl%20Home%20%C2%B7%20Vim%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%0Ahttp://lhcfl.github.io/2018/10/07/notesofvim/%0A"></a></div></div><div class="pagination"><ul class="clearfix"><li class="pre pagbuttons"><a class="btn" role="navigation" href="/2020/02/20/Python-selenium-auto-commit/" title="Python+selenium实现听力表单自动填写">上一篇</a></li><li class="next pagbuttons"><a class="btn" role="navigation" href="/2018/08/30/C%E9%BC%A0%E6%A0%87%E6%8E%A7%E5%88%B6%E5%87%BD%E6%95%B0%E5%AE%9E%E7%8E%B0/" title="C++鼠标控制函数实现">下一篇</a></li></ul></div><script src="/js/visitors.js"></script><a id="comments"></a><div id="gitalk_container" style="padding:10px"></div><script>loadComment();</script></div></div></div></div></main-outlet><script>(function(window){var INSIGHT_CONFIG={TRANSLATION:{POSTS:"文章",PAGES:"页面",CATEGORIES:"分类",TAGS:"标签",UNTITLED:"(无标题)",},CONTENT_URL:"/content.json",};window.INSIGHT_CONFIG=INSIGHT_CONFIG})(window);</script><script src="/js/insight.js" defer></script><div class="searchbox ins-search"><div class="searchbox-container ins-search-container"><div class="searchbox-input-wrapper"><input class="searchbox-input ins-search-input" type="text" placeholder="想要查找什么..."><span class="searchbox-close"><a class="fa fa-times-circle" onclick="closeWindow();"></a></span></div><div class="searchbox-result-wrapper ins-section-wrapper"><div class="ins-section-container"><p>Seraching...</p></div></div></div></div></body></html>

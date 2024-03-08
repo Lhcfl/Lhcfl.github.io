@@ -1,0 +1,266 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Lhcfl"><title>用GitHub建立自己的博客 · Lhc_fl Home</title><meta name="description" content="搭建这个网站失败了几次后终于成功了。于是决定把步骤和注意事项写下来，纪念一下。
+
+由于这个教程是完全面向一点准备都没有的人，因此，可能遇到已经做过了的，请自行跳过。
+注意，安装Git后全程请不要关闭Git Bash
+
+所需工具： ¶
+
+一台电脑 （废话）
+有自己的GitHub账户
+Git
+Node."><meta name="keywords" content="Blog,博客,Hexo"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta id="site_root_url" data="/"><meta id="default-theme" data="light"><meta name="renderer" content="webkit"><link rel="shortcut icon" type="image/x-icon" href="/images/logo.png"><link rel="stylesheet" href="/css/theme/light.css"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/insight.css"><link rel="stylesheet" href="/css/search.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><script src="/js/url_for.js"></script><script src="/js/friends-link-generator.js"></script><script src="/js/jquery.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/site.js"></script><script src="/js/router.js"></script><script src="/js/darkLightToggle.js"></script><script src="/js/add-bookmark.js"></script><link rel="stylesheet" href="/css/comments/gittalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script><script>function loadComment(retry = 3) { 
+  const id = site.getThis()?.title || '用GitHub建立自己的博客';
+  if (!id) {
+    if (retry > 0) {
+      setTimeout(() => loadComment(retry - 1), 1000);
+    }
+    return;
+  }
+  const gitalk = new Gitalk({
+    clientID: '12a250ac67f452906dd6',
+    clientSecret: '7422a9ecdc933d5e6facbc61d546bced40519f0b',
+    repo: 'Lhcfl.github.io',      // The repository of store comments,
+    owner: 'Lhcfl',
+    admin: ['Lhcfl'],
+    id,      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+  gitalk.render('gitalk_container')
+}
+</script><meta name="generator" content="Hexo 6.3.0"></head><body><main-outlet><div class="page-top animated"><div class="nav"><li> <a href="/">首页</a></li><li> <a href="/archives">归档</a></li><li> <a href="/tags">标签</a></li><li> <a href="/about">关于</a></li><li> <a href="/links">友链</a></li></div><div class="information"><div class="nav_right_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li><li><a class="fa fa-search" onclick="openWindow();"></a></li><li><a class="fa fa-sun-o" onclick="darkLightToggle();"></a></li></div><div class="avatar"><img src="/images/logo.png"></div></div></div><div class="toc-mobile"><div class="toc-button"><span>目录</span></div><div class="toc-container in-page animated fadeInDown"><div class="toclist-container"><div class="tocmenu"><ol class="toclist"><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#%E6%89%80%E9%9C%80%E5%B7%A5%E5%85%B7%EF%BC%9A"><span class="toclist-text">所需工具：</span></a></li><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"><span class="toclist-text">准备工作</span></a><ol class="toclist-child"><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#%E5%BB%BA%E7%AB%8B%E4%B8%80%E4%B8%AAGitHub%E8%B4%A6%E6%88%B7"><span class="toclist-text">建立一个GitHub账户</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#%E5%AE%89%E8%A3%85Git"><span class="toclist-text">安装Git</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#%E5%AE%89%E8%A3%85Node-js"><span class="toclist-text">安装Node.js</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#%E5%AE%89%E8%A3%85Hexo"><span class="toclist-text">安装Hexo</span></a></li></ol></li><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#%E5%88%9B%E5%BB%BA%E5%8D%9A%E5%AE%A2"><span class="toclist-text">创建博客</span></a></li><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#%E5%8F%91%E5%B8%83%E4%B8%80%E7%AF%87%E5%8D%9A%E5%AE%A2"><span class="toclist-text">发布一篇博客</span></a></li><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#%E5%8D%9A%E5%AE%A2%E9%85%8D%E7%BD%AE"><span class="toclist-text">博客配置</span></a><ol class="toclist-child"><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#%E7%94%A8%E6%88%B7%E8%AE%BE%E7%BD%AE"><span class="toclist-text">用户设置</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#github%E4%B8%8A%E4%BC%A0%E9%85%8D%E7%BD%AE"><span class="toclist-text">github上传配置</span></a></li></ol></li><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#%E7%BD%91%E9%A1%B5%E9%83%A8%E7%BD%B2%E5%88%B0GitHub"><span class="toclist-text">网页部署到GitHub</span></a></li><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#%E4%B8%BB%E9%A2%98"><span class="toclist-text">主题</span></a></li><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#%E7%9B%B8%E5%85%B3%E9%93%BE%E6%8E%A5%EF%BC%9A"><span class="toclist-text">相关链接：</span></a></li></ol></div></div></div></div><div class="sidebar animated"><div class="sidebar-top"><div class="logo-title"><div class="title"><img src="/images/logo.png" style="width:250px;" alt="favicon"><h3 title=""><a href="/">Lhc_fl Home</a></h3><div class="description"><p>欢迎来到Chelationland!</p></div></div><ul class="social-links"><li><a target="_blank" rel="noopener" href="https://github.com/Lhcfl"><i class="fa fa-github"></i></a></li><li><a href="mailto:lhcfl@outlook.com"><i class="fa fa-envelope"></i></a></li></ul></div><div class="toc-container in-sidebar animated fadeInDown"><details class="ltr" open><summary>目录</summary><div class="toclist-container"><div class="tocmenu"><ol class="toclist"><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#%E6%89%80%E9%9C%80%E5%B7%A5%E5%85%B7%EF%BC%9A"><span class="toclist-text">所需工具：</span></a></li><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"><span class="toclist-text">准备工作</span></a><ol class="toclist-child"><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#%E5%BB%BA%E7%AB%8B%E4%B8%80%E4%B8%AAGitHub%E8%B4%A6%E6%88%B7"><span class="toclist-text">建立一个GitHub账户</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#%E5%AE%89%E8%A3%85Git"><span class="toclist-text">安装Git</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#%E5%AE%89%E8%A3%85Node-js"><span class="toclist-text">安装Node.js</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#%E5%AE%89%E8%A3%85Hexo"><span class="toclist-text">安装Hexo</span></a></li></ol></li><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#%E5%88%9B%E5%BB%BA%E5%8D%9A%E5%AE%A2"><span class="toclist-text">创建博客</span></a></li><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#%E5%8F%91%E5%B8%83%E4%B8%80%E7%AF%87%E5%8D%9A%E5%AE%A2"><span class="toclist-text">发布一篇博客</span></a></li><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#%E5%8D%9A%E5%AE%A2%E9%85%8D%E7%BD%AE"><span class="toclist-text">博客配置</span></a><ol class="toclist-child"><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#%E7%94%A8%E6%88%B7%E8%AE%BE%E7%BD%AE"><span class="toclist-text">用户设置</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#github%E4%B8%8A%E4%BC%A0%E9%85%8D%E7%BD%AE"><span class="toclist-text">github上传配置</span></a></li></ol></li><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#%E7%BD%91%E9%A1%B5%E9%83%A8%E7%BD%B2%E5%88%B0GitHub"><span class="toclist-text">网页部署到GitHub</span></a></li><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#%E4%B8%BB%E9%A2%98"><span class="toclist-text">主题</span></a></li><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#%E7%9B%B8%E5%85%B3%E9%93%BE%E6%8E%A5%EF%BC%9A"><span class="toclist-text">相关链接：</span></a></li></ol></div></div></details></div></div><div class="footer"><div class="p"> <span> 如未声明则为CC-BY-SA-3.0 </span><i class="fa fa-star"></i><span> Lhcfl</span></div><div class="by_farbox"><span>Powered by </span><a href="https://hexo.io/zh-cn/" target="_blank">Hexo </a><span> & </span><a href="https://github.com/Lhcfl/hexo-theme-anatolo" target="_blank">Anatolo </a></div><div class="beian"></div></div></div><div class="main animated fadeInDown"><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated"><div class="post-title"><h3><a>用GitHub建立自己的博客</a></h3></div><div class="post-content"><p><p>搭建这个网站失败了几次后终于成功了。于是决定把步骤和注意事项写下来，纪念一下。</p>
+<span id="more"></span>
+<p>由于这个教程是完全面向一点准备都没有的人，因此，可能遇到已经做过了的，请自行跳过。</p>
+<p>注意，安装Git后全程请不要关闭Git Bash</p>
+<hr>
+<h2 id="所需工具：">所需工具：<a class="header-anchor" href="#所需工具："> ¶</a></h2>
+<ul>
+<li>一台电脑 <s>（废话）</s></li>
+<li>有自己的GitHub账户</li>
+<li>Git</li>
+<li>Node.js</li>
+<li>Hexo</li>
+</ul>
+<hr>
+<h2 id="准备工作">准备工作<a class="header-anchor" href="#准备工作"> ¶</a></h2>
+<ul>
+<li>
+<h3 id="建立一个GitHub账户">建立一个GitHub账户<a class="header-anchor" href="#建立一个GitHub账户"> ¶</a></h3>
+<ol>
+<li>
+<p>访问<a target="_blank" rel="noopener" href="https://github.com/">GitHub</a>,由于是外国网站，可能有一点慢。</p>
+</li>
+<li>
+<p>在网站上输入注册信息，点击<code>Sign up for GitHub</code>，按提示完成注册<br>
+<img src="https://gitee.com/lhcfl/photobed/raw/master/1.png" alt=""></p>
+</li>
+<li>
+<p>注册完成后，在欢迎页面点击“Start a project”以新建一个存储库<br>
+<img src="https://gitee.com/lhcfl/photobed/raw/master/2.PNG" alt=""></p>
+</li>
+<li>
+<p>在页面中把存储库名字命名为 <code>你的名字.github.io</code> ，其中“你的名字”为你的用户名。像我，就是<code>Lhcfl.github.io</code><br>
+<img src="https://gitee.com/lhcfl/photobed/raw/master/3.PNG" alt=""></p>
+</li>
+<li>
+<p>Github这里的步骤完成了！<br>
+如果你想要自己制作一个网页，可以上传你自己制作的<code>index.html</code>。<br>
+以下部分为不会自己做网页的人准备。<br>
+⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇</p>
+</li>
+</ol>
+</li>
+<li>
+<h3 id="安装Git">安装Git<a class="header-anchor" href="#安装Git"> ¶</a></h3>
+<ol>
+<li>
+<p>下载链接：<a target="_blank" rel="noopener" href="https://git-scm.com/downloads">https://git-scm.com/downloads</a>  点击“windows”即可<br>
+由于git是国外网站，很容易下载失败，也可以到我的百度网盘下载。<a target="_blank" rel="noopener" href="https://pan.baidu.com/s/13Z2gWHCJVqPnpMbY6bkz0w">链接</a></p>
+</li>
+<li>
+<p>安装即可。</p>
+</li>
+<li>
+<p>按<code>Win</code>+<code>R</code>，在“运行”框里输入<code>cmd</code>打开命令提示符</p>
+</li>
+<li>
+<p>输入<code>git --version</code>，如果显示了版本号即成功<br>
+（如果没有，可能是没有添加到Path，请自行百度“Git添加到Path”）</p>
+</li>
+</ol>
+</li>
+<li>
+<h3 id="安装Node-js">安装Node.js<a class="header-anchor" href="#安装Node-js"> ¶</a></h3>
+<ol>
+<li>
+<p>下载链接：<a target="_blank" rel="noopener" href="https://nodejs.org/zh-cn/">https://nodejs.org/zh-cn/</a>   (请下载长期支持版)</p>
+</li>
+<li>
+<p>安装</p>
+</li>
+<li>
+<p>按<code>Win</code>+<code>R</code>，在“运行”框里输入<code>cmd</code>打开命令提示符</p>
+</li>
+<li>
+<p>输入<code>node -v</code>，如果显示了版本号即成功</p>
+</li>
+</ol>
+</li>
+<li>
+<h3 id="安装Hexo">安装Hexo<a class="header-anchor" href="#安装Hexo"> ¶</a></h3>
+<ol>
+<li>
+<p>按<code>Win</code>+<code>R</code>，在“运行”框里输入<code>cmd</code>打开命令提示符</p>
+</li>
+<li>
+<p>输入<code>npm install -g hexo-cli</code>,回车</p>
+</li>
+<li>
+<p>等安装完成后，输入<code>hexo -v</code>, 如果显示了版本号即成功。</p>
+</li>
+</ol>
+</li>
+</ul>
+<h2 id="创建博客">创建博客<a class="header-anchor" href="#创建博客"> ¶</a></h2>
+<ol>
+<li>
+<p>在你喜欢的地方建立一个文件夹，可以叫Blog</p>
+</li>
+<li>
+<p>鼠标右键B，点击<code>Git Bash Here</code></p>
+</li>
+<li>
+<p>输入<code>hexo init</code>,回车.</p>
+</li>
+<li>
+<p>输入<code>npm install</code>,回车.</p>
+</li>
+<li>
+<p>输入<code>hexo g</code>,回车. 这个命令是部署你的Blog。默认生成一个叫“Hello,world”的博客</p>
+</li>
+<li>
+<p>输入<code>hexo s</code>,回车. 这个命令是把生成的网页放在本机服务器上，进入 <a target="_blank" rel="noopener" href="http://localhost:4000/">http://localhost:4000/</a> 就可以预览成果。</p>
+</li>
+<li>
+<p>看完以后，回到Git Bash，按<code>Ctrl</code>+<code>C</code>退出，这时 <a target="_blank" rel="noopener" href="http://localhost:4000/">http://localhost:4000/</a> 不再可以访问。</p>
+</li>
+</ol>
+<h2 id="发布一篇博客">发布一篇博客<a class="header-anchor" href="#发布一篇博客"> ¶</a></h2>
+<ol>
+<li>
+<p>在Git Bash里输入<code>hexo new &quot;博客名&quot;</code>,博客名可以改成任意的，但是要加英文引号。</p>
+</li>
+<li>
+<p>在<code>blog\source_posts</code> 路径下，会有一个 <a target="_blank" rel="noopener" href="http://xn--9kr2pz1q.md">博客名.md</a> 的文件。 编辑这个文件，然后保存。</p>
+</li>
+<li>
+<p>回到 Git Bash，输入 <code>hexo g</code></p>
+</li>
+<li>
+<p>输入 <code>hexo s</code>,进入 <a target="_blank" rel="noopener" href="http://localhost:4000/">http://localhost:4000/</a> 预览成果。按<code>Ctrl</code>+<code>C</code>退出</p>
+ <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">编辑时注意事项：</span><br><span class="line">文件里会有以下几行，不要删除！</span><br><span class="line">---</span><br><span class="line">title: 博客名</span><br><span class="line">date: XXXX-YY-ZZ</span><br><span class="line">tags:</span><br><span class="line">---</span><br><span class="line">（title后面是博客标题，date后面的是日期）</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="博客配置">博客配置<a class="header-anchor" href="#博客配置"> ¶</a></h2>
+<ul>
+<li>
+<h3 id="用户设置">用户设置<a class="header-anchor" href="#用户设置"> ¶</a></h3>
+<ol>
+<li>
+<p>打开<code>blog\_config.yml</code><br>
+找到 <code># Site</code>，添加博客名称，作者名字等。</p>
+ <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">说明：</span><br><span class="line">你会看到以下几行：</span><br><span class="line">title: </span><br><span class="line">subtitle: </span><br><span class="line">description:</span><br><span class="line">keywords:</span><br><span class="line">author: </span><br><span class="line">language: </span><br><span class="line">timezone:</span><br><span class="line"></span><br><span class="line">修改时，在对应行后面加入你的东西，</span><br><span class="line">如：</span><br><span class="line">title: 我的网页标题</span><br><span class="line">注意，冒号后面有一个英文空格。</span><br><span class="line"></span><br><span class="line">修改不同地方有不同意义。</span><br><span class="line">title后面加网页标题</span><br><span class="line">subtitle后面加副标题</span><br><span class="line">description后面加网页描述</span><br><span class="line">author后面加作者名字</span><br><span class="line">language后面加皮肤语言</span><br><span class="line">timezone建议不要修改！</span><br><span class="line">keywords作者还不知道什么意思QAQ</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>找到 <code># URL</code>, 填入 你的网页url。比如 <code>url: https://lhcfl.github.io</code></p>
+</li>
+</ol>
+</li>
+<li>
+<h3 id="github上传配置">github上传配置<a class="header-anchor" href="#github上传配置"> ¶</a></h3>
+<ol>
+<li>
+<p>获取 Github 对应的 Repository 的链接。<br>
+登陆 Github，进入到你所建立的那个存储库，点击 <code>Clone or download</code><br>
+复制 URL 待用</p>
+</li>
+<li>
+<p>修改博客的配置文件。<br>
+打开配置文件 <code>blog\_config.yml</code> 找到 <code>#Deployment</code>，填入以下内容：</p>
+ <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">deploy:  </span><br><span class="line">	type: git  </span><br><span class="line">	repository: 你的URL</span><br><span class="line">	branch: master</span><br></pre></td></tr></table></figure>
+<p><code>你的URL</code>里面填你复制的那个地址。</p>
+</li>
+<li>
+<p>回到 Git Bash<br>
+输入 <code>npm install hexo-deployer-git --save</code> 以安装 hexo-deployer-git (此步骤只需要做一次。)</p>
+</li>
+</ol>
+</li>
+</ul>
+<h2 id="网页部署到GitHub">网页部署到GitHub<a class="header-anchor" href="#网页部署到GitHub"> ¶</a></h2>
+<ul>
+<li>
+<p>回到Git Bash，输入 <code>hexo d</code><br>
+得到 INFO Deploy done: git 即为部署成功</p>
+</li>
+<li>
+<p>结果<br>
+到 <a target="_blank" rel="noopener" href="http://xn--6qqv7i14ofosyrb.github.io">你的用户名.github.io</a> 查看即可。这时别人已经可以使用这个域名访问你的博客了。</p>
+</li>
+</ul>
+<h2 id="主题">主题<a class="header-anchor" href="#主题"> ¶</a></h2>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://hexo.io/themes/">Hexo主题仓库</a></li>
+<li>这里，我们以主题Anatole为例子。许多Hexo的主题设置可能需要一定的额外设置。</li>
+<li><strong>操作方法：</strong>
+<ol>
+<li>
+<p>回到Git Bash，输入<code>git clone https://github.com/Ben02/hexo-theme-Anatole themes/Anatole</code><br>
+如果是别的主题，输入<code>git clone 主题的GitHub链接 themes/主题的名字</code></p>
+</li>
+<li>
+<p>打开 <code>blog\_config.yml</code><br>
+找到 theme:<br>
+把 Hexo 默认的主题 lanscape 修改成主题名，这里是 Anatole。 即 <code>theme: Anatole</code></p>
+</li>
+<li>
+<p>汉化：<br>
+找到 <code># Site</code>, 在<code>language: </code>后面写<code>zh-cn</code>,即<code>language: zh-cn</code><br>
+如果是别的主题，可以打开<code>blog\themes\主题名\languages</code>，里面的<code>.yml</code>文件就是语言文件。中文一般是叫<code>zh-cn</code>或<code>zh-hans</code><br>
+复制中文配置的无后缀名的文件名，填到<code># Site</code>的<code>language: </code>后面就行了。</p>
+</li>
+<li>
+<p>安装支持包<br>
+回到Git Bash，输入<code>npm install --save hexo-render-pug</code><br>
+如果是别的主题，先输入<code>npm install --save hexo-render-</code>，不要回车，再打开<code>blog\themes\主题名\layout</code>,看到什么后缀名就接着输入什么。<br>
+例如，<code>npm install --save hexo-render-ejs</code>。<br>
+（不知道后缀名是什么？请自行百度一下）</p>
+</li>
+<li>
+<p>修改图标。进入<code>blog\themes\Anatole\source\images</code>, 里面有三个文件。<br>
+<code>favicon.png</code>是网页的图标。<br>
+<code>logo.png</code>和<code>logo@2x.png</code>是你的头像。<br>
+如果觉得想要修改，替换成自己的就行了</p>
+</li>
+<li>
+<p>添加about页和links页<br>
+在<code>blog\source</code>下建立两个文件夹，分别叫做<code>about</code>和<code>links</code><br>
+<a target="_blank" rel="noopener" href="http://xn--index-fg1hqc2j2bc55tbvpvngqvm2xhqzynozy12o.md">在这两个文件夹下各创建一个index.md</a><br>
+按文档的方式编辑保存即可</p>
+</li>
+<li>
+<p>测试。回到 Git Bash，输入 <code>hexo g</code>，回车后输入 <code>hexo s</code>,进入 <a target="_blank" rel="noopener" href="http://localhost:4000/">http://localhost:4000/</a> 预览成果。按<code>Ctrl</code>+<code>C</code>退出</p>
+</li>
+<li>
+<p>如果在Git Bash输入了<code>hexo g</code>和<code>hexo s</code>后，预览后图标没变，请输入<code>hexo clean</code>并重试。</p>
+</li>
+</ol>
+</li>
+</ul>
+<hr>
+<h2 id="相关链接：">相关链接：<a class="header-anchor" href="#相关链接："> ¶</a></h2>
+<ul>
+<li>Hexo主题 <a target="_blank" rel="noopener" href="https://hexo.io/themes/">https://hexo.io/themes/</a></li>
+<li>Hexo文档 <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/">https://hexo.io/zh-cn/docs/</a></li>
+<li>Anatole主题Wiki: <a target="_blank" rel="noopener" href="https://github.com/Ben02/hexo-theme-Anatole/wiki">https://github.com/Ben02/hexo-theme-Anatole/wiki</a></li>
+</ul>
+</p></div><div class="post-footer"><div class="tip">本文采用CC-BY-SA-3.0协议，转载请注明出处<br>作者: Lhcfl</div><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2018-08-24</span><i class="fa fa-tag"></i><a class="tag" href="/tags/Hexo/" title="Hexo">Hexo </a><i class="fa fa-tag"></i><a class="tag" href="/tags/教程/" title="教程">教程 </a><i class="fa fa-tag"></i><a class="tag" href="/tags/GitHub/" title="GitHub">GitHub </a><i class="fa fa-tag"></i><a class="tag" href="/tags/Blog/" title="Blog">Blog </a><span class="leancloud_visitors"></span><span>大约1734个字, 5分钟46秒读完</span></div></div></div></div><div class="share"><div class="evernote"><a class="fa fa-bookmark" href="" onclick="javascript:join_favorite()" ref="sidebar"></a></div><div class="weibo"><a class="fa fa-weibo" href="javascript:void((function(s,d,e){try{}catch(e){}var f='http://service.weibo.com/share/share.php?',u=d.location.href,p=['url=',e(u),'&amp;title=',e(d.title),'&amp;appkey=2924220432'].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=620,height=450,left=',(s.width-620)/2,',top=',(s.height-450)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})(screen,document,encodeURIComponent));"></a></div><div class="twitter"><a class="fa fa-twitter" target="_blank" rel="noopener" href="http://twitter.com/intent/tweet?text=%E5%88%86%E4%BA%AB%E6%96%87%E7%AB%A0%EF%BC%9A%0A%0ALhc_fl%20Home%20%C2%B7%20%E7%94%A8GitHub%E5%BB%BA%E7%AB%8B%E8%87%AA%E5%B7%B1%E7%9A%84%E5%8D%9A%E5%AE%A2%0Ahttp://lhcfl.github.io/2018/08/24/%E7%94%A8GitHub%E5%BB%BA%E7%AB%8B%E8%87%AA%E5%B7%B1%E7%9A%84%E5%8D%9A%E5%AE%A2/%0A"></a></div></div><div class="pagination"><ul class="clearfix"><li class="pre pagbuttons"><a class="btn" role="navigation" href="/2018/08/30/C%E9%BC%A0%E6%A0%87%E6%8E%A7%E5%88%B6%E5%87%BD%E6%95%B0%E5%AE%9E%E7%8E%B0/" title="C++鼠标控制函数实现">上一篇</a></li><li class="next pagbuttons"><a class="btn" role="navigation" href="/2018/08/23/My-First-Blog/" title="My First Blog">下一篇</a></li></ul></div><script src="/js/visitors.js"></script><a id="comments"></a><div id="gitalk_container" style="padding:10px"></div><script>loadComment();</script></div></div></div></div></main-outlet><script>(function(window){var INSIGHT_CONFIG={TRANSLATION:{POSTS:"文章",PAGES:"页面",CATEGORIES:"分类",TAGS:"标签",UNTITLED:"(无标题)",},CONTENT_URL:"/content.json",};window.INSIGHT_CONFIG=INSIGHT_CONFIG})(window);</script><script src="/js/insight.js" defer></script><div class="searchbox ins-search"><div class="searchbox-container ins-search-container"><div class="searchbox-input-wrapper"><input class="searchbox-input ins-search-input" type="text" placeholder="想要查找什么..."><span class="searchbox-close"><a class="fa fa-times-circle" onclick="closeWindow();"></a></span></div><div class="searchbox-result-wrapper ins-section-wrapper"><div class="ins-section-container"><p>Seraching...</p></div></div></div></div></body></html>
