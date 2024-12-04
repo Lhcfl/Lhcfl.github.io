@@ -1,0 +1,133 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Linca"><title>讨厌Python的N个理由 · Zero Calorie Drink Shop</title><meta name="description" content="谁喜欢 Python 啊，反正我不喜欢。
+
+缩进噩梦 ¶
+如果要说 Python 给一个普通人（不是语言律师或者数学家）带来的最大印象是什么，我想缩进决定代码块绝对是其中之一。
+喜欢 Python 的人会觉得这种缩进非常的方便，少敲一个大括号，还不用在文件末尾看到 &amp;#125;&amp;#125;&amp;#125"><meta name="keywords" content="Code"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="mobile-web-app-capable" content="yes"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta id="site_data_static" data-url="/"><meta name="renderer" content="webkit"><link rel="shortcut icon" type="image/x-icon" href="/images/logo.png"><link rel="stylesheet" href="/js_complied/bundle.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><script src="/js_complied/bundle.js"></script><script>Utils.loadCSS("https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200..900&family=Noto+Serif+KR:wght@200..900&family=Noto+Serif+SC:wght@200..900&family=Noto+Serif+TC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap");
+Utils.loadCSS("https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css");
+Utils.loadCSS("/css/font-awesome.min.css");</script><meta name="generator" content="Hexo 7.3.0"></head><body class="post-page"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200..900&amp;family=Noto+Serif+KR:wght@200..900&amp;family=Noto+Serif+SC:wght@200..900&amp;family=Noto+Serif+TC:wght@200..900&amp;family=Noto+Serif:ital,wght@0,100..900;1,100..900&amp;display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"></noscript><nav class="nav"><a href="/">Home</a>&nbsp;&nbsp;<a href="/archives">Archives</a>&nbsp;&nbsp;<a href="/tags">Tags</a>&nbsp;&nbsp;<a href="/about">About</a>&nbsp;&nbsp;<a href="/links">Links</a>&nbsp;&nbsp;<a href="/search">Search</a>&nbsp;&nbsp;<a href="javascript:SoSimple.darkLightToggle()">Dark/Light Mode</a></nav><div class="main"><div class="post-container post-full"><div class="post-title"><h1>讨厌Python的N个理由</h1></div><div class="post-body"><p>谁喜欢 Python 啊，反正我不喜欢。</p>
+<span id="more"></span>
+<h3 id="缩进噩梦">缩进噩梦<a class="header-anchor" href="#缩进噩梦"> ¶</a></h3>
+<p>如果要说 Python 给一个普通人（不是语言律师或者数学家）带来的最大印象是什么，我想缩进决定代码块绝对是其中之一。</p>
+<p>喜欢 Python 的人会觉得这种缩进非常的方便，少敲一个大括号，还不用在文件末尾看到 <code>&#125;&#125;&#125;&#125;&#125;</code> 这样的经典 lisp 笑话（？）。但是稍微深入一点就会意识到这种缩进方式给 Python 带来了很大的先天缺陷。</p>
+<p>Python 的缩进在发明之出或许是友好的，毕竟它强迫初学者写出“能看”的代码，便于老手查看，而无须跑 formatter。（并且据 Python 发明者所说，当年的格式化工具并没有现在好用）。但是现在的 formatter 技术已经非常成熟，为 JavaScript 设计的格式化工具随便就能说出五六种。缩进给 Python 带来的益处已经消失不见了，反而带来无数的问题。</p>
+<p>最简单的，编辑是否方便的问题。别人写好的 Python 代码片段难以直接复制粘贴到编辑器中，你得先调好缩进。这也反应在现代编辑器中，想象你有这段代码：</p>
+<table width="100%">
+<tr>
+<td>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> a = <span class="hljs-number">1</span>;
+<span class="hljs-keyword">if</span> (<span class="hljs-title function_">foo</span>()) &#123;
+  a = <span class="hljs-number">2</span>;
+  <span class="hljs-title function_">bar</span>();
+&#125;
+<span class="hljs-title function_">other</span>();
+</code></pre>
+</td>
+<td>
+<pre><code class="hljs language-python">a = <span class="hljs-number">1</span>
+<span class="hljs-keyword">if</span> foo():
+  a = <span class="hljs-number">2</span>
+  bar()
+
+other()
+</code></pre>
+</td>
+</tr>
+</table>
+<p>在 VSCode 中你想要上下移动 <code>a = 2</code> 非常方便，只需要 <kbd>Alt</kbd> + <kbd>↑</kbd> / <kbd>↓</kbd> 就可以了。因为作用域是被括号明确标出的，编辑器很容易知道当 <code>a = 2</code> 移下两行的时候进入了另一个块中，可以自动调整这一行的缩进。但 Python 就不行，编辑器根本就看不出你是否打算让这一行进入另一个块中。这导致编码的时候你必须和缩进斗智斗勇，而不是你尽管写，由编辑器帮你跑 formatter，回车一下就能看到美观的代码。</p>
+<p>其次，这直接导致 Python 先天性地难以应用函数式思想。众所周知，Python 的 lambda 函数几乎是个废物，你必须控制 lambda 函数在一行以内</p>
+<pre><code class="hljs language-python"><span class="hljs-keyword">lambda</span> x : x + <span class="hljs-number">1</span>
+</code></pre>
+<p>很显然，抛开 Python 设计者看不起 lambda 函数不谈，python 缩进决定层次的思想就直接重创了 lambda 函数，因为 lambda 函数很难决定缩进位置。<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> 而 lambda 函数在函数式编程范式的美观性上极其重要，python 在这里直接缺一个</p>
+<p>举个例子，工程上很容易遇到类似这样的例子：需要把一个数组 filter 几下，map 几下，得到新的数组，举个例子</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> data = dataRaw
+  .<span class="hljs-title function_">filter</span>(<span class="hljs-function">(<span class="hljs-params">x</span>) =&gt;</span> x)
+  .<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">x</span>) =&gt;</span> &#123;
+    <span class="hljs-comment">// balabala...</span>
+    <span class="hljs-comment">// something...</span>
+    <span class="hljs-keyword">return</span> y;
+  &#125;);
+</code></pre>
+<p>这在 python 中必须要费力定义一个映射函数来用，因为你根本就没法在 lambda 函数里写多行！</p>
+<p>这在静态语言中都没这么致命，起码，要在外面定义一个函数，你得定义 arguments 的类型和 return 的类型，这样你起码知道一个函数传入了啥，返回啥</p>
+<p>而 lambda 函数巧妙避免了这个问题，因为调用链上每一个函数的类型都是可以肉眼看出的，并且肉眼看不出还可以自动推导。</p>
+<p>但是在 Python 里你必须得把这个函数拆出去，相当于分离了背景和逻辑。这个坑已经在 js 里犯过了，在 js 早期的“面向对象”中 <code>this</code> 完全就是梦魇，你根本就不知道 this 是个啥；在 Python 中这个问题以另一种方式体现，这些“本来没有被拆分的必要但是被拆分”的函数你难以肉眼瞪出参数和返回值。它不仅平添了代码的复杂性，让代码变得更丑陋，而且还更容易出错。</p>
+<h3 id="糟糕的设计">糟糕的设计<a class="header-anchor" href="#糟糕的设计"> ¶</a></h3>
+<p><a target="_blank" rel="noopener" href="https://lethain.com/digg-v4/">Digg’s v4 launch: an optimism born of necessity. | Irrational Exuberance</a> 讲述了当年曾可以与 Reddit 匹敌的科技网站 Digg，因为 Python 默认参数的特性导致了一个内存泄露问题，让 Digg 的用户迅速流失，最终在一年以后被 Beatworks 以 50 万美金的价格收购的故事。</p>
+<p>这个特性几乎可以说是 Python 独家。只要看下面的 REPL 过程，你就知道这是什么了：</p>
+<pre><code class="hljs language-python"><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-keyword">def</span> <span class="hljs-title function_">push1</span>(<span class="hljs-params">arr = []</span>):
+<span class="hljs-meta">... </span>    arr.append(<span class="hljs-number">1</span>)
+<span class="hljs-meta">... </span>    <span class="hljs-keyword">return</span> arr
+...
+<span class="hljs-meta">&gt;&gt;&gt; </span>push1()
+[<span class="hljs-number">1</span>]
+<span class="hljs-meta">&gt;&gt;&gt; </span>push1()
+[<span class="hljs-number">1</span>, <span class="hljs-number">1</span>]
+<span class="hljs-meta">&gt;&gt;&gt; </span>push1()
+[<span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>]
+<span class="hljs-meta">&gt;&gt;&gt; </span>push1()
+[<span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>]
+</code></pre>
+<p>Python 选择了一种很蠢的默认传参方式，默认参数始终共用同一个对象。这在别的语言看来几乎是匪夷所思的，只有 Python 必须要写出这样的傻 x 代码来传入默认参数：</p>
+<pre><code class="hljs language-python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">push1</span>(<span class="hljs-params">arr=<span class="hljs-literal">None</span></span>):
+  <span class="hljs-keyword">if</span> arr <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>:
+    arr = []
+  ...
+</code></pre>
+<p>繁琐又愚蠢，完全不符合 <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/DWIM">DWIM</a> 的思想。</p>
+<p>这可能只是 Python 糟糕设计的冰山一角。在我看来 Python 当得上最死板最没有表现力的流行语言的称号。（也可能要和 Java 竞争，不过我不写 Java，谁知道呢）。实际上，Python 整体就体现出一种思维，程序员不值钱，不需要有自己的思想，只需要把思路翻译成 Python 代码让计算机跑就好了。可能这种特性让 Python 作为教学语言会很合适，但是真的不适合成为最流行的语言之一。</p>
+<p>Python 的风格死板又诡异。既试图融入一些面向对象的元素，又摆脱不了过程式的影子，还想融一点函数式的元素。可以从简单的 <code>len()</code> 函数就能看出来，长度应该是某个对象的属性，但是 Python 选择用一个全局函数（What the fuck？）<code>len</code> 去处理。但是 Python 又确实提供了面向对象风格的类。Python 提供了函数式的 <code>map</code> ，却对 lambda 表达式嗤之以鼻。这些都让 Python 代码充满了一种诡异的不协调感。</p>
+<p>有点极端的反面教材是 Ruby，以自由浪漫闻名的同样的动态语言。<a target="_blank" rel="noopener" href="https://rubyonrails.org/doctrine/zh_cn">Rails 信条</a>如是说：</p>
+<blockquote>
+<p>是 Ruby 造就了 Rails，所以第一条信条便是从创造 Ruby 的核心理念所提炼出來。</p>
+<p>早期 Ruby 的极端邪说就是把程序员的幸福度放到第一位。还把追求幸福置于驱动编程语言与生态圈前进的考量之上。</p>
+<p>然而 Python 可能对于“用一种方法，最好只有一种方法来完成一件事”而感到自豪，而 Ruby 则喜欢自身表现力与巧妙。Java 是饱受软件工程师的强力推崇，Ruby 则在欢迎工具里就附上了自尽的绳子。Smalltalk 专注于消息传递的纯粹性，Ruby 则累积关键字和臃肿的语法构造。</p>
+</blockquote>
+<p>举个例子，这是一段来自 discourse/discourse 的 Ruby 代码。它要做的就是定义一个 TrashMessage 的过程。</p>
+<pre><code class="hljs language-ruby"><span class="hljs-keyword">class</span> <span class="hljs-title class_">TrashMessage</span>
+  <span class="hljs-keyword">include</span> <span class="hljs-title class_">Service::Base</span>
+
+  params <span class="hljs-keyword">do</span>
+    attribute <span class="hljs-symbol">:message_id</span>, <span class="hljs-symbol">:integer</span>
+    attribute <span class="hljs-symbol">:channel_id</span>, <span class="hljs-symbol">:integer</span>
+
+    validates <span class="hljs-symbol">:message_id</span>, <span class="hljs-symbol">presence:</span> <span class="hljs-literal">true</span>
+    validates <span class="hljs-symbol">:channel_id</span>, <span class="hljs-symbol">presence:</span> <span class="hljs-literal">true</span>
+  <span class="hljs-keyword">end</span>
+
+  model <span class="hljs-symbol">:message</span>
+  policy <span class="hljs-symbol">:invalid_access</span>
+
+  transaction <span class="hljs-keyword">do</span>
+    step <span class="hljs-symbol">:trash_message</span>
+    step <span class="hljs-symbol">:destroy_notifications</span>
+    step <span class="hljs-symbol">:update_last_message_ids</span>
+    step <span class="hljs-symbol">:update_tracking_state</span>
+    step <span class="hljs-symbol">:update_thread_reply_cache</span>
+  <span class="hljs-keyword">end</span>
+
+  step <span class="hljs-symbol">:publish_events</span>
+
+  <span class="hljs-keyword">private</span>
+
+  <span class="hljs-keyword">def</span> <span class="hljs-title function_">fetch_message</span>(<span class="hljs-params"><span class="hljs-symbol">params:</span></span>)
+    ...
+<span class="hljs-keyword">end</span>
+</code></pre>
+<p>Ruby 的放纵允许程序员定义出向上面这样离经叛道的写法，直接把步骤写成任务列表的格式，然后在按照列表里定义的名字编写每个小任务的函数。这使得 Ruby 程序非常富有表现力，可能看上去非常天马行空。</p>
+<p>相比而言，Python 的语法就死板得完全不懂变通。</p>
+<h3 id="糟糕的……大儒">糟糕的……大儒<a class="header-anchor" href="#糟糕的……大儒"> ¶</a></h3>
+<blockquote>
+<p>“入关之后，自有大儒为我辩经”</p>
+</blockquote>
+<p>我还是很尊重真心的语言爱好者的，但是当谈论起一些流行语言——不只是 Python 的时候，总是有一种自有大儒为我辩经的既视感</p>
+<p>Python 采用缩进？大儒们会说这是深思熟虑的选择，非常方便，大括号多么无用（哪怕 Python 之父后来自己承认这是一个败笔）Python 有意忽视 lambda 函数？大儒们会说又不是不能定义一个带名字的函数。反正大儒们终会找到理由。他们还有终极武器：Python 那么多库本身就说明搞底层的大佬接受这个语言的逻辑！</p>
+<p>（那还有银行在用 1960s 的 COBOL 呢，怎么，是因为 COBOL 设计得让它们爱不释手吗？）</p>
+<p>或者说大众语言本身是一种不好的话语权。如果大家都在用，那怕这语言设计得跟屎一样，你也得硬吃。典型的例子就是 Java 以后的语言花了 30 年的时间弥补 Java 的各种不足。典型的例子就是现代前端框架已经演变了好几代了还有人抱着 PHP 大喊 PHP 是世界上最好的语言，转手就写出一堆 SQL 注入的程序。</p>
+<hr class="footnotes-sep">
+<section class="footnotes">
+<ol class="footnotes-list">
+<li id="fn1" class="footnote-item"><p>实际上这是可以解决的，经典函数式语言 Haskell 就是使用的空白字符缩进。但是 Haskell 在多行 lambda 函数上也同样有游标卡尺的问题，而且 Haskell 支持显式使用大括号缩进，也可以用更加函数式的方式规避这个问题。 <a href="#fnref1" class="footnote-backref">↩︎</a></p>
+</li>
+</ol>
+</section>
+</div><div class="post-meta"><span class="info"><i class="fa fa-calendar"></i> <span class="date">2024-12-03</span>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Code/" title="Code">Code</a>  </span></div></div><p class="pagination"><a href="/2024/11/28/%E7%B1%BB%E5%9E%8B%E4%BD%93%E6%93%8D%E5%85%A5%E9%97%A8%EF%BC%9ASlice/" title="类型体操入门：Slice">Next</a></p><div class="comment-container"><div class="comment-container"><script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js" onload="(new Gitalk({&quot;clientID&quot;:&quot;12a250ac67f452906dd6&quot;,&quot;clientSecret&quot;:&quot;7422a9ecdc933d5e6facbc61d546bced40519f0b&quot;,&quot;repo&quot;:&quot;lhcfl.github.io&quot;,&quot;owner&quot;:&quot;lhcfl&quot;,&quot;admin&quot;:[&quot;lhcfl&quot;],&quot;id&quot;:&quot;讨厌Python的N个理由&quot;,&quot;distractionFreeMode&quot;:false})).render(&quot;gitalk-comment-slot&quot;)"></script><div id="gitalk-comment-slot">Loading...</div></div></div></div><footer class="footer"><br><p class="powered_by">Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> and <a target="_blank" rel="noopener" href="https://github.com/Lhcfl/hexo-theme-sosimple">SoSimple</a></p></footer></body></html>
