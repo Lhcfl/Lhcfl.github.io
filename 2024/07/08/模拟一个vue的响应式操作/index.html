@@ -1,0 +1,407 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Linca"><title>试着复刻一个vue的计算属性 · Zero Calorie Drink Shop</title><meta name="description" content="之前对于Vue的响应式封装（这里主要思考的是computed），主要是用用，其实是懒得思考背后的原理的。毕竟原理其实可以用一句话说明：计算属性对别的属性产生有向的依赖关系，这个依赖关系构成一个有向无环图（DAG），图上的某个节点更新后重新计算其所有后置节点即可。
+但是仔细想来，内部其实有一些时间复杂"><meta name="keywords" content="Code,Frontend,Javascript,Algorithm"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="mobile-web-app-capable" content="yes"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta id="site_data_static" data-url="/"><meta name="renderer" content="webkit"><link rel="shortcut icon" type="image/x-icon" href="/images/logo.png"><link rel="stylesheet" href="/js_complied/bundle.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><script src="/js_complied/bundle.js"></script><script>Utils.loadCSS("https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200..900&family=Noto+Serif+KR:wght@200..900&family=Noto+Serif+SC:wght@200..900&family=Noto+Serif+TC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap");
+Utils.loadCSS("https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css");
+Utils.loadCSS("/css/font-awesome.min.css");</script><meta name="generator" content="Hexo 7.3.0"></head><body class="post-page"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200..900&amp;family=Noto+Serif+KR:wght@200..900&amp;family=Noto+Serif+SC:wght@200..900&amp;family=Noto+Serif+TC:wght@200..900&amp;family=Noto+Serif:ital,wght@0,100..900;1,100..900&amp;display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"></noscript><nav class="nav"><a href="/">Home</a>&nbsp;&nbsp;<a href="/archives">Archives</a>&nbsp;&nbsp;<a href="/tags">Tags</a>&nbsp;&nbsp;<a href="/about">About</a>&nbsp;&nbsp;<a href="/links">Links</a>&nbsp;&nbsp;<a href="/search">Search</a>&nbsp;&nbsp;<a href="javascript:SoSimple.darkLightToggle()">Dark/Light Mode</a></nav><div class="main"><div class="post-container post-full"><div class="post-title"><h1>试着复刻一个vue的计算属性</h1></div><div class="post-body"><p>之前对于Vue的响应式封装（这里主要思考的是computed），主要是用用，其实是懒得思考背后的原理的。毕竟原理其实可以用一句话说明：计算属性对别的属性产生有向的依赖关系，这个依赖关系构成一个有向无环图（DAG），图上的某个节点更新后重新计算其所有后置节点即可。</p>
+<p>但是仔细想来，内部其实有一些时间复杂度的问题。显然，我们不能暴力调用回调函数（会卡出指数级时间复杂度 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mn>2</mn><mi>n</mi></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(2^n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> 下面会详细解释）。同时朴素的做法很难解决这样的问题：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> a = <span class="hljs-title function_">ref</span>([]);
+<span class="hljs-keyword">const</span> b = <span class="hljs-title function_">computed</span>(<span class="hljs-function">() =&gt;</span> a.<span class="hljs-title function_">join</span>(<span class="hljs-string">&quot;,&quot;</span>));
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">1</span>; i &lt;= n; i++) &#123;
+  a.<span class="hljs-property">value</span> = a.<span class="hljs-property">value</span>.<span class="hljs-title function_">concat</span>([i]);
+&#125;
+</code></pre>
+<p>注意到对于一个网页而言，我们实际上期望 <code>b</code> 能在整个宏任务跑完以后才更新。所以实际上<code>a.value</code> 的setter触发的更新必须要进行推迟。</p>
+<p>这篇文章讲讲我怎么在思考这些的过程中试着复刻一个vue的计算属性 <code>computed</code> 的</p>
+<span id="more"></span>
+<h2 id="关于-computed">关于 <code>computed</code><a class="header-anchor" href="#关于-computed"> ¶</a></h2>
+<p>Vue的 <code>computed</code> 有多种，不过为了简化问题，这里我们只讨论最经典的那种：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">computed</span>(<span class="hljs-params"><span class="hljs-attr">fn</span>: () =&gt; T</span>): <span class="hljs-title class_">ComputedRef</span>&lt;T&gt;
+</code></pre>
+<p>这个 <code>computed</code> 函数接受一个 <code>callback</code>， 每当 <code>callback</code> 涉及到的其他响应式变量发生变化时，重新计算。具体请自行参考vue的文档。</p>
+<p>如果我们希望构建一个高性能的<code>computed</code>，就必须进行复杂度分析。</p>
+<h2 id="复杂度分析">复杂度分析<a class="header-anchor" href="#复杂度分析"> ¶</a></h2>
+<p>现在假设我们有 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 个响应式状态，彼此之间总共有 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi></mrow><annotation encoding="application/x-tex">m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span> 的依赖关系。它们可以构成一个 DAG <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>G</mi><mo>=</mo><mo stretchy="false">(</mo><mi>V</mi><mo separator="true">,</mo><mi>E</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">G = (V, E)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">G</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.22222em;">V</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="mclose">)</span></span></span></span>。 其中， <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mo>=</mo><mo stretchy="false">{</mo><mo stretchy="false">(</mo><mi>u</mi><mo separator="true">,</mo><mi>v</mi><mo stretchy="false">)</mo><mi mathvariant="normal">∣</mi><mi>u</mi><mtext>的计算依赖于</mtext><mi>v</mi><mo stretchy="false">}</mo></mrow><annotation encoding="application/x-tex">E = \{(u, v) | u 的计算依赖于v \}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">{(</span><span class="mord mathnormal">u</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mclose">)</span><span class="mord">∣</span><span class="mord mathnormal">u</span><span class="mord cjk_fallback">的计算依赖于</span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mclose">}</span></span></span></span>。显然出度为0的点是可写的 <code>Ref</code>，其余点是 <code>ComputedRef</code>.</p>
+<p>这里必须是DAG，因为一旦计算属性出现环，那就会出现死循环。</p>
+<p>我们把 <code>ComputedRef</code> 的平均计算时间记为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">T</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">T</span></span></span></span></p>
+<h3 id="朴素写法复杂度分析">朴素写法复杂度分析<a class="header-anchor" href="#朴素写法复杂度分析"> ¶</a></h3>
+<p>考虑一个这样的朴素 <code>computed</code> 实现：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">computed</span>(<span class="hljs-params">fn</span>) &#123;
+  <span class="hljs-keyword">let</span> cached = <span class="hljs-literal">false</span>;
+  <span class="hljs-keyword">let</span> val;
+  <span class="hljs-keyword">let</span> children = [];
+  <span class="hljs-keyword">const</span> res = &#123;
+    <span class="hljs-keyword">get</span> <span class="hljs-title function_">value</span>() &#123;
+      children.<span class="hljs-title function_">push</span>(<span class="hljs-title function_">useContext</span>());
+      <span class="hljs-title function_">inContext</span>(res, <span class="hljs-function">() =&gt;</span> &#123;
+        <span class="hljs-keyword">if</span> (!cached) val = <span class="hljs-title function_">fn</span>();
+        cached = <span class="hljs-literal">true</span>;
+      &#125;);
+      <span class="hljs-keyword">return</span> val;
+    &#125;,
+    <span class="hljs-title function_">update</span>(<span class="hljs-params"></span>) &#123;
+      val = <span class="hljs-title function_">fn</span>();
+      children.<span class="hljs-title function_">forEach</span>(<span class="hljs-function"><span class="hljs-params">c</span> =&gt;</span> c.<span class="hljs-title function_">update</span>());
+    &#125;
+  &#125;
+&#125;
+</code></pre>
+<p>第一次尝试获得 <code>.value</code> 的时候，我们在 res 的 context 下跑一次 <code>fn</code>。 跑 fn 的过程中，每个响应式属性 .value 都会尝试把 context 设为自己的 children （也就是构建 u,v 边）</p>
+<p>容易发现，跑完第一次的 <code>fn</code> 以后再调用 <code>.value</code> 是 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(1)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span> 的。也就是说，计算全图的所有属性只需要挨个计算一次，即为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>n</mi><mi>T</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(nT)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="mclose">)</span></span></span></span></p>
+<p>但是考虑更新。最坏条件下，我们会发现有类似这样的依赖关系：</p>
+<pre><code class="hljs language-mermaid">graph LR;
+E --&gt; D --&gt; C --&gt; B --&gt; A
+E --&gt; C --&gt; A
+D --&gt; B
+E --&gt; B
+D --&gt; A
+E --&gt; A
+</code></pre>
+<p>现在假设我们更新了 <code>A</code> 。A 的孩子是 <code>[D, C, B]</code>，我们发现递归树是这样的：</p>
+<pre><code class="hljs language-mermaid">graph TD;
+
+A --&gt; AB --&gt; ABC --&gt; ABCD --&gt; ABCDE
+ABC --&gt; ABCE
+AB --&gt; ABD --&gt; ABDE
+AB --&gt; ABE
+A --&gt; AC --&gt; ACD --&gt; ACDE
+AC --&gt; ACE
+A --&gt; AD --&gt; ADE
+A --&gt; AE
+</code></pre>
+<p>这里的问题在于A可能先用错误的B,C,D数据触发了对E的更新；然后对D更新时D又引起了依赖D的E的更新。E在这个递归树中整整被计算了8次！</p>
+<p>显然树的叶子数即为ABCDE的全部以A开头E结尾的子串数。也就是说，如果我们有 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 个计算属性依次依赖前面的 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">n-1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> 个计算属性 （第一个计算属性依赖于A）。最后再有一个计算属性 E 依赖于这 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 个计算属性，那么我们会得到 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mi>n</mi></msup></mrow><annotation encoding="application/x-tex">2^n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6644em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span></span></span></span></span></span></span> 个不同的以A开头E结尾的子串。 更新 A 会导致整整 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mn>2</mn><mi>n</mi></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(2^n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> 次 E 的计算！</p>
+<h3 id="优化">优化<a class="header-anchor" href="#优化"> ¶</a></h3>
+<p>很容易想到一个优化算法。既然依赖关系是DAG，那么我们可以在DAG上跑一个拓扑排序，按照拓扑序更新不就好了？</p>
+<p>但问题来了，在这个隐形的有向图上优雅地跑拓扑排序呢？我们知道对于 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 个简单节点我们可以这样跑拓扑排序：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> sorted = [];
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">topo_sort</span>(<span class="hljs-params">node</span>) &#123;
+  <span class="hljs-keyword">if</span> (n.<span class="hljs-property">vis</span>) <span class="hljs-keyword">return</span>;
+  n.<span class="hljs-property">vis</span> = <span class="hljs-literal">true</span>;
+  node.<span class="hljs-property">parents</span>.<span class="hljs-title function_">forEach</span>(<span class="hljs-function"><span class="hljs-params">n</span> =&gt;</span> <span class="hljs-title function_">topo_sort</span>(n))
+  sorted.<span class="hljs-title function_">push</span>(node)
+&#125;
+nodes.<span class="hljs-title function_">forEach</span>(<span class="hljs-function"><span class="hljs-params">n</span> =&gt;</span> <span class="hljs-title function_">topo_sort</span>(n));
+</code></pre>
+<p>由于每个顶点只访问了一遍，复杂度显然为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span></p>
+<p>再考虑拓补排序回溯的过程本身已经求出了该点的前置，因此可以把fn放在这里计算。 <code>computed</code> 伪代码如下：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">computed</span>(<span class="hljs-params">fn</span>) &#123;
+  <span class="hljs-keyword">let</span> cached_val;
+  <span class="hljs-keyword">let</span> cached = <span class="hljs-literal">false</span>;
+  <span class="hljs-keyword">const</span> <span class="hljs-title function_">calculate</span> = (<span class="hljs-params"></span>) =&gt; &#123;
+    <span class="hljs-title function_">in_context</span>(closure, <span class="hljs-function">() =&gt;</span> &#123;
+      cached_val = <span class="hljs-title function_">fn</span>();
+    &#125;);
+    cached = <span class="hljs-literal">true</span>;
+  &#125;;
+  <span class="hljs-keyword">const</span> closure = &#123;
+    <span class="hljs-keyword">get</span> <span class="hljs-title function_">value</span>() &#123;
+      context.<span class="hljs-property">parents</span>.<span class="hljs-title function_">add</span>(closure);
+      <span class="hljs-keyword">if</span> (!cached) <span class="hljs-title function_">calculate</span>();
+      <span class="hljs-keyword">return</span> cached_val;
+    &#125;,
+    <span class="hljs-title function_">uncache</span>(<span class="hljs-params"></span>) &#123;
+      <span class="hljs-keyword">if</span> (!cached) <span class="hljs-keyword">return</span>;
+      cached = <span class="hljs-literal">false</span>;
+      <span class="hljs-title function_">recursiveUncache</span>(closure.<span class="hljs-property">children</span>);
+    &#125;
+  &#125;;
+  <span class="hljs-keyword">return</span> ret;
+&#125;
+</code></pre>
+<p>这里的关键在于我们把整个得到的 <code>ComputedRef</code> 变成了静态的：上游更新某个节点以后，调用 <code>recursiveUncache</code> 递归地把其按拓扑序的所有子节点全部设为缓存失效状态，但不进行 <code>fn</code> 的计算。由于一个处于缓存失效状态的节点，其子节点必然已经先行被缓存失效，因此每个节点只会 <code>uncache</code> 一次。也就是说，更改的最坏时间复杂度为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span> 没有 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">T</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">T</span></span></span></span>。</p>
+<p>此时，某个元素可以进行多次更改；由于都是懒计算的，多次更改也不会触发计算属性的计算。这一点我们可以用如下的vue代码证实：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">let</span> b_count = <span class="hljs-number">0</span>;
+<span class="hljs-keyword">const</span> a = <span class="hljs-title function_">ref</span>(<span class="hljs-number">1</span>);
+<span class="hljs-keyword">const</span> b = <span class="hljs-title function_">computed</span>(<span class="hljs-function">() =&gt;</span> &#123;
+  b_count ++;
+  <span class="hljs-keyword">return</span> a.<span class="hljs-property">value</span> + <span class="hljs-number">1</span>;
+&#125;);
+
+a.<span class="hljs-property">value</span> = <span class="hljs-number">1</span>
+a.<span class="hljs-property">value</span> = <span class="hljs-number">11</span>
+a.<span class="hljs-property">value</span> = <span class="hljs-number">114</span>
+a.<span class="hljs-property">value</span> = <span class="hljs-number">1145</span>
+a.<span class="hljs-property">value</span> = <span class="hljs-number">11451</span>
+a.<span class="hljs-property">value</span> = <span class="hljs-number">114514</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(b_count) <span class="hljs-comment">// 0，因为b没有被访问过value属性，根本无需被计算</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(b.<span class="hljs-property">value</span>) <span class="hljs-comment">// 114515</span>
+
+a.<span class="hljs-property">value</span> = <span class="hljs-number">114514</span>
+a.<span class="hljs-property">value</span> = <span class="hljs-number">11451</span>
+a.<span class="hljs-property">value</span> = <span class="hljs-number">1145</span>
+a.<span class="hljs-property">value</span> = <span class="hljs-number">114</span>
+a.<span class="hljs-property">value</span> = <span class="hljs-number">11</span>
+a.<span class="hljs-property">value</span> = <span class="hljs-number">1</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(b.<span class="hljs-property">value</span>) <span class="hljs-comment">// 1</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(b_count) <span class="hljs-comment">// 2。b是懒计算的，因此实际上只计算了两次。</span>
+</code></pre>
+<p>这样我们就初步写好了一个 <code>computed</code>。其时间复杂度是 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>n</mi><mi>T</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(nT)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="mclose">)</span></span></span></span></p>
+<p>完整的，可运行的代码会类似这样：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">MyVue</span>(<span class="hljs-params"></span>) &#123;
+  <span class="hljs-keyword">let</span> _newId = <span class="hljs-number">0</span>;
+  <span class="hljs-keyword">function</span> <span class="hljs-title function_">newId</span>(<span class="hljs-params"></span>) &#123;
+    <span class="hljs-keyword">return</span> _newId++;
+  &#125;
+
+  <span class="hljs-comment">/** <span class="hljs-doctag">@template</span> T */</span>
+  <span class="hljs-keyword">class</span> <span class="hljs-title class_">Closure</span> &#123;
+    <span class="hljs-comment">/**
+     * 依赖的其他响应式
+     * <span class="hljs-doctag">@type</span> &#123;<span class="hljs-type">Set&lt;Closure&gt;</span>&#125;
+     */</span>
+    parents = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Set</span>();
+    <span class="hljs-comment">/**
+     * 被这些东西依赖
+     * <span class="hljs-doctag">@type</span> &#123;<span class="hljs-type">Set&lt;Closure&gt;</span>&#125;
+     */</span>
+    children = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Set</span>();
+    <span class="hljs-comment">/**
+     * 闭包的其他状态
+     * <span class="hljs-doctag">@type</span> &#123;<span class="hljs-type">Record&lt;string, any&gt;</span>&#125;
+     */</span>
+    state = &#123;&#125;;
+    <span class="hljs-comment">/** <span class="hljs-doctag">@param</span> &#123;<span class="hljs-type">T</span>&#125; ret  */</span>
+    <span class="hljs-title function_">constructor</span>(<span class="hljs-params">ret</span>) &#123;
+      <span class="hljs-variable language_">this</span>.<span class="hljs-property">_ret</span> = ret;
+    &#125;
+    <span class="hljs-comment">/** <span class="hljs-doctag">@returns</span> &#123;<span class="hljs-type">T</span>&#125; */</span>
+    <span class="hljs-keyword">get</span> <span class="hljs-title function_">ret</span>() &#123;
+      <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.<span class="hljs-property">_ret</span>;
+    &#125;
+  &#125;
+  <span class="hljs-keyword">let</span> context = <span class="hljs-literal">null</span>;
+  <span class="hljs-keyword">const</span> nextTickCalculates = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Set</span>();
+
+  <span class="hljs-comment">/**
+   * <span class="hljs-doctag">@param</span> &#123;<span class="hljs-type">Closure</span>&#125; <span class="hljs-variable">closure</span>
+   */</span>
+  <span class="hljs-keyword">function</span> <span class="hljs-title function_">triggerUncacheChain</span>(<span class="hljs-params">closure</span>) &#123;
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> child <span class="hljs-keyword">of</span> closure.<span class="hljs-property">children</span>) &#123;
+      child.<span class="hljs-property">state</span>.<span class="hljs-property">uncache</span>?.();
+    &#125;
+  &#125;
+  <span class="hljs-comment">/**
+   * 模拟nextTick触发的内容
+   * <span class="hljs-doctag">@param</span> &#123;<span class="hljs-type">Closure</span>&#125; <span class="hljs-variable">closure</span>
+   */</span>
+  <span class="hljs-keyword">function</span> <span class="hljs-title function_">queueRecalculate</span>(<span class="hljs-params">closure</span>) &#123;
+    <span class="hljs-keyword">if</span> (nextTickCalculates.<span class="hljs-property">size</span> == <span class="hljs-number">0</span>) &#123;
+      nextTickCalculates.<span class="hljs-title function_">add</span>(<span class="hljs-literal">null</span>);
+      <span class="hljs-title function_">queueMicrotask</span>(<span class="hljs-function">() =&gt;</span> &#123;
+        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;// Microtask:&quot;</span>);
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> closure <span class="hljs-keyword">of</span> nextTickCalculates) &#123;
+          <span class="hljs-keyword">if</span> (closure != <span class="hljs-literal">null</span>) &#123;
+            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> child <span class="hljs-keyword">of</span> <span class="hljs-title class_">Array</span>.<span class="hljs-title function_">from</span>(closure.<span class="hljs-property">children</span>)) &#123;
+              <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(
+                <span class="hljs-string">&quot;update = &#123; id:&quot;</span>,
+                child.<span class="hljs-property">id</span>,
+                <span class="hljs-string">&quot;, val: &quot;</span>,
+                child.<span class="hljs-property">ret</span>.<span class="hljs-property">value</span>,
+                <span class="hljs-string">&quot;&#125;&quot;</span>
+              );
+            &#125;
+          &#125;
+        &#125;
+        nextTickCalculates.<span class="hljs-title function_">clear</span>();
+      &#125;);
+    &#125;
+    nextTickCalculates.<span class="hljs-title function_">add</span>(closure);
+  &#125;
+  <span class="hljs-comment">/**
+   * <span class="hljs-doctag">@param</span> &#123;<span class="hljs-type">Closure</span>&#125; <span class="hljs-variable">closure</span>
+   */</span>
+  <span class="hljs-keyword">function</span> <span class="hljs-title function_">cancelRecalculate</span>(<span class="hljs-params">closure</span>) &#123;
+    nextTickCalculates.<span class="hljs-title function_">delete</span>(closure);
+  &#125;
+
+  <span class="hljs-comment">/**
+   * 类似vue的shallowRef
+   * <span class="hljs-doctag">@template</span> <span class="hljs-variable">T</span>
+   * <span class="hljs-doctag">@param</span> &#123;<span class="hljs-type">T</span>&#125; <span class="hljs-variable">val</span>
+   * <span class="hljs-doctag">@returns</span> &#123;&#123;value: T&#125;&#125;
+   */</span>
+  <span class="hljs-keyword">function</span> <span class="hljs-title function_">ref</span>(<span class="hljs-params">val</span>) &#123;
+    <span class="hljs-keyword">const</span> closure = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Closure</span>(&#123;
+      <span class="hljs-keyword">get</span> <span class="hljs-title function_">value</span>() &#123;
+        context?.<span class="hljs-property">parents</span>?.<span class="hljs-title function_">add</span>(closure);
+        <span class="hljs-keyword">return</span> closure.<span class="hljs-property">state</span>.<span class="hljs-property">val</span>;
+      &#125;,
+      <span class="hljs-keyword">set</span> <span class="hljs-title function_">value</span>(<span class="hljs-params">v</span>) &#123;
+        closure.<span class="hljs-property">state</span>.<span class="hljs-property">val</span> = v;
+        <span class="hljs-title function_">triggerUncacheChain</span>(closure);
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+      &#125;,
+    &#125;);
+    closure.<span class="hljs-property">id</span> = <span class="hljs-title function_">newId</span>();
+    closure.<span class="hljs-property">state</span>.<span class="hljs-property">val</span> = val;
+    <span class="hljs-keyword">return</span> closure.<span class="hljs-property">ret</span>;
+  &#125;
+
+  <span class="hljs-comment">/**
+   * <span class="hljs-doctag">@template</span> &#123;<span class="hljs-type">() =&gt; T</span>&#125; <span class="hljs-variable">Fn</span>
+   * <span class="hljs-doctag">@param</span> &#123;<span class="hljs-type">Fn</span>&#125; <span class="hljs-variable">fn</span>
+   * <span class="hljs-doctag">@returns</span> &#123;&#123;value: ReturnType<Fn>&#125;&#125;
+   */</span>
+  <span class="hljs-keyword">function</span> <span class="hljs-title function_">computed</span>(<span class="hljs-params">fn</span>) &#123;
+    <span class="hljs-keyword">const</span> <span class="hljs-title function_">calculate</span> = (<span class="hljs-params"></span>) =&gt; &#123;
+      <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> parent <span class="hljs-keyword">of</span> <span class="hljs-title class_">Array</span>.<span class="hljs-title function_">from</span>(closure.<span class="hljs-property">parents</span>)) &#123;
+        parent.<span class="hljs-property">children</span>.<span class="hljs-title function_">delete</span>(closure);
+      &#125;
+      closure.<span class="hljs-property">parents</span>.<span class="hljs-title function_">clear</span>();
+
+      old_context = context;
+      context = closure;
+      closure.<span class="hljs-property">state</span>.<span class="hljs-property">cached_val</span> = <span class="hljs-title function_">fn</span>();
+      context = old_context;
+
+      <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> parent <span class="hljs-keyword">of</span> closure.<span class="hljs-property">parents</span>) &#123;
+        parent.<span class="hljs-property">children</span>.<span class="hljs-title function_">add</span>(closure);
+      &#125;
+
+      <span class="hljs-title function_">cancelRecalculate</span>(closure);
+      closure.<span class="hljs-property">state</span>.<span class="hljs-property">cached</span> = <span class="hljs-literal">true</span>;
+      <span class="hljs-keyword">return</span> closure.<span class="hljs-property">state</span>.<span class="hljs-property">cached_val</span>;
+    &#125;;
+    <span class="hljs-keyword">const</span> closure = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Closure</span>(&#123;
+      <span class="hljs-keyword">get</span> <span class="hljs-title function_">value</span>() &#123;
+        context?.<span class="hljs-property">parents</span>?.<span class="hljs-title function_">add</span>(closure);
+        <span class="hljs-keyword">if</span> (!closure.<span class="hljs-property">state</span>.<span class="hljs-property">cached</span>) <span class="hljs-title function_">calculate</span>();
+        <span class="hljs-keyword">return</span> closure.<span class="hljs-property">state</span>.<span class="hljs-property">cached_val</span>;
+      &#125;,
+    &#125;);
+    closure.<span class="hljs-property">id</span> = <span class="hljs-title function_">newId</span>();
+    closure.<span class="hljs-property">state</span>.<span class="hljs-property">cached</span> = <span class="hljs-literal">false</span>;
+    closure.<span class="hljs-property">state</span>.<span class="hljs-property">uncache</span> = <span class="hljs-function">() =&gt;</span> &#123;
+      <span class="hljs-keyword">if</span> (!closure.<span class="hljs-property">state</span>.<span class="hljs-property">cached</span>) <span class="hljs-keyword">return</span>;
+      closure.<span class="hljs-property">state</span>.<span class="hljs-property">cached</span> = <span class="hljs-literal">false</span>;
+      <span class="hljs-title function_">queueRecalculate</span>(closure);
+      <span class="hljs-title function_">triggerUncacheChain</span>(closure);
+    &#125;;
+    <span class="hljs-keyword">return</span> closure.<span class="hljs-property">ret</span>;
+  &#125;
+
+  <span class="hljs-keyword">return</span> &#123; ref, computed &#125;;
+&#125;
+
+<span class="hljs-keyword">const</span> &#123; ref, computed &#125; = <span class="hljs-title class_">MyVue</span>();
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">test</span>(<span class="hljs-params">desc, fn</span>) &#123;
+  <span class="hljs-keyword">let</span> prom = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Promise</span>(<span class="hljs-function">(<span class="hljs-params">res</span>) =&gt;</span> &#123;
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`// =========================================`</span>);
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`// =========================================`</span>);
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`// =========================================`</span>);
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;// &quot;</span>, desc);
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`// =====TEST <span class="hljs-subst">$&#123;desc&#125;</span> START========`</span>);
+    <span class="hljs-title function_">fn</span>();
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`// =====TEST <span class="hljs-subst">$&#123;desc&#125;</span> OVER=========`</span>);
+    <span class="hljs-title function_">res</span>();
+  &#125;);
+  <span class="hljs-keyword">const</span> res = &#123;
+    <span class="hljs-attr">thenTest</span>: <span class="hljs-function">(<span class="hljs-params">desc, fn</span>) =&gt;</span> &#123;
+      prom = prom.<span class="hljs-title function_">then</span>(<span class="hljs-function">() =&gt;</span> &#123;
+        <span class="hljs-title function_">test</span>(desc, fn);
+      &#125;);
+      <span class="hljs-keyword">return</span> res;
+    &#125;,
+  &#125;;
+  <span class="hljs-keyword">return</span> res;
+&#125;
+
+<span class="hljs-title function_">test</span>(<span class="hljs-string">&quot;链&quot;</span>, <span class="hljs-function">() =&gt;</span> &#123;
+  <span class="hljs-keyword">const</span> a = <span class="hljs-title function_">ref</span>(<span class="hljs-number">1</span>); <span class="hljs-comment">// id: 0</span>
+  <span class="hljs-keyword">const</span> nums = [a];
+  <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">TEST_SIZE</span> = <span class="hljs-number">8</span>;
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">1</span>; i &lt;= <span class="hljs-variable constant_">TEST_SIZE</span>; i++) &#123;
+    nums[i] = <span class="hljs-title function_">computed</span>(<span class="hljs-function">() =&gt;</span>
+      <span class="hljs-title class_">Array</span>.<span class="hljs-title function_">from</span>(&#123; <span class="hljs-attr">length</span>: i &#125;, <span class="hljs-function">(<span class="hljs-params">_, index</span>) =&gt;</span> index)
+        .<span class="hljs-title function_">sort</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">random</span>() - <span class="hljs-number">0.5</span>)
+        .<span class="hljs-title function_">reduce</span>(<span class="hljs-function">(<span class="hljs-params">x, id</span>) =&gt;</span> x + nums[id].<span class="hljs-property">value</span>, <span class="hljs-number">0</span>)
+    );
+  &#125;
+
+  <span class="hljs-keyword">let</span> cnt = <span class="hljs-number">0</span>;
+
+  <span class="hljs-keyword">const</span> i = <span class="hljs-title function_">computed</span>(<span class="hljs-function">() =&gt;</span> &#123;
+    cnt++;
+    <span class="hljs-keyword">return</span> <span class="hljs-string">`last is: <span class="hljs-subst">$&#123;nums[TEST_SIZE].value&#125;</span>, computed <span class="hljs-subst">$&#123;cnt&#125;</span> times`</span>;
+  &#125;);
+
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;/* NOW:  */  i.value =&quot;</span>, <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(i.<span class="hljs-property">value</span>));
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;/* STEP: */  a.value = 2&quot;</span>);
+  a.<span class="hljs-property">value</span> = <span class="hljs-number">2</span>;
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;/* STEP: */  a.value = 3&quot;</span>);
+  a.<span class="hljs-property">value</span> = <span class="hljs-number">3</span>;
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;/* STEP: */  a.value = 4&quot;</span>);
+  a.<span class="hljs-property">value</span> = <span class="hljs-number">4</span>;
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;/* STEP: */  a.value = 5&quot;</span>);
+  a.<span class="hljs-property">value</span> = <span class="hljs-number">5</span>;
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;/* STEP: */  a.value = 2&quot;</span>);
+  a.<span class="hljs-property">value</span> = <span class="hljs-number">2</span>;
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;/* NOW:  */  i.value =&quot;</span>, <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(i.<span class="hljs-property">value</span>));
+
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;/* STEP: */  a.value = 3&quot;</span>);
+  a.<span class="hljs-property">value</span> = <span class="hljs-number">3</span>;
+&#125;)
+  .<span class="hljs-title function_">thenTest</span>(<span class="hljs-string">&quot;测试2&quot;</span>, <span class="hljs-function">() =&gt;</span> &#123;
+    <span class="hljs-keyword">const</span> a = <span class="hljs-title function_">ref</span>(<span class="hljs-number">1</span>);
+
+    <span class="hljs-keyword">let</span> cnt_c = <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">let</span> cnt_d = <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">const</span> c = <span class="hljs-title function_">computed</span>(<span class="hljs-function">() =&gt;</span> &#123;
+      a.<span class="hljs-property">value</span>;
+      <span class="hljs-keyword">return</span> ++cnt_c;
+    &#125;);
+    <span class="hljs-keyword">const</span> d = <span class="hljs-title function_">computed</span>(<span class="hljs-function">() =&gt;</span> &#123;
+      a.<span class="hljs-property">value</span>;
+      <span class="hljs-keyword">return</span> ++cnt_d;
+    &#125;);
+
+    <span class="hljs-keyword">const</span> b = <span class="hljs-title function_">computed</span>(<span class="hljs-function">() =&gt;</span> &#123;
+      <span class="hljs-keyword">if</span> (a.<span class="hljs-property">value</span>) &#123;
+        <span class="hljs-keyword">return</span> c.<span class="hljs-property">value</span>;
+      &#125; <span class="hljs-keyword">else</span> &#123;
+        <span class="hljs-keyword">return</span> d.<span class="hljs-property">value</span>;
+      &#125;
+    &#125;);
+
+    <span class="hljs-keyword">const</span> msg = [];
+
+    msg.<span class="hljs-title function_">push</span>(b.<span class="hljs-property">value</span> + <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(&#123; cnt_c, cnt_d &#125;));
+    a.<span class="hljs-property">value</span> = <span class="hljs-number">0</span>;
+    msg.<span class="hljs-title function_">push</span>(b.<span class="hljs-property">value</span> + <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(&#123; cnt_c, cnt_d &#125;));
+    a.<span class="hljs-property">value</span> = <span class="hljs-number">1</span>;
+    msg.<span class="hljs-title function_">push</span>(b.<span class="hljs-property">value</span> + <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(&#123; cnt_c, cnt_d &#125;));
+    a.<span class="hljs-property">value</span> = <span class="hljs-number">0</span>;
+    msg.<span class="hljs-title function_">push</span>(b.<span class="hljs-property">value</span> + <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(&#123; cnt_c, cnt_d &#125;));
+    a.<span class="hljs-property">value</span> = <span class="hljs-number">1</span>;
+    msg.<span class="hljs-title function_">push</span>(<span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(&#123; cnt_c, cnt_d &#125;));
+
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(msg);
+  &#125;)
+  .<span class="hljs-title function_">thenTest</span>(<span class="hljs-string">&quot;两个依赖&quot;</span>, <span class="hljs-function">() =&gt;</span> &#123;
+    <span class="hljs-keyword">const</span> a = <span class="hljs-title function_">ref</span>(<span class="hljs-number">1</span>);
+    <span class="hljs-keyword">const</span> b = <span class="hljs-title function_">ref</span>(<span class="hljs-number">1</span>);
+    <span class="hljs-keyword">const</span> a_then = <span class="hljs-title function_">ref</span>(<span class="hljs-string">&quot;a_then&quot;</span>);
+    <span class="hljs-keyword">const</span> b_then = <span class="hljs-title function_">ref</span>(<span class="hljs-string">&quot;b_then&quot;</span>);
+    <span class="hljs-keyword">const</span> c = <span class="hljs-title function_">computed</span>(<span class="hljs-function">() =&gt;</span> &#123;
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;c发生了重新计算&quot;</span>);
+      <span class="hljs-keyword">if</span> (a.<span class="hljs-property">value</span>) &#123;
+        <span class="hljs-keyword">return</span> a_then.<span class="hljs-property">value</span>;
+      &#125;
+      <span class="hljs-keyword">if</span> (b.<span class="hljs-property">value</span>) &#123;
+        <span class="hljs-keyword">return</span> b_then.<span class="hljs-property">value</span>;
+      &#125;
+    &#125;);
+
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(c.<span class="hljs-property">value</span>);
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(c.<span class="hljs-property">value</span>);
+    b.<span class="hljs-property">value</span> = <span class="hljs-number">0</span>;
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(c.<span class="hljs-property">value</span>);
+    a.<span class="hljs-property">value</span> = <span class="hljs-number">0</span>;
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(c.<span class="hljs-property">value</span>);
+    b.<span class="hljs-property">value</span> = <span class="hljs-number">1</span>;
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(c.<span class="hljs-property">value</span>);
+  &#125;);
+</code></pre>
+</div><div class="post-meta"><span class="info"><i class="fa fa-calendar"></i> <span class="date">2024-07-08</span>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Code/" title="Code">Code</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Frontend/" title="Frontend">Frontend</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Javascript/" title="Javascript">Javascript</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Algorithm/" title="Algorithm">Algorithm</a>  </span></div></div><p class="pagination"><a href="/2024/09/03/lean4-intro/" title="Lean 初见笔记">Previous</a><span>  </span><a href="/2024/07/02/latex-symbols-collection/" title="Latex符号大全">Next</a></p><div class="comment-container"><div class="comment-container"><script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js" onload="(new Gitalk({&quot;clientID&quot;:&quot;12a250ac67f452906dd6&quot;,&quot;clientSecret&quot;:&quot;7422a9ecdc933d5e6facbc61d546bced40519f0b&quot;,&quot;repo&quot;:&quot;lhcfl.github.io&quot;,&quot;owner&quot;:&quot;lhcfl&quot;,&quot;admin&quot;:[&quot;lhcfl&quot;],&quot;id&quot;:&quot;试着复刻一个vue的计算属性&quot;,&quot;distractionFreeMode&quot;:false})).render(&quot;gitalk-comment-slot&quot;)"></script><div id="gitalk-comment-slot">Loading...</div></div></div></div><footer class="footer"><br><p class="powered_by">Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> and <a target="_blank" rel="noopener" href="https://github.com/Lhcfl/hexo-theme-sosimple">SoSimple</a></p></footer></body></html>
