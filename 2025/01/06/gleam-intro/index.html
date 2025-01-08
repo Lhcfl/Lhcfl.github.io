@@ -1,0 +1,410 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Linca"><title>仿生电子锈会梦到自己变成纯函数式吗：gleam 语言初见 · Zero Calorie Drink Shop</title><meta name="description" content="Gleam is a friendly language for building type-safe systems that scale! —— https://gleam.run/
+虽然我倒不觉得纯函数式语言能有多 friendly……
+
+事情的起因是刷到知乎提问如何评价 gleam 语言，然"><meta name="keywords" content="Code,Gleam,Functional,Programing Language"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="mobile-web-app-capable" content="yes"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta id="site_data_static" data-url="/"><meta name="renderer" content="webkit"><link rel="shortcut icon" type="image/x-icon" href="/images/logo.png"><link rel="stylesheet" href="/js_complied/bundle.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><script src="/js_complied/bundle.js"></script><script>Utils.loadCSS("https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200..900&family=Noto+Serif+KR:wght@200..900&family=Noto+Serif+SC:wght@200..900&family=Noto+Serif+TC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap");
+Utils.loadCSS("https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css");
+Utils.loadCSS("/css/font-awesome.min.css");</script><meta name="generator" content="Hexo 7.3.0"></head><body class="post-page"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200..900&amp;family=Noto+Serif+KR:wght@200..900&amp;family=Noto+Serif+SC:wght@200..900&amp;family=Noto+Serif+TC:wght@200..900&amp;family=Noto+Serif:ital,wght@0,100..900;1,100..900&amp;display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"></noscript><nav class="nav"><a href="/">Home</a>&nbsp;&nbsp;<a href="/archives">Archives</a>&nbsp;&nbsp;<a href="/tags">Tags</a>&nbsp;&nbsp;<a href="/about">About</a>&nbsp;&nbsp;<a href="/links">Links</a>&nbsp;&nbsp;<a href="/search">Search</a>&nbsp;&nbsp;<a href="javascript:SoSimple.darkLightToggle()">Dark/Light Mode</a></nav><div class="main"><div class="post-container post-full"><div class="post-title"><h1>仿生电子锈会梦到自己变成纯函数式吗：gleam 语言初见</h1></div><div class="post-body"><p><em>Gleam is a friendly language for building type-safe systems that scale!</em> —— <a target="_blank" rel="noopener" href="https://gleam.run/">https://gleam.run/</a></p>
+<p>虽然我倒不觉得纯函数式语言能有多 friendly……</p>
+<span id="more"></span>
+<p>事情的起因是刷到知乎提问如何评价 gleam 语言，然后有人说在 rust 和 go 之间应该有一门中间态的语言 balabala</p>
+<p>于是就跑过去看了，最开始看语法如此像 rust，再加上安利的描述，还以为是 GC 的过程式语言加点函数式糖，直到看到 Gleam is an immutable language 才发现啊被骗了怎么是纯函数式（）</p>
+<p>先来看看 hello world：</p>
+<pre><code class="hljs language-gleam">import gleam/io
+
+<span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() &#123;
+  io.<span class="hljs-title function_ invoke__">println</span>(<span class="hljs-string">&quot;Hello, world!&quot;</span>)
+&#125;
+</code></pre>
+<p>非常好懂（点头</p>
+<h3 id="Immutable">Immutable<a class="header-anchor" href="#Immutable"> ¶</a></h3>
+<p>虽然 immutable 比过程式语言通常写起来更容易遇到一些不得不搞一些奇怪的递归函数的情况，但是也是一个不错的选择。</p>
+<p>Gleam 会编译到 Erlang（可以编译到 js，但是因为语言特性很容易爆递归），听说过 Erlang 的人大概都知道这个传闻：写 Erlang/Elixir 的人习以为常地开几万甚至几十万个进程<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup>，这也是得益于 immutable 的特性让并发操作变得非常简单好写</p>
+<p>对于 mutable 的语言，需要担忧一块内存空间被并发地同时读和写，进而引出了一堆的互斥锁/原子操作之类的概念，而 immutable 根本不需要担心这个问题，因为你根本没有编写“覆写”一块内存区域的代码，（虽然 Erlang 虚拟机可能会优化这个操作，从而实际上覆写），所有的变量都是只读的。</p>
+<p>这也是大多数 immutable 函数式语言共享的优势，许多纯函数连状态都没有，自然也就不存在状态不一致的问题。对于函数式而言并发、scale 都是天然的事情。</p>
+<h3 id="Pipeline">Pipeline<a class="header-anchor" href="#Pipeline"> ¶</a></h3>
+<p>Gleam 支持 pipeline 操作</p>
+<p>我是链式调用狂热粉丝（？）所以非常需要这个！对我来说一个语言能吸引我的一个重要的 sugar 就是类似 pipeline 的机制 i.e.</p>
+<pre><code class="hljs language-haskell">(|&gt;) :: a -&gt; (a -&gt; b) -&gt; b
+<span class="hljs-title">x</span> |&gt; f = f x
+</code></pre>
+<p>这意味着任何一个 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo>:</mo><mi>a</mi><mo>→</mo><mi>b</mi></mrow><annotation encoding="application/x-tex">f: a \to b</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span></span></span></span> 都能 pipeline 一个 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi></mrow><annotation encoding="application/x-tex">a</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">a</span></span></span></span> 进去得到 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi></mrow><annotation encoding="application/x-tex">b</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span></span></span></span>，非常好用，因为很多现实世界的操作本来就是串联起来的</p>
+<p>比如你可以在 gleam 中写这样的：</p>
+<pre><code class="hljs language-gleam">import gleam/io
+import gleam/string
+
+<span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() &#123;
+  <span class="hljs-comment">// Without the pipe operator</span>
+  io.<span class="hljs-title function_ invoke__">debug</span>(string.<span class="hljs-title function_ invoke__">drop_start</span>(string.<span class="hljs-title function_ invoke__">drop_end</span>(<span class="hljs-string">&quot;Hello, Joe!&quot;</span>, <span class="hljs-number">1</span>), <span class="hljs-number">7</span>)) <span class="hljs-comment">// &quot;Joe&quot;</span>
+
+  <span class="hljs-comment">// With the pipe operator</span>
+  <span class="hljs-string">&quot;Hello, Mike!&quot;</span>
+  |&gt; string.<span class="hljs-title function_ invoke__">drop_end</span>(<span class="hljs-number">1</span>)
+  |&gt; string.<span class="hljs-title function_ invoke__">drop_start</span>(<span class="hljs-number">7</span>)
+  |&gt; io.debug <span class="hljs-comment">// &quot;Mike&quot;</span>
+
+  <span class="hljs-comment">// Changing order with function capturing</span>
+  <span class="hljs-string">&quot;1&quot;</span>
+  |&gt; string.<span class="hljs-title function_ invoke__">append</span>(<span class="hljs-string">&quot;2&quot;</span>)
+  |&gt; string.<span class="hljs-title function_ invoke__">append</span>(<span class="hljs-string">&quot;3&quot;</span>, _)
+  |&gt; io.debug  <span class="hljs-comment">// &quot;312&quot;</span>
+&#125;
+</code></pre>
+<p>中缀表示法 <code>a f b</code> 就是比前缀表示法 <code>f a b</code> 在链式调用下好看多了！这或许是一种比 Ruby 的 Open Class 更好的方案来给对象添加“成员函数”，因为实际上成员函数就是一个 <code>fn(self, ...)</code></p>
+<h3 id="Pattern-matching">Pattern matching<a class="header-anchor" href="#Pattern-matching"> ¶</a></h3>
+<p>说到函数式语言最重要的特色当然是 Pattern matching！</p>
+<p>Gleam 的 Pattern matching 基本上就是 rust 的形状，不过更强大，和大多数其它函数式语言一样可以匹配一些内置运算：</p>
+<pre><code class="hljs language-gleam">import gleam/io
+
+<span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() &#123;
+  io.<span class="hljs-title function_ invoke__">debug</span>(<span class="hljs-title function_ invoke__">get_name</span>(<span class="hljs-string">&quot;Hello, Joe&quot;</span>))            <span class="hljs-comment">// &quot;Joe&quot;</span>
+  io.<span class="hljs-title function_ invoke__">debug</span>(<span class="hljs-title function_ invoke__">get_name</span>(<span class="hljs-string">&quot;Hello, Mike&quot;</span>))           <span class="hljs-comment">// &quot;Mike&quot;</span>
+  io.<span class="hljs-title function_ invoke__">debug</span>(<span class="hljs-title function_ invoke__">get_name</span>(<span class="hljs-string">&quot;System still working?&quot;</span>)) <span class="hljs-comment">// &quot;Unknown&quot;</span>
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">get_name</span>(x: <span class="hljs-type">String</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">String</span> &#123;
+  case x &#123;
+    <span class="hljs-string">&quot;Hello, &quot;</span> &lt;&gt; name <span class="hljs-punctuation">-&gt;</span> name
+    _ <span class="hljs-punctuation">-&gt;</span> <span class="hljs-string">&quot;Unknown&quot;</span>
+  &#125;
+&#125;
+</code></pre>
+<p>Gleam 也能写类似 Rust 的 <code>let</code>，但是 Gleam 不存在 <code>if</code> 所以没法写 <code>if let</code> 也没有 <code>let mut</code> 这些东西，let 就是一个纯的 irrefutable 的 pattern matching 而已。当然更多的时候可以用来给变量“赋值”（）</p>
+<pre><code class="hljs language-gleam">import gleam/io
+
+<span class="hljs-keyword">pub</span> <span class="hljs-keyword">type</span> <span class="hljs-title class_">Teacher</span> &#123;
+  <span class="hljs-title function_ invoke__">Teacher</span>(name: <span class="hljs-type">String</span>, subject: <span class="hljs-type">String</span>)
+&#125;
+
+<span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() &#123;
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">teacher</span> = <span class="hljs-title function_ invoke__">Teacher</span>(<span class="hljs-string">&quot;Mr Schofield&quot;</span>, <span class="hljs-string">&quot;Physics&quot;</span>)
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">Teacher</span>(tname, _) = teacher
+
+  io.<span class="hljs-title function_ invoke__">debug</span>(tname) <span class="hljs-comment">// &quot;Mr Schofield&quot;</span>
+&#125;
+</code></pre>
+<h3 id="只有递归">只有递归<a class="header-anchor" href="#只有递归"> ¶</a></h3>
+<p>和很多纯函数式语言一样，Gleam 没有循环结构只有递归，老实说我不觉得这很好，因为这让一些简单的事情变得更复杂……</p>
+<p>经典的 list 求 sum 可以写这样的函数</p>
+<pre><code class="hljs language-gleam"><span class="hljs-keyword">fn</span> <span class="hljs-title function_">sum_list</span>(list: <span class="hljs-title function_ invoke__">List</span>(Int)) <span class="hljs-punctuation">-&gt;</span> Int &#123;
+  case list &#123;
+    [first, ..rest] <span class="hljs-punctuation">-&gt;</span> first + <span class="hljs-title function_ invoke__">sum_list</span>(rest)
+    [] <span class="hljs-punctuation">-&gt;</span> <span class="hljs-number">0</span>
+  &#125;
+&#125;
+</code></pre>
+<p>有过函数式经验的人应该非常好理解，也就是每次取第一位递归地加末尾。写成 haskell 就是：</p>
+<pre><code class="hljs language-haskell"><span class="hljs-title">sumlist</span> :: [<span class="hljs-type">Int</span>] -&gt; <span class="hljs-type">Int</span>
+<span class="hljs-title">sumlist</span> [] = <span class="hljs-number">0</span>
+<span class="hljs-title">sumlist</span> (x:xs) = x + sumlist xs
+</code></pre>
+<p>看上去 gleam 还更长一点，没有 haskell 的韵味 xd</p>
+<h3 id="Use-sugar">Use sugar<a class="header-anchor" href="#Use-sugar"> ¶</a></h3>
+<p>比较喜欢的是 Gleam 的 use sugar，类似 Javascript 的 <code>async/await</code> 一样，负责简化嵌套层级。</p>
+<blockquote>
+<p>Gleam’s use expression helps out here by enabling us to write code that uses callbacks in an unindented style, as shown in the code window.<br>
+Gleam 的 use 表达式使我们能够编写以未缩进样式使用回调的代码，从而在此处提供帮助，如代码窗口中所示。</p>
+<p>The higher order function being called goes on the right hand side of the &lt;- operator. It must take a callback function as its final argument.<br>
+被调用的高阶函数位于 &lt;- 运算符的右侧。它必须将回调函数作为其最终参数。</p>
+<p>The argument names for the callback function go on the left hand side of the &lt;- operator. The function can take any number of arguments, including zero.<br>
+回调函数的参数名称位于 &lt;- 运算符的左侧。该函数可以接受任意数量的参数，包括零。</p>
+<p>All the remaining code in the enclosing {} block becomes the body of the callback function.<br>
+封闭的 {} 块中的所有剩余代码都成为回调函数的主体。</p>
+</blockquote>
+<p>直接放官方示例：</p>
+<pre><code class="hljs language-gleam">import gleam/io
+import gleam/result
+
+<span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() &#123;
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">_</span> = io.<span class="hljs-title function_ invoke__">debug</span>(<span class="hljs-title function_ invoke__">without_use</span>())
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">_</span> = io.<span class="hljs-title function_ invoke__">debug</span>(<span class="hljs-title function_ invoke__">with_use</span>())
+&#125;
+
+<span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">without_use</span>() <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Result</span>(<span class="hljs-type">String</span>, Nil) &#123;
+  result.<span class="hljs-title function_ invoke__">try</span>(<span class="hljs-title function_ invoke__">get_username</span>(), <span class="hljs-title function_ invoke__">fn</span>(username) &#123;
+    result.<span class="hljs-title function_ invoke__">try</span>(<span class="hljs-title function_ invoke__">get_password</span>(), <span class="hljs-title function_ invoke__">fn</span>(password) &#123;
+      result.<span class="hljs-title function_ invoke__">map</span>(<span class="hljs-title function_ invoke__">log_in</span>(username, password), <span class="hljs-title function_ invoke__">fn</span>(greeting) &#123;
+        greeting &lt;&gt; <span class="hljs-string">&quot;, &quot;</span> &lt;&gt; username
+      &#125;)
+    &#125;)
+  &#125;)
+&#125;
+
+<span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">with_use</span>() <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Result</span>(<span class="hljs-type">String</span>, Nil) &#123;
+  <span class="hljs-keyword">use</span> username &lt;- result.<span class="hljs-title function_ invoke__">try</span>(<span class="hljs-title function_ invoke__">get_username</span>())
+  <span class="hljs-keyword">use</span> password &lt;- result.<span class="hljs-title function_ invoke__">try</span>(<span class="hljs-title function_ invoke__">get_password</span>())
+  <span class="hljs-keyword">use</span> greeting &lt;- result.<span class="hljs-title function_ invoke__">map</span>(<span class="hljs-title function_ invoke__">log_in</span>(username, password))
+  greeting &lt;&gt; <span class="hljs-string">&quot;, &quot;</span> &lt;&gt; username
+&#125;
+
+<span class="hljs-comment">// Here are some pretend functions for this example:</span>
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">get_username</span>() <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Result</span>(<span class="hljs-type">String</span>, Nil) &#123;
+  <span class="hljs-title function_ invoke__">Ok</span>(<span class="hljs-string">&quot;alice&quot;</span>)
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">get_password</span>() <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Result</span>(<span class="hljs-type">String</span>, Nil) &#123;
+  <span class="hljs-title function_ invoke__">Ok</span>(<span class="hljs-string">&quot;hunter2&quot;</span>)
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">log_in</span>(_username: <span class="hljs-type">String</span>, _password: <span class="hljs-type">String</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Result</span>(<span class="hljs-type">String</span>, Nil) &#123;
+  <span class="hljs-title function_ invoke__">Ok</span>(<span class="hljs-string">&quot;Welcome&quot;</span>)
+&#125;
+</code></pre>
+<p>这里其实 <code>use xxx &lt;- result.try(foo())</code> 翻译成 rust 就是 <code>foo</code> 会返回一个 <code>Result&lt;T, E&gt;</code>，然后</p>
+<pre><code class="hljs language-rust"><span class="hljs-keyword">let</span> <span class="hljs-variable">xxx</span> = <span class="hljs-title function_ invoke__">foo</span>()?
+</code></pre>
+<p>如果匹配到 <code>Err</code> 就直接返回了，否则再对 <code>Ok(T)</code> 做某种映射</p>
+<h3 id="实战：写个-JSON-Parser">实战：写个 JSON Parser<a class="header-anchor" href="#实战：写个-JSON-Parser"> ¶</a></h3>
+<p>其实本来是想在 rust 里写 json parser 的但是看到有这么像 rust 的 gleam 以后就干脆拿 gleam 了（</p>
+<p>由于 parse number 比较复杂这又是个玩具就不写 number parser 了</p>
+<p>首先定义节点的类型，长得很像 rust 的语法（整个语言都很像啊喂！）</p>
+<pre><code class="hljs language-gleam"><span class="hljs-keyword">pub</span> <span class="hljs-keyword">type</span> <span class="hljs-title class_">Node</span> &#123;
+  Nul
+  <span class="hljs-title function_ invoke__">Bol</span>(val: Bool)
+  <span class="hljs-title function_ invoke__">Num</span>(val: Int)
+  <span class="hljs-title function_ invoke__">Str</span>(val: <span class="hljs-type">String</span>)
+  <span class="hljs-title function_ invoke__">Arr</span>(val: <span class="hljs-title function_ invoke__">List</span>(Node))
+  <span class="hljs-title function_ invoke__">Obj</span>(val: dict.<span class="hljs-title function_ invoke__">Dict</span>(<span class="hljs-type">String</span>, Node))
+&#125;
+</code></pre>
+<p>我们大致定义一个 parse 函数返回的成功类型可能长这样：</p>
+<pre><code class="hljs language-gleam"><span class="hljs-keyword">type</span> <span class="hljs-title class_">ParseObjResult</span> &#123;
+  <span class="hljs-title function_ invoke__">ParseObjResult</span>(result: dict.<span class="hljs-title function_ invoke__">Dict</span>(<span class="hljs-type">String</span>, Node), rest: <span class="hljs-type">String</span>)
+&#125;
+</code></pre>
+<p>result 是 parse 出来的内核，rest 是剩下的字符串，用来继续 parse：</p>
+<p>然后就能写出大概这样的 parser</p>
+<p>可以看到，<code>use</code> sugar 在简化层级上有多么必要，use 可以极大程度简化代码防止过多的层级嵌套</p>
+<pre><code class="hljs language-gleam"><span class="hljs-keyword">fn</span> <span class="hljs-title function_">parse_obj</span>(<span class="hljs-type">str</span>: <span class="hljs-type">String</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Result</span>(ParseObjResult, <span class="hljs-type">String</span>) &#123;
+  case <span class="hljs-type">str</span> |&gt; string.trim_start &#123;
+    <span class="hljs-string">&quot;&#125;&quot;</span> &lt;&gt; rest <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Ok</span>(<span class="hljs-title function_ invoke__">ParseObjResult</span>(dict.<span class="hljs-title function_ invoke__">from_list</span>([]), rest))
+    x <span class="hljs-punctuation">-&gt;</span> &#123;
+      <span class="hljs-keyword">use</span> <span class="hljs-title function_ invoke__">ParseStrResult</span>(key, rest) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">parse_str</span>(x))
+      <span class="hljs-keyword">use</span> rest &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">parse_col</span>(rest))
+      <span class="hljs-keyword">use</span> <span class="hljs-title function_ invoke__">ParseNodeResult</span>(node, rest) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">parse_node</span>(rest))
+
+      case rest |&gt; string.trim_start |&gt; string.pop_grapheme &#123;
+        <span class="hljs-title function_ invoke__">Ok</span>(#(<span class="hljs-string">&quot;,&quot;</span>, next)) <span class="hljs-punctuation">-&gt;</span>
+          next
+          |&gt; string.trim_start
+          |&gt; parse_obj
+          |&gt; result.<span class="hljs-title function_ invoke__">map</span>(<span class="hljs-title function_ invoke__">fn</span>(res) &#123;
+            <span class="hljs-title function_ invoke__">ParseObjResult</span>(res.result |&gt; dict.<span class="hljs-title function_ invoke__">insert</span>(key, node), res.rest)
+          &#125;)
+        <span class="hljs-title function_ invoke__">Ok</span>(#(<span class="hljs-string">&quot;&#125;&quot;</span>, rest)) <span class="hljs-punctuation">-&gt;</span>
+          <span class="hljs-title function_ invoke__">Ok</span>(<span class="hljs-title function_ invoke__">ParseObjResult</span>(dict.<span class="hljs-title function_ invoke__">from_list</span>([#(key, node)]), rest))
+
+        <span class="hljs-title function_ invoke__">Ok</span>(#(x, _)) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(<span class="hljs-string">&quot;unexpected token &quot;</span> &lt;&gt; x)
+        <span class="hljs-title function_ invoke__">Error</span>(_) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(<span class="hljs-string">&quot;unexpected eof&quot;</span>)
+      &#125;
+    &#125;
+  &#125;
+&#125;
+
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">parse_node</span>(<span class="hljs-type">str</span>: <span class="hljs-type">String</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Result</span>(ParseNodeResult, <span class="hljs-type">String</span>) &#123;
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">str</span> = <span class="hljs-type">str</span> |&gt; string.trim_start
+  case <span class="hljs-type">str</span> &#123;
+    <span class="hljs-string">&quot;null&quot;</span> &lt;&gt; rest <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Ok</span>(<span class="hljs-title function_ invoke__">ParseNodeResult</span>(Nul, rest))
+    <span class="hljs-string">&quot;true&quot;</span> &lt;&gt; rest <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Ok</span>(<span class="hljs-title function_ invoke__">ParseNodeResult</span>(<span class="hljs-title function_ invoke__">Bol</span>(val: True), rest))
+    <span class="hljs-string">&quot;false&quot;</span> &lt;&gt; rest <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Ok</span>(<span class="hljs-title function_ invoke__">ParseNodeResult</span>(<span class="hljs-title function_ invoke__">Bol</span>(val: False), rest))
+    <span class="hljs-string">&quot;\&quot;&quot;</span> &lt;&gt; _ <span class="hljs-punctuation">-&gt;</span>
+      <span class="hljs-title function_ invoke__">parse_str</span>(<span class="hljs-type">str</span>)
+      |&gt; result.<span class="hljs-title function_ invoke__">map</span>(<span class="hljs-title function_ invoke__">fn</span>(res) &#123; <span class="hljs-title function_ invoke__">ParseNodeResult</span>(<span class="hljs-title function_ invoke__">Str</span>(val: res.result), res.rest) &#125;)
+    <span class="hljs-string">&quot;&#123;&quot;</span> &lt;&gt; rest <span class="hljs-punctuation">-&gt;</span>
+      <span class="hljs-title function_ invoke__">parse_obj</span>(rest)
+      |&gt; result.<span class="hljs-title function_ invoke__">map</span>(<span class="hljs-title function_ invoke__">fn</span>(res) &#123; <span class="hljs-title function_ invoke__">ParseNodeResult</span>(<span class="hljs-title function_ invoke__">Obj</span>(val: res.result), res.rest) &#125;)
+    <span class="hljs-string">&quot;[&quot;</span> &lt;&gt; rest <span class="hljs-punctuation">-&gt;</span>
+      <span class="hljs-title function_ invoke__">parse_arr</span>(rest)
+      |&gt; result.<span class="hljs-title function_ invoke__">map</span>(<span class="hljs-title function_ invoke__">fn</span>(res) &#123; <span class="hljs-title function_ invoke__">ParseNodeResult</span>(<span class="hljs-title function_ invoke__">Arr</span>(val: res.result), res.rest) &#125;)
+    x <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(<span class="hljs-string">&quot;unexpected token &quot;</span> &lt;&gt; x)
+  &#125;
+&#125;
+</code></pre>
+<details>
+<summary>完整代码</summary>
+<pre><code class="hljs language-gleam">import gleam/dict
+import gleam/io
+import gleam/result
+import gleam/string
+
+<span class="hljs-keyword">pub</span> <span class="hljs-keyword">type</span> <span class="hljs-title class_">Node</span> &#123;
+  Nul
+  <span class="hljs-title function_ invoke__">Bol</span>(val: Bool)
+  <span class="hljs-title function_ invoke__">Num</span>(val: Int)
+  <span class="hljs-title function_ invoke__">Str</span>(val: <span class="hljs-type">String</span>)
+  <span class="hljs-title function_ invoke__">Arr</span>(val: <span class="hljs-title function_ invoke__">List</span>(Node))
+  <span class="hljs-title function_ invoke__">Obj</span>(val: dict.<span class="hljs-title function_ invoke__">Dict</span>(<span class="hljs-type">String</span>, Node))
+&#125;
+
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">ParseNodeResult</span> &#123;
+  <span class="hljs-title function_ invoke__">ParseNodeResult</span>(result: Node, rest: <span class="hljs-type">String</span>)
+&#125;
+
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">ParseStrResult</span> &#123;
+  <span class="hljs-title function_ invoke__">ParseStrResult</span>(result: <span class="hljs-type">String</span>, rest: <span class="hljs-type">String</span>)
+&#125;
+
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">ParseListResult</span> &#123;
+  <span class="hljs-title function_ invoke__">ParseListResult</span>(result: <span class="hljs-title function_ invoke__">List</span>(Node), rest: <span class="hljs-type">String</span>)
+&#125;
+
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">ParseObjResult</span> &#123;
+  <span class="hljs-title function_ invoke__">ParseObjResult</span>(result: dict.<span class="hljs-title function_ invoke__">Dict</span>(<span class="hljs-type">String</span>, Node), rest: <span class="hljs-type">String</span>)
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">read_str</span>(<span class="hljs-type">str</span>: <span class="hljs-type">String</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Result</span>(ParseStrResult, <span class="hljs-type">String</span>) &#123;
+  case <span class="hljs-type">str</span> |&gt; string.pop_grapheme &#123;
+    <span class="hljs-title function_ invoke__">Error</span>(Nil) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(<span class="hljs-string">&quot;Unexpected EOF&quot;</span>)
+    <span class="hljs-title function_ invoke__">Ok</span>(#(first, rest)) <span class="hljs-punctuation">-&gt;</span>
+      case first &#123;
+        <span class="hljs-string">&quot;\&quot;&quot;</span> <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Ok</span>(<span class="hljs-title function_ invoke__">ParseStrResult</span>(<span class="hljs-string">&quot;&quot;</span>, rest))
+        _ <span class="hljs-punctuation">-&gt;</span>
+          <span class="hljs-title function_ invoke__">read_str</span>(rest)
+          |&gt; result.<span class="hljs-title function_ invoke__">map</span>(<span class="hljs-title function_ invoke__">fn</span>(res) &#123;
+            <span class="hljs-title function_ invoke__">ParseStrResult</span>(first &lt;&gt; res.result, res.rest)
+          &#125;)
+      &#125;
+  &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">parse_str</span>(<span class="hljs-type">str</span>: <span class="hljs-type">String</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Result</span>(ParseStrResult, <span class="hljs-type">String</span>) &#123;
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">str</span> = <span class="hljs-type">str</span> |&gt; string.trim_start
+  case <span class="hljs-type">str</span> &#123;
+    <span class="hljs-string">&quot;\&quot;&quot;</span> &lt;&gt; content <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">read_str</span>(content)
+    x <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(<span class="hljs-string">&quot;unexpected token &quot;</span> &lt;&gt; x)
+  &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">parse_col</span>(<span class="hljs-type">str</span>: <span class="hljs-type">String</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Result</span>(<span class="hljs-type">String</span>, <span class="hljs-type">String</span>) &#123;
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">str</span> = <span class="hljs-type">str</span> |&gt; string.trim_start
+  case <span class="hljs-type">str</span> &#123;
+    <span class="hljs-string">&quot;:&quot;</span> &lt;&gt; rest <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Ok</span>(rest |&gt; string.trim_start)
+    x <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(<span class="hljs-string">&quot;unexpected token &quot;</span> &lt;&gt; x)
+  &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">parse_obj</span>(<span class="hljs-type">str</span>: <span class="hljs-type">String</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Result</span>(ParseObjResult, <span class="hljs-type">String</span>) &#123;
+  case <span class="hljs-type">str</span> |&gt; string.trim_start &#123;
+    <span class="hljs-string">&quot;&#125;&quot;</span> &lt;&gt; rest <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Ok</span>(<span class="hljs-title function_ invoke__">ParseObjResult</span>(dict.<span class="hljs-title function_ invoke__">from_list</span>([]), rest))
+    x <span class="hljs-punctuation">-&gt;</span> &#123;
+      <span class="hljs-keyword">use</span> <span class="hljs-title function_ invoke__">ParseStrResult</span>(key, rest) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">parse_str</span>(x))
+      <span class="hljs-keyword">use</span> rest &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">parse_col</span>(rest))
+      <span class="hljs-keyword">use</span> <span class="hljs-title function_ invoke__">ParseNodeResult</span>(node, rest) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">parse_node</span>(rest))
+
+      case rest |&gt; string.trim_start |&gt; string.pop_grapheme &#123;
+        <span class="hljs-title function_ invoke__">Ok</span>(#(<span class="hljs-string">&quot;,&quot;</span>, next)) <span class="hljs-punctuation">-&gt;</span>
+          next
+          |&gt; string.trim_start
+          |&gt; parse_obj
+          |&gt; result.<span class="hljs-title function_ invoke__">map</span>(<span class="hljs-title function_ invoke__">fn</span>(res) &#123;
+            <span class="hljs-title function_ invoke__">ParseObjResult</span>(res.result |&gt; dict.<span class="hljs-title function_ invoke__">insert</span>(key, node), res.rest)
+          &#125;)
+        <span class="hljs-title function_ invoke__">Ok</span>(#(<span class="hljs-string">&quot;&#125;&quot;</span>, rest)) <span class="hljs-punctuation">-&gt;</span>
+          <span class="hljs-title function_ invoke__">Ok</span>(<span class="hljs-title function_ invoke__">ParseObjResult</span>(dict.<span class="hljs-title function_ invoke__">from_list</span>([#(key, node)]), rest))
+
+        <span class="hljs-title function_ invoke__">Ok</span>(#(x, _)) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(<span class="hljs-string">&quot;unexpected token &quot;</span> &lt;&gt; x)
+        <span class="hljs-title function_ invoke__">Error</span>(_) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(<span class="hljs-string">&quot;unexpected eof&quot;</span>)
+      &#125;
+    &#125;
+  &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">parse_arr</span>(<span class="hljs-type">str</span>: <span class="hljs-type">String</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Result</span>(ParseListResult, <span class="hljs-type">String</span>) &#123;
+  case <span class="hljs-type">str</span> |&gt; string.trim_start &#123;
+    <span class="hljs-string">&quot;]&quot;</span> &lt;&gt; rest <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Ok</span>(<span class="hljs-title function_ invoke__">ParseListResult</span>([], rest))
+    x <span class="hljs-punctuation">-&gt;</span> &#123;
+      <span class="hljs-keyword">use</span> <span class="hljs-title function_ invoke__">ParseNodeResult</span>(node, rest) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">parse_node</span>(x))
+      case rest |&gt; string.trim_start |&gt; string.pop_grapheme &#123;
+        <span class="hljs-title function_ invoke__">Ok</span>(#(<span class="hljs-string">&quot;,&quot;</span>, next)) <span class="hljs-punctuation">-&gt;</span>
+          next
+          |&gt; string.trim_start
+          |&gt; parse_arr
+          |&gt; result.<span class="hljs-title function_ invoke__">map</span>(<span class="hljs-title function_ invoke__">fn</span>(res) &#123;
+            <span class="hljs-title function_ invoke__">ParseListResult</span>([node, ..res.result], res.rest)
+          &#125;)
+        <span class="hljs-title function_ invoke__">Ok</span>(#(<span class="hljs-string">&quot;]&quot;</span>, rest)) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Ok</span>(<span class="hljs-title function_ invoke__">ParseListResult</span>([node], rest))
+
+        <span class="hljs-title function_ invoke__">Ok</span>(#(x, _)) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(<span class="hljs-string">&quot;unexpected token &quot;</span> &lt;&gt; x)
+        <span class="hljs-title function_ invoke__">Error</span>(_) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(<span class="hljs-string">&quot;unexpected eof&quot;</span>)
+      &#125;
+    &#125;
+  &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">parse_node</span>(<span class="hljs-type">str</span>: <span class="hljs-type">String</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Result</span>(ParseNodeResult, <span class="hljs-type">String</span>) &#123;
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">str</span> = <span class="hljs-type">str</span> |&gt; string.trim_start
+  case <span class="hljs-type">str</span> &#123;
+    <span class="hljs-string">&quot;null&quot;</span> &lt;&gt; rest <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Ok</span>(<span class="hljs-title function_ invoke__">ParseNodeResult</span>(Nul, rest))
+    <span class="hljs-string">&quot;true&quot;</span> &lt;&gt; rest <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Ok</span>(<span class="hljs-title function_ invoke__">ParseNodeResult</span>(<span class="hljs-title function_ invoke__">Bol</span>(val: True), rest))
+    <span class="hljs-string">&quot;false&quot;</span> &lt;&gt; rest <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Ok</span>(<span class="hljs-title function_ invoke__">ParseNodeResult</span>(<span class="hljs-title function_ invoke__">Bol</span>(val: False), rest))
+    <span class="hljs-string">&quot;\&quot;&quot;</span> &lt;&gt; _ <span class="hljs-punctuation">-&gt;</span>
+      <span class="hljs-title function_ invoke__">parse_str</span>(<span class="hljs-type">str</span>)
+      |&gt; result.<span class="hljs-title function_ invoke__">map</span>(<span class="hljs-title function_ invoke__">fn</span>(res) &#123; <span class="hljs-title function_ invoke__">ParseNodeResult</span>(<span class="hljs-title function_ invoke__">Str</span>(val: res.result), res.rest) &#125;)
+    <span class="hljs-string">&quot;&#123;&quot;</span> &lt;&gt; rest <span class="hljs-punctuation">-&gt;</span>
+      <span class="hljs-title function_ invoke__">parse_obj</span>(rest)
+      |&gt; result.<span class="hljs-title function_ invoke__">map</span>(<span class="hljs-title function_ invoke__">fn</span>(res) &#123; <span class="hljs-title function_ invoke__">ParseNodeResult</span>(<span class="hljs-title function_ invoke__">Obj</span>(val: res.result), res.rest) &#125;)
+    <span class="hljs-string">&quot;[&quot;</span> &lt;&gt; rest <span class="hljs-punctuation">-&gt;</span>
+      <span class="hljs-title function_ invoke__">parse_arr</span>(rest)
+      |&gt; result.<span class="hljs-title function_ invoke__">map</span>(<span class="hljs-title function_ invoke__">fn</span>(res) &#123; <span class="hljs-title function_ invoke__">ParseNodeResult</span>(<span class="hljs-title function_ invoke__">Arr</span>(val: res.result), res.rest) &#125;)
+    x <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(<span class="hljs-string">&quot;unexpected token &quot;</span> &lt;&gt; x)
+  &#125;
+&#125;
+
+<span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">parse_json</span>(<span class="hljs-type">str</span>: <span class="hljs-type">String</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Result</span>(Node, <span class="hljs-type">String</span>) &#123;
+  case <span class="hljs-title function_ invoke__">parse_node</span>(<span class="hljs-type">str</span> |&gt; string.trim) &#123;
+    <span class="hljs-title function_ invoke__">Error</span>(e) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(e)
+    <span class="hljs-title function_ invoke__">Ok</span>(<span class="hljs-title function_ invoke__">ParseNodeResult</span>(node, rest)) <span class="hljs-punctuation">-&gt;</span>
+      case rest &#123;
+        <span class="hljs-string">&quot;&quot;</span> <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Ok</span>(node)
+        _ <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(<span class="hljs-string">&quot;unexpected non EOF&quot;</span>)
+      &#125;
+  &#125;
+&#125;
+
+<span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() &#123;
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">_</span> = io.<span class="hljs-title function_ invoke__">debug</span>(<span class="hljs-title function_ invoke__">parse_json</span>(<span class="hljs-string">&quot;null&quot;</span>))
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">_</span> = io.<span class="hljs-title function_ invoke__">debug</span>(<span class="hljs-title function_ invoke__">parse_json</span>(<span class="hljs-string">&quot;true&quot;</span>))
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">_</span> = io.<span class="hljs-title function_ invoke__">debug</span>(<span class="hljs-title function_ invoke__">parse_json</span>(<span class="hljs-string">&quot;false&quot;</span>))
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">_</span> = io.<span class="hljs-title function_ invoke__">debug</span>(<span class="hljs-title function_ invoke__">parse_json</span>(<span class="hljs-string">&quot;\&quot;wwww\&quot;&quot;</span>))
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">_</span> = io.<span class="hljs-title function_ invoke__">debug</span>(<span class="hljs-title function_ invoke__">parse_json</span>(<span class="hljs-string">&quot;&#123;&#125;&quot;</span>))
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">_</span> = io.<span class="hljs-title function_ invoke__">debug</span>(<span class="hljs-title function_ invoke__">parse_json</span>(<span class="hljs-string">&quot;&#123;\&quot;a\&quot;: true, \&quot;b\&quot;: [true, false, null]&#125;&quot;</span>))
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">_</span> = io.<span class="hljs-title function_ invoke__">debug</span>(<span class="hljs-title function_ invoke__">parse_json</span>(<span class="hljs-string">&quot;[ true, false, null, \&quot;abcd\&quot; ]&quot;</span>))
+
+  io.<span class="hljs-title function_ invoke__">debug</span>(<span class="hljs-string">&quot;done&quot;</span>)
+&#125;
+</code></pre>
+</details>
+<h3 id="还有一些缺陷">还有一些缺陷<a class="header-anchor" href="#还有一些缺陷"> ¶</a></h3>
+<p>可能是我不会用的原因，gleam 莫名不能 production build……build 的产物全是在 dev 文件夹下的，令人担忧它实际的能力</p>
+<p>gleam 也不能随便找个文件夹就开始编写单文件代码然后直接 build 一个可执行文件，必须新建一个 project</p>
+<h3 id="总结">总结<a class="header-anchor" href="#总结"> ¶</a></h3>
+<p>Gleam 是一个长得很像 rust 的纯函数式语言。由于我不怎么写函数式，写起来还是略微费劲了一点（）</p>
+<p>像下面 ⬇️ 这样的代码片段显得 gleam 很有魅力，但是因为没有 if，遇到只有两个的情况还不得不 case match 就有点令人抓狂了</p>
+<pre><code class="hljs language-gleam"><span class="hljs-keyword">use</span> <span class="hljs-title function_ invoke__">ParseStrResult</span>(key, rest) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">parse_str</span>(x))
+<span class="hljs-keyword">use</span> rest &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">parse_col</span>(rest))
+<span class="hljs-keyword">use</span> <span class="hljs-title function_ invoke__">ParseNodeResult</span>(node, rest) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">parse_node</span>(rest))
+
+case rest |&gt; string.trim_start |&gt; string.pop_grapheme &#123;
+  <span class="hljs-title function_ invoke__">Ok</span>(#(<span class="hljs-string">&quot;,&quot;</span>, next)) <span class="hljs-punctuation">-&gt;</span>
+    next
+    |&gt; string.trim_start
+    |&gt; parse_obj
+    |&gt; result.<span class="hljs-title function_ invoke__">map</span>(<span class="hljs-title function_ invoke__">fn</span>(res) &#123;
+      <span class="hljs-title function_ invoke__">ParseObjResult</span>(res.result |&gt; dict.<span class="hljs-title function_ invoke__">insert</span>(key, node), res.rest)
+    &#125;)
+  <span class="hljs-title function_ invoke__">Ok</span>(#(<span class="hljs-string">&quot;&#125;&quot;</span>, rest)) <span class="hljs-punctuation">-&gt;</span>
+    <span class="hljs-title function_ invoke__">Ok</span>(<span class="hljs-title function_ invoke__">ParseObjResult</span>(dict.<span class="hljs-title function_ invoke__">from_list</span>([#(key, node)]), rest))
+
+  <span class="hljs-title function_ invoke__">Ok</span>(#(x, _)) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(<span class="hljs-string">&quot;unexpected token &quot;</span> &lt;&gt; x)
+  <span class="hljs-title function_ invoke__">Error</span>(_) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(<span class="hljs-string">&quot;unexpected eof&quot;</span>)
+&#125;
+</code></pre>
+<hr class="footnotes-sep">
+<section class="footnotes">
+<ol class="footnotes-list">
+<li id="fn1" class="footnote-item"><p>Elixir 的进程是 Erlang 虚拟机提供的“轻量级”进程，甚至比一般语言的线程还轻量 <a href="#fnref1" class="footnote-backref">↩︎</a></p>
+</li>
+</ol>
+</section>
+</div><div class="post-meta"><span class="info"><i class="fa fa-calendar"></i> <span class="date">2025-01-06</span>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Code/" title="Code">Code</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Gleam/" title="Gleam">Gleam</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Functional/" title="Functional">Functional</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Programing-Language/" title="Programing Language">Programing Language</a>  </span></div></div><p class="pagination"><a href="/2024/12/24/cpp-toy-json-parser/" title="用 C++ 写一个玩具 JSON 库">Next</a></p><div class="comment-container"><div class="comment-container"><script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js" onload="(new Gitalk({&quot;clientID&quot;:&quot;12a250ac67f452906dd6&quot;,&quot;clientSecret&quot;:&quot;7422a9ecdc933d5e6facbc61d546bced40519f0b&quot;,&quot;repo&quot;:&quot;lhcfl.github.io&quot;,&quot;owner&quot;:&quot;lhcfl&quot;,&quot;admin&quot;:[&quot;lhcfl&quot;],&quot;id&quot;:&quot;仿生电子锈会梦到自己变成纯函数式吗：gleam 语言初见&quot;,&quot;distractionFreeMode&quot;:false})).render(&quot;gitalk-comment-slot&quot;)"></script><div id="gitalk-comment-slot">Loading...</div></div></div></div><footer class="footer"><br><p class="powered_by">Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> and <a target="_blank" rel="noopener" href="https://github.com/Lhcfl/hexo-theme-sosimple">SoSimple</a></p></footer></body></html>
