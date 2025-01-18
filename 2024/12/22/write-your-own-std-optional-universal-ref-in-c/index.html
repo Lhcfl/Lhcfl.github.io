@@ -1,0 +1,320 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Linca"><title>DIY std::optional: Using Universal References in C++ · Zero Calorie Drink Shop</title><meta name="description" content="This blog was written entirely because of the item Familiarize yourself with alternatives to overloading on universal references in Effcetive Morden C"><meta name="keywords" content="Code,C++,Note,双语"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="mobile-web-app-capable" content="yes"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta id="site_data_static" data-url="/"><meta name="renderer" content="webkit"><link rel="shortcut icon" type="image/x-icon" href="/images/logo.png"><link rel="stylesheet" href="/js_complied/bundle.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><script src="/js_complied/bundle.js"></script><script>Utils.loadCSS("https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200..900&family=Noto+Serif+KR:wght@200..900&family=Noto+Serif+SC:wght@200..900&family=Noto+Serif+TC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap");
+Utils.loadCSS("https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css");
+Utils.loadCSS("/css/font-awesome.min.css");</script><meta name="generator" content="Hexo 7.3.0"></head><body class="post-page"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200..900&amp;family=Noto+Serif+KR:wght@200..900&amp;family=Noto+Serif+SC:wght@200..900&amp;family=Noto+Serif+TC:wght@200..900&amp;family=Noto+Serif:ital,wght@0,100..900;1,100..900&amp;display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"></noscript><nav class="nav"><a href="/">Home</a>&nbsp;&nbsp;<a href="/archives">Archives</a>&nbsp;&nbsp;<a href="/tags">Tags</a>&nbsp;&nbsp;<a href="/about">About</a>&nbsp;&nbsp;<a href="/links">Links</a>&nbsp;&nbsp;<a href="/search">Search</a>&nbsp;&nbsp;<a href="javascript:SoSimple.darkLightToggle()">Dark/Light Mode</a></nav><div class="main"><article class="post-container post-full"><header class="post-title"><h1>DIY <code>std::optional</code>: Using Universal References in C++</h1></header><section class="post-body"><p>This blog was written entirely because of the item <a target="_blank" rel="noopener" href="https://cntransgroup.github.io/EffectiveModernCppChinese/5.RRefMovSemPerfForw/item27.html"><em>Familiarize yourself with alternatives to overloading on universal references</em></a> in Effcetive Morden C++. We start with a practical problem trying to emulate <code>std::optional</code> in C++14, because optional monads are a good paradigm for expressing values ​​that may be null, rather than assuming everything is maybe null which can easily break through the type system.<br>
+写下这篇文章完全是因为看到了 Effcetive Morden C++ 中的<a target="_blank" rel="noopener" href="https://cntransgroup.github.io/EffectiveModernCppChinese/5.RRefMovSemPerfForw/item27.html">熟悉通用引用重载的替代方法</a>。我们从一个现实的问题开始，即在 C++14 尝试模拟 std::optional，因为 optional 是表达可能为空的值的时候一个很好的范式，而不是假定一切都可能为 null 并轻易击穿类型系统。</p>
+<span id="more"></span>
+<h2 id="Simplest-Approach">Simplest Approach<a class="header-anchor" href="#Simplest-Approach"> ¶</a></h2>
+<p><strong>最简单的方法</strong></p>
+<p>Obviously, a <code>std::optional&lt;T&gt;</code> is just a wrapper around two things: a <code>T</code> and a <code>bool</code> indicating whether <code>T</code> makes sense. We can easily write code like this:</p>
+<p>显然，一个 <code>std::optional&lt;T&gt;</code> 就是两个东西的包装：一个 <code>T</code> 和一个 <code>bool</code>，指示 T 是否有意义。我们可以很容易写下类似这样的代码：</p>
+<pre><code class="hljs language-cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">_None_t</span> &#123;&#125;;
+<span class="hljs-type">static</span> <span class="hljs-keyword">constexpr</span> _None_t None;
+
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">T</span>&gt; <span class="hljs-keyword">class</span> <span class="hljs-title class_">option</span> &#123;
+  T val;
+  <span class="hljs-type">bool</span> has_val;
+
+<span class="hljs-keyword">public</span>:
+  <span class="hljs-built_in">option</span>() : <span class="hljs-built_in">has_val</span>(<span class="hljs-literal">false</span>) &#123;&#125;;
+  <span class="hljs-built_in">option</span>(<span class="hljs-type">const</span> _None_t &amp;) : <span class="hljs-built_in">has_val</span>(<span class="hljs-literal">false</span>) &#123;&#125;;
+  <span class="hljs-built_in">option</span>(<span class="hljs-type">const</span> T &amp;x) : <span class="hljs-built_in">val</span>(x), <span class="hljs-built_in">has_val</span>(<span class="hljs-literal">true</span>) &#123;&#125;;
+  <span class="hljs-built_in">option</span>(T &amp;&amp;x) : <span class="hljs-built_in">val</span>(std::<span class="hljs-built_in">move</span>(x)), <span class="hljs-built_in">has_val</span>(<span class="hljs-literal">true</span>) &#123;&#125;;
+  <span class="hljs-built_in">option</span>(<span class="hljs-type">const</span> option &amp;copy_from) = <span class="hljs-keyword">default</span>;
+  <span class="hljs-built_in">option</span>(option &amp;&amp;move_from) = <span class="hljs-keyword">default</span>;
+
+  option &amp;<span class="hljs-keyword">operator</span>=(<span class="hljs-type">const</span> option &amp;x) = <span class="hljs-keyword">default</span>;
+  option &amp;<span class="hljs-keyword">operator</span>=(option &amp;&amp;x) = <span class="hljs-keyword">default</span>;
+  option &amp;<span class="hljs-keyword">operator</span>=(<span class="hljs-type">const</span> T &amp;x) &#123;
+    val = x;
+    has_val = <span class="hljs-literal">true</span>;
+    <span class="hljs-keyword">return</span> *<span class="hljs-keyword">this</span>;
+  &#125;;
+  option &amp;<span class="hljs-keyword">operator</span>=(T &amp;&amp;x) &#123;
+    val = std::<span class="hljs-built_in">move</span>(x);
+    has_val = <span class="hljs-literal">true</span>;
+    <span class="hljs-keyword">return</span> *<span class="hljs-keyword">this</span>;
+  &#125;
+  option &amp;<span class="hljs-keyword">operator</span>=(<span class="hljs-type">const</span> _None_t &amp;) &#123;
+    has_val = <span class="hljs-literal">false</span>;
+    <span class="hljs-keyword">return</span> *<span class="hljs-keyword">this</span>;
+  &#125;
+&#125;
+</code></pre>
+<p>The correctness of this is obvious, but it is not guaranteed to always compile. Obviously, <code>T</code> may have to be initialized with a meaningful parameter. This makes it impossible for our <code>option&lt;T&gt;</code> to be <code>None</code> in this case.<br>
+这样做的正确性当然是显然的，但是它不保证总是能编译。显然，<code>T</code> 有可能必须要一个有意义的参数来初始化。这使得对于这种情况，我们的 <code>option&lt;T&gt;</code> 根本无法为 <code>None</code>。</p>
+<p>To solve this situation, we naturally think of pointers. A pointer can always be <code>nullptr</code> unless it is allocated with a real value, so we can rewrite our <code>option&lt;T&gt;</code> as a alias of <code>std::unique_ptr&lt;T&gt;</code>, adding an additional function <code>has_value() const</code> to check if it is <code>nullptr</code>, and a copy constructor. Such a class is easy to write, but it obviously still has disadvantages. The biggest disadvantage is that it needs to dynamically allocate memory, and on the heap, which seriously slows down our <code>option&lt;T&gt;</code>.<br>
+为了解决这个情况，我们自然会想到指针。指针在除非它被赋予一个真正的值之前可以一直是 <code>nullptr</code>，因此我们可以重写我们的 <code>option&lt;T&gt;</code> 为一个 <code>std::unique_ptr&lt;T&gt;</code> 的重命名，添加了一个额外的函数 <code>has_value() const</code> 判断它是不是 <code>nullptr</code>，并添加复制构造。这样的类很容易写出，但是它显然仍然有缺点。最大的缺点是它需要动态分配内存，而且是在堆上，这严重拖慢了我们的 <code>option&lt;T&gt;</code> 的速度。</p>
+<p>To solve this problem, we will use <code>union</code>, a keyword inherited from C that allows multiple different types to coexist in the same memory position. But here <code>union</code> has another use: shielding the constructor and destructor of <code>T</code> and letting us manage it ourselves.<br>
+为了解决这个问题我们会使用 <code>union</code>，这个继承自 C 的关键字可以将多个不同类型共存于同一块内存空间。但在这里 <code>union</code> 另一个用途：屏蔽 <code>T</code> 的构造函数和析构函数，让我们自己托管它。</p>
+<pre><code class="hljs language-cpp"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt; <span class="hljs-keyword">class</span> <span class="hljs-title class_">option</span> &#123;
+  <span class="hljs-keyword">union</span> &#123;
+    T val;
+  &#125;;
+  <span class="hljs-type">bool</span> has_val;
+&#125;;
+</code></pre>
+<p>In the above definition we put <code>T</code> in a <code>union</code>, which disables the constructor and destructor of <code>T</code>. Next, when we need to make sure that <code>option</code> actually has a <code>T</code>, we use <a target="_blank" rel="noopener" href="https://en.cppreference.com/w/cpp/language/new">placement new</a> to construct <code>T</code> in place.<br>
+在上面的定义中我们把 <code>T</code> 放在 <code>union</code> 中，这禁用了 <code>T</code> 的构造和析构函数。接下来，当我们需要让 <code>option</code> 里面真的有 <code>T</code> 的时候，我们用 <a target="_blank" rel="noopener" href="https://zh.cppreference.com/w/cpp/language/new">placement new</a> 原地构造 <code>T</code>。</p>
+<pre><code class="hljs language-cpp">  <span class="hljs-built_in">option</span>(T &amp;&amp;f) : <span class="hljs-built_in">val</span>(std::<span class="hljs-built_in">move</span>(f)), <span class="hljs-built_in">has_val</span>(<span class="hljs-literal">true</span>) &#123;&#125;
+  <span class="hljs-built_in">option</span>(<span class="hljs-type">const</span> T &amp;f) : <span class="hljs-built_in">val</span>(f), <span class="hljs-built_in">has_val</span>(<span class="hljs-literal">true</span>) &#123;&#125;
+  <span class="hljs-built_in">option</span>() : <span class="hljs-built_in">has_val</span>(<span class="hljs-literal">false</span>) &#123;&#125;;
+  <span class="hljs-built_in">option</span>(<span class="hljs-type">const</span> <span class="hljs-type">none_t</span> &amp;) : <span class="hljs-built_in">has_val</span>(<span class="hljs-literal">false</span>) &#123;&#125;;
+  <span class="hljs-built_in">option</span>(<span class="hljs-type">const</span> option &amp;b) : <span class="hljs-built_in">has_val</span>(b.has_val) &#123;
+    <span class="hljs-keyword">if</span> (has_val)
+      <span class="hljs-keyword">new</span> (&amp;val) <span class="hljs-built_in">T</span>(b.val);
+  &#125;
+  <span class="hljs-built_in">option</span>(option &amp;&amp;b) : <span class="hljs-built_in">has_val</span>(b.has_val) &#123;
+    <span class="hljs-keyword">if</span> (b.has_val) &#123;
+      <span class="hljs-keyword">new</span> (&amp;val) <span class="hljs-built_in">T</span>(std::<span class="hljs-built_in">move</span>(b.val));
+    &#125;
+  &#125;
+</code></pre>
+<p>This looks perfect. In fact, it does roughly meet our needs, but is that enough? Suppose we have a custom class that needs to use <code>string</code> as a constructor. A <code>string</code> can certainly be constructed with <code>const char*</code>, so we naturally try to construct it with a string literal, like this. But does it really work as we wish? Guess if the following code will compile?<br>
+这看上去非常完美。实际上，它也确实能很大程度上满足了我们的需求，但是让我们精益求精。假如我们有一个自定义类，需要用到 <code>string</code> 作为构造函数。一个 <code>string</code> 当然可以用 <code>const char*</code> 来构造，所以我们自然而然地尝试用字符串字面量来构造它，就像这样。但是它真的能如我所愿吗？猜猜下面的代码会不会通过编译？</p>
+<pre><code class="hljs language-cpp"><span class="hljs-keyword">struct</span> <span class="hljs-title class_">StringWrapper</span> &#123;
+  std::string s;
+  <span class="hljs-built_in">StringWrapper</span>(std::string str) : <span class="hljs-built_in">s</span>(std::<span class="hljs-built_in">move</span>(str)) &#123;&#125;
+&#125;;
+<span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;
+  <span class="hljs-function">option&lt;StringWrapper&gt; <span class="hljs-title">test</span><span class="hljs-params">(<span class="hljs-string">&quot;123&quot;</span>)</span></span>;
+  <span class="hljs-comment">// opt_test.cpp: In function &#x27;int main()&#x27;:</span>
+  <span class="hljs-comment">// opt_test.cpp:123:45: error: no matching function for call to &#x27;option&lt;StringWrapper&gt;::option(const char [4])&#x27;</span>
+&#125;
+</code></pre>
+<p>The answer is no! You need to explicitly construct a <code>StringWrapper</code> object to call the <code>option&lt;StringWrapper&gt;</code> constructor, because the <code>option&lt;StringWrapper&gt;</code> call function does not accept <code>const char [4]</code> as a parameter. C++ will not automatically “forward” it.<br>
+答案是否定的！你需要显式构造一个 <code>StringWrapper</code> 对象才能调用 <code>option&lt;StringWrapper&gt;</code> 的构造函数，因为 <code>option&lt;StringWrapper&gt;</code> 的调用函数并不能接受 <code>const char [4]</code> 作为参数。C++ s 不会自动“转发”它。</p>
+<h2 id="Universal-Referances">Universal Referances<a class="header-anchor" href="#Universal-Referances"> ¶</a></h2>
+<p><strong>通用引用</strong></p>
+<p>In order to forward the arguments to <code>T</code>’s constructor, as if our <code>option&lt;T&gt;</code> is actually <code>T</code>, we need to use perfect forwarding and universal references.<br>
+为了转发参数到 T 的构造函数，就像我们的 <code>option&lt;T&gt;</code> 实际上是 <code>T</code> 一样，我们需要用到完美转发和通用引用。</p>
+<blockquote>
+<p>In fact, “T&amp;&amp;” has two different meanings. One is rvalue reference, of course. Such references behave exactly the way you expect: they bind only to rvalues, and their primary raison d’être is to identify objects that may be moved from.<br>
+事实上，“T&amp;&amp;”有两种不同的意思。第一种，当然是右值引用。这种引用表现得正如你所期待的那样：它们只绑定到右值上，并且它们主要的存在原因就是为了识别可以移动操作的对象。<br>
+The other meaning for “T&amp;&amp;” is either rvalue reference or lvalue reference. Such references look like rvalue references in the source code (i.e., “T&amp;&amp;”), but they can behave as if they were lvalue references (i.e., “T&amp;”). Their dual nature permits them to bind to rvalues (like rvalue references) as well as lvalues (like lvalue references). Furthermore, they can bind to const or non-const objects, to volatile or non-volatile objects, even to objects that are both const and volatile. They can bind to virtually anything. Such unprecedentedly flexible references deserve a name of their own. I call them universal references.<br>
+“T&amp;&amp;”的另一种意思是，它既可以是右值引用，也可以是左值引用。这种引用在源码里看起来像右值引用（即“T&amp;&amp;”），但是它们可以表现得像是左值引用（即“T&amp;”）。它们的二重性使它们既可以绑定到右值上（就像右值引用），也可以绑定到左值上（就像左值引用）。 此外，它们还可以绑定到 const 或者 non-const 的对象上，也可以绑定到 volatile 或者 non-volatile 的对象上，甚至可以绑定到既 const 又 volatile 的对象上。它们可以绑定到几乎任何东西。这种空前灵活的引用值得拥有自己的名字。我把它叫做通用引用（universal references）。<br>
+<a target="_blank" rel="noopener" href="https://cntransgroup.github.io/EffectiveModernCppChinese/5.RRefMovSemPerfForw/item24.html">https://cntransgroup.github.io/EffectiveModernCppChinese/5.RRefMovSemPerfForw/item24.html</a></p>
+</blockquote>
+<p>Assuming that everyone already understands how to write perfect forwarding, or you can also read the relevant description in Effective Morden C++, I won’t go into details here. The only problem with perfect forwarding is that it is not convenient to overload. It is easy to write a perfect forwarding constructor:<br>
+关于完美转发的写法假定大家都已经懂了，不懂的也可以看 Effective Morden C++ 相关的描述，这里不用多说了。完美转发唯一的问题是，它并不方便重载。我们很容易写出一个完美转发的构造函数：</p>
+<pre><code class="hljs language-cpp">  <span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> Arg&gt;
+  <span class="hljs-built_in">option</span>(Arg &amp;&amp;f) : <span class="hljs-built_in">val</span>(std::forward&lt;Arg&gt;(f)), <span class="hljs-built_in">has_val</span>(<span class="hljs-literal">true</span>) &#123;&#125;  <span class="hljs-comment">// &lt;---- Perfect forwarding</span>
+  <span class="hljs-built_in">option</span>(<span class="hljs-type">const</span> option &amp;b) : <span class="hljs-built_in">has_val</span>(b.has_val) &#123;
+    <span class="hljs-keyword">if</span> (has_val)
+      <span class="hljs-keyword">new</span> (&amp;val) <span class="hljs-built_in">T</span>(b.val);
+  &#125;
+  <span class="hljs-built_in">option</span>(option &amp;&amp;b) : <span class="hljs-built_in">has_val</span>(b.has_val) &#123;
+    <span class="hljs-keyword">if</span> (b.has_val) &#123;
+      <span class="hljs-keyword">new</span> (&amp;val) <span class="hljs-built_in">T</span>(std::<span class="hljs-built_in">move</span>(b.val));
+    &#125;
+  &#125;
+</code></pre>
+<p>But these two overloads do not work as we expect. Compiling the following code will produce a compiler error:<br>
+但是这两个重载并不会像我们想象的那样工作。编译以下代码，它会产生编译器错误：</p>
+<pre><code class="hljs language-cpp"><span class="hljs-keyword">struct</span> <span class="hljs-title class_">StringWrapper</span> &#123;
+  std::string s;
+  <span class="hljs-built_in">StringWrapper</span>(std::string str) : <span class="hljs-built_in">s</span>(std::<span class="hljs-built_in">move</span>(str)) &#123;&#125;
+&#125;;
+
+<span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;
+  option&lt;StringWrapper&gt; test1;
+  <span class="hljs-function">option&lt;StringWrapper&gt; <span class="hljs-title">test2</span><span class="hljs-params">(test1)</span></span>;
+  <span class="hljs-comment">// In instantiation of &#x27;option&lt;T&gt;::option(Arg&amp;&amp;) [with Arg = option&lt;StringWrapper&gt;&amp;; T = StringWrapper]&#x27;:</span>
+  <span class="hljs-comment">//    required from here</span>
+  <span class="hljs-comment">//  11 |   option&lt;StringWrapper&gt; test2(test1);</span>
+  <span class="hljs-comment">//     |                                    ^</span>
+  <span class="hljs-comment">// error: no matching function for call to &#x27;StringWrapper::StringWrapper(option&lt;StringWrapper&gt;&amp;)&#x27;</span>
+  <span class="hljs-comment">//  23 |   option(Arg &amp;&amp;f) : val(std::forward&lt;Arg&gt;(f)), has_val(true) &#123;&#125;</span>
+&#125;
+</code></pre>
+<p>How could that be! We did clearly declared <code>option(const option &amp;b)</code>! But the overloading is not in this order. For more information on why the compiler overloads in this way, please see <a target="_blank" rel="noopener" href="https://cntransgroup.github.io/EffectiveModernCppChinese/5.RRefMovSemPerfForw/item26.html"><em>Avoid overloading on universal references</em></a>, which I will not go into here. In short, when encountering <code>option&lt;T&gt;</code>, the compiler will expand the universal reference above to:<br>
+怎么会呢！明明我们声明了 <code>option(const option &amp;b)</code>! 但是重载并不是按这个顺序来的。关于编译器为什么会这样重载，请看 <a target="_blank" rel="noopener" href="https://cntransgroup.github.io/EffectiveModernCppChinese/5.RRefMovSemPerfForw/item26.html">Avoid overloading on universal references</a>，这里不赘述。总而言之，遇到 <code>option&lt;T&gt;</code> 的时候，编译器会将上面那个通用引用展开为：</p>
+<pre><code class="hljs language-cpp">  <span class="hljs-comment">// template &lt;typename Arg&gt; // &lt;-- Arg = option&amp;</span>
+  <span class="hljs-built_in">option</span>(option &amp;f) : <span class="hljs-built_in">val</span>(f), <span class="hljs-built_in">has_val</span>(<span class="hljs-literal">true</span>) &#123;&#125;
+</code></pre>
+<p>Obviously it is a better match than the copy constructor of <code>const option&amp;</code>, so the compiler chooses it.<br>
+显然这相比于 <code>const option&amp;</code> 的复制构造函数是一个更好的匹配，因此，编译器选择了它。</p>
+<h3 id="Use-enable-if">Use <code>enable_if</code><a class="header-anchor" href="#Use-enable-if"> ¶</a></h3>
+<p><strong>使用 <code>std::enable_if</code></strong></p>
+<p>(Of course, C++20 introduces better practices, namely concepts, but let’s use the features of C++14 to build our <code>option&lt;T&gt;</code>.)<br>
+（当然，C++20 引入了更好的做法即 concepts，但是我们这里先用 C++14 就有的功能来构建我们的 <code>option&lt;T&gt;</code>。）</p>
+<blockquote>
+<p><code>std::enable_if</code> gives you a way to force compilers to behave as if a particular template didn’t exist. Such templates are said to be disabled. By default, all templates are enabled, but a template using <code>std::enable_if</code> is enabled only if the condition specified by <code>std::enable_if</code> is satisfied.<br>
+<code>std::enable_if</code> 可以给你提供一种强制编译器执行行为的方法，像是特定模板不存在一样。这种模板被称为被禁止（disabled）。默认情况下，所有模板是启用的（enabled），但是使用 <code>std::enable_if</code> 可以使得仅在 <code>std::enable_if</code> 指定的条件满足时模板才启用。</p>
+</blockquote>
+<p>I am not going to explain the syntax of <code>enable_if</code> here. In short, after introducing <code>enable_if</code>, our constructors become like this;<br>
+这里不打算解释 <code>enable_if</code> 的语法。总而言之，引入 <code>enable_if</code> 后，我们的构造函数变成了这样；</p>
+<pre><code class="hljs language-cpp">  <span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> Arg,
+            <span class="hljs-keyword">typename</span> std::enable_if&lt; expression , <span class="hljs-type">bool</span>&gt;::type = <span class="hljs-literal">true</span>&gt;
+  <span class="hljs-built_in">option</span>(Arg &amp;&amp;f) : <span class="hljs-built_in">val</span>(std::forward&lt;Arg&gt;(f)), <span class="hljs-built_in">has_val</span>(<span class="hljs-literal">true</span>) &#123;&#125;
+</code></pre>
+<p>Where the <em>expression</em> is an expression that only when it is true will the overloaded function be called. Obviously, it is appropriate to call perfect forwarding only when <code>Args</code> can be used to construct <code>T</code> (for convenience, we do not consider meaningless duplicate types like <code>option&lt;option&lt;T&gt;&gt;</code>). Therefore, the expanded code becomes obvious (to highlight the type traits, I use <code>not</code> instead of <code>!</code>):<br>
+其中 <em>expression</em> 是某个表达式，只有在它成立的时候，这个重载函数才会被调用。显然，我们只有在 <code>Args</code> 可以用来构造 <code>T</code> 的时候调用完美转发是合适的（为了方便，我们不考虑像 <code>option&lt;option&lt;T&gt;&gt;</code> 这样无意义的重复类型）因此，详细的写法就变得显然了（为了突出 type traits 的关系，我使用了 <code>not</code> 代替 <code>!</code>）：</p>
+<pre><code class="hljs language-cpp"><span class="hljs-comment">// ...</span>
+  <span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> Arg&gt;
+  <span class="hljs-keyword">using</span> OptionConstructable =
+      std::is_base_of&lt;option&lt;T&gt;,
+                      std::<span class="hljs-type">remove_reference_t</span>&lt;std::<span class="hljs-type">remove_const_t</span>&lt;Arg&gt;&gt;&gt;;
+
+<span class="hljs-keyword">public</span>:
+  <span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> Arg,
+            std::<span class="hljs-type">enable_if_t</span>&lt;std::is_constructible&lt;T, Arg&gt;::value <span class="hljs-keyword">and</span>
+                                 <span class="hljs-keyword">not</span> OptionConstructable&lt;Arg&gt;::value,
+                             <span class="hljs-type">bool</span>&gt; = <span class="hljs-literal">true</span>&gt;
+  <span class="hljs-built_in">option</span>(Arg &amp;&amp;f) : <span class="hljs-built_in">val</span>(std::forward&lt;Arg&gt;(f)), <span class="hljs-built_in">has_val</span>(<span class="hljs-literal">true</span>) &#123;&#125;
+  <span class="hljs-built_in">option</span>() : <span class="hljs-built_in">has_val</span>(<span class="hljs-literal">false</span>) &#123;&#125;;
+  <span class="hljs-built_in">option</span>(<span class="hljs-type">const</span> <span class="hljs-type">none_t</span> &amp;) : <span class="hljs-built_in">has_val</span>(<span class="hljs-literal">false</span>) &#123;&#125;;
+  <span class="hljs-built_in">option</span>(<span class="hljs-type">const</span> option &amp;b) : <span class="hljs-built_in">has_val</span>(b.has_val) &#123;
+    <span class="hljs-keyword">if</span> (has_val)
+      <span class="hljs-keyword">new</span> (&amp;val) <span class="hljs-built_in">T</span>(b.val);
+  &#125;
+  <span class="hljs-built_in">option</span>(option &amp;&amp;b) : <span class="hljs-built_in">has_val</span>(b.has_val) &#123;
+    <span class="hljs-keyword">if</span> (b.has_val) &#123;
+      <span class="hljs-keyword">new</span> (&amp;val) <span class="hljs-built_in">T</span>(std::<span class="hljs-built_in">move</span>(b.val));
+    &#125;
+  &#125;
+<span class="hljs-comment">// ...</span>
+</code></pre>
+<h2 id="Code-and-Tests">Code and Tests<a class="header-anchor" href="#Code-and-Tests"> ¶</a></h2>
+<p><strong>代码和测试</strong></p>
+<p>Finally, our self-made <code>std::optional&lt;T&gt;</code> using universal references is ready! Here is what the code looks like:<br>
+最后，我们使用通用引用的自制 <code>std::optional&lt;T&gt;</code> 就写好了！代码长这样：</p>
+<pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">pragma</span> once</span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;type_traits&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;utility&gt;</span></span>
+
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">none_t</span> &#123;&#125;;
+<span class="hljs-keyword">constexpr</span> <span class="hljs-type">none_t</span> None;
+
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt; <span class="hljs-keyword">class</span> <span class="hljs-title class_">option</span> &#123;
+  <span class="hljs-keyword">union</span> &#123;
+    T val;
+  &#125;;
+  <span class="hljs-type">bool</span> has_val;
+
+  <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">release</span><span class="hljs-params">()</span> </span>&#123;
+    <span class="hljs-keyword">if</span> (has_val)
+      val.~<span class="hljs-built_in">T</span>();
+    has_val = <span class="hljs-literal">false</span>;
+  &#125;
+
+  <span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> Arg&gt;
+  <span class="hljs-keyword">using</span> OptionConstructable =
+      std::is_base_of&lt;option&lt;T&gt;,
+                      std::<span class="hljs-type">remove_reference_t</span>&lt;std::<span class="hljs-type">remove_const_t</span>&lt;Arg&gt;&gt;&gt;;
+
+<span class="hljs-keyword">public</span>:
+  <span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> Arg,
+            std::<span class="hljs-type">enable_if_t</span>&lt;std::is_constructible&lt;T, Arg&gt;::value <span class="hljs-keyword">and</span>
+                                 <span class="hljs-keyword">not</span> OptionConstructable&lt;Arg&gt;::value,
+                             <span class="hljs-type">bool</span>&gt; = <span class="hljs-literal">true</span>&gt;
+  <span class="hljs-built_in">option</span>(Arg &amp;&amp;f) : <span class="hljs-built_in">val</span>(std::forward&lt;Arg&gt;(f)), <span class="hljs-built_in">has_val</span>(<span class="hljs-literal">true</span>) &#123;&#125;
+  <span class="hljs-built_in">option</span>() : <span class="hljs-built_in">has_val</span>(<span class="hljs-literal">false</span>) &#123;&#125;;
+  <span class="hljs-built_in">option</span>(<span class="hljs-type">const</span> <span class="hljs-type">none_t</span> &amp;) : <span class="hljs-built_in">has_val</span>(<span class="hljs-literal">false</span>) &#123;&#125;;
+  <span class="hljs-built_in">option</span>(<span class="hljs-type">const</span> option &amp;b) : <span class="hljs-built_in">has_val</span>(b.has_val) &#123;
+    <span class="hljs-keyword">if</span> (has_val)
+      <span class="hljs-keyword">new</span> (&amp;val) <span class="hljs-built_in">T</span>(b.val);
+  &#125;
+  <span class="hljs-built_in">option</span>(option &amp;&amp;b) : <span class="hljs-built_in">has_val</span>(b.has_val) &#123;
+    <span class="hljs-keyword">if</span> (b.has_val) &#123;
+      <span class="hljs-keyword">new</span> (&amp;val) <span class="hljs-built_in">T</span>(std::<span class="hljs-built_in">move</span>(b.val));
+    &#125;
+  &#125;
+
+  option &amp;<span class="hljs-keyword">operator</span>=(<span class="hljs-type">none_t</span>) &#123;
+    <span class="hljs-built_in">release</span>();
+    <span class="hljs-keyword">return</span> *<span class="hljs-keyword">this</span>;
+  &#125;
+  <span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> Arg&gt;
+  std::<span class="hljs-type">enable_if_t</span>&lt;std::is_constructible&lt;T, Arg&gt;::value <span class="hljs-keyword">and</span>
+                       <span class="hljs-keyword">not</span> OptionConstructable&lt;Arg&gt;::value,
+                   option &amp;&gt;
+  <span class="hljs-keyword">operator</span>=(Arg &amp;&amp;fwd) &#123;
+    <span class="hljs-keyword">if</span> (has_val) &#123;
+      val = std::forward&lt;Arg&gt;(fwd);
+    &#125; <span class="hljs-keyword">else</span> &#123;
+      <span class="hljs-built_in">new</span> (&amp;val) <span class="hljs-built_in">T</span>(std::forward&lt;Arg&gt;(fwd));
+    &#125;
+    has_val = <span class="hljs-literal">true</span>;
+    <span class="hljs-keyword">return</span> *<span class="hljs-keyword">this</span>;
+  &#125;
+  <span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> Arg&gt;
+  std::<span class="hljs-type">enable_if_t</span>&lt;OptionConstructable&lt;Arg&gt;::value, option &amp;&gt;
+  <span class="hljs-keyword">operator</span>=(Arg &amp;&amp;fwd) &#123;
+    has_val = fwd.has_val;
+    val = std::forward&lt;T&gt;(fwd.val);
+    <span class="hljs-keyword">return</span> *<span class="hljs-keyword">this</span>;
+  &#125;
+
+  <span class="hljs-function"><span class="hljs-keyword">constexpr</span> <span class="hljs-type">bool</span> <span class="hljs-title">has_value</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> <span class="hljs-keyword">noexcept</span> </span>&#123; <span class="hljs-keyword">return</span> has_val; &#125;
+  <span class="hljs-function">T &amp;<span class="hljs-title">value</span><span class="hljs-params">()</span> </span>&#123; <span class="hljs-keyword">return</span> val; &#125;
+  <span class="hljs-function"><span class="hljs-type">const</span> T &amp;<span class="hljs-title">value</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> val; &#125;
+
+  T *<span class="hljs-keyword">operator</span>-&gt;() &#123; <span class="hljs-keyword">return</span> &amp;val; &#125;
+  T <span class="hljs-type">const</span> *<span class="hljs-keyword">operator</span>-&gt;() <span class="hljs-type">const</span> &#123; <span class="hljs-keyword">return</span> &amp;val; &#125;
+
+  ~<span class="hljs-built_in">option</span>() &#123; <span class="hljs-built_in">release</span>(); &#125;
+&#125;;
+</code></pre>
+<p>What a <em>lovely</em> code! Comparing to the real <code>std::optional</code>, the behavior of our’s is very consistent in allocation and moving or copying.<br>
+多么<em>优美</em>的代码！将它和真正的 <code>std::optional</code> 对比，无论是分配内存还是移动/拷贝的行为都非常一致。</p>
+<h2 id="And-C-20">And C++20<a class="header-anchor" href="#And-C-20"> ¶</a></h2>
+<p><strong>以及 C++20</strong></p>
+<p>When using C++20, a great improvement is that we can use <em>concepts</em> to replace complex and difficult <code>std::enable_if</code> to get more semantic error prompts. So the original <code>std::enable_if</code> can be replaced with <code>requires</code>, like this:<br>
+当我们使用 C++20 的时候，一个很大的特点是我们可以用 <em>concepts</em> 来替换复杂难用的 <code>std::enable_if</code> 并且获得更加语义化的错误提示。所以原先的 <code>std::enable_if</code> 可以替换成 <code>requires</code>，就像这样：</p>
+<pre><code class="hljs language-cpp"> <span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> Arg&gt;
+    <span class="hljs-built_in">requires</span>(std::is_constructible&lt;T, Arg&gt;::value <span class="hljs-keyword">and</span>
+             <span class="hljs-keyword">not</span> OptionConstructable&lt;Arg&gt;::value)
+  <span class="hljs-built_in">option</span>(Arg &amp;&amp;f) : <span class="hljs-built_in">val</span>(std::forward&lt;Arg&gt;(f)), <span class="hljs-built_in">has_val</span>(<span class="hljs-literal">true</span>) &#123;&#125;
+  <span class="hljs-built_in">option</span>() : <span class="hljs-built_in">has_val</span>(<span class="hljs-literal">false</span>) &#123;&#125;;
+  <span class="hljs-built_in">option</span>(<span class="hljs-type">const</span> <span class="hljs-type">none_t</span> &amp;) : <span class="hljs-built_in">has_val</span>(<span class="hljs-literal">false</span>) &#123;&#125;;
+  <span class="hljs-built_in">option</span>(<span class="hljs-type">const</span> option &amp;b) : <span class="hljs-built_in">has_val</span>(b.has_val) &#123;
+    <span class="hljs-keyword">if</span> (has_val)
+      <span class="hljs-keyword">new</span> (&amp;val) <span class="hljs-built_in">T</span>(b.val);
+  &#125;
+  <span class="hljs-built_in">option</span>(option &amp;&amp;b) : <span class="hljs-built_in">has_val</span>(b.has_val) &#123;
+    <span class="hljs-keyword">if</span> (b.has_val) &#123;
+      <span class="hljs-keyword">new</span> (&amp;val) <span class="hljs-built_in">T</span>(std::<span class="hljs-built_in">move</span>(b.val));
+    &#125;
+  &#125;
+
+  option &amp;<span class="hljs-keyword">operator</span>=(<span class="hljs-type">none_t</span>) &#123;
+    <span class="hljs-built_in">release</span>();
+    <span class="hljs-keyword">return</span> *<span class="hljs-keyword">this</span>;
+  &#125;
+  <span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> Arg&gt;
+    <span class="hljs-built_in">requires</span>(std::is_constructible&lt;T, Arg&gt;::value <span class="hljs-keyword">and</span>
+             <span class="hljs-keyword">not</span> OptionConstructable&lt;Arg&gt;::value)
+  option &amp;<span class="hljs-keyword">operator</span>=(Arg &amp;&amp;fwd) &#123;
+    <span class="hljs-keyword">if</span> (has_val) &#123;
+      val = std::forward&lt;Arg&gt;(fwd);
+    &#125; <span class="hljs-keyword">else</span> &#123;
+      <span class="hljs-built_in">new</span> (&amp;val) <span class="hljs-built_in">T</span>(std::forward&lt;Arg&gt;(fwd));
+    &#125;
+    has_val = <span class="hljs-literal">true</span>;
+    <span class="hljs-keyword">return</span> *<span class="hljs-keyword">this</span>;
+  &#125;
+  <span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> Arg&gt;
+    <span class="hljs-keyword">requires</span> OptionConstructable&lt;Arg&gt;::value
+  option &amp;<span class="hljs-keyword">operator</span>=(Arg &amp;&amp;fwd) &#123;
+    has_val = fwd.has_val;
+    val = std::forward&lt;T&gt;(fwd.val);
+    <span class="hljs-keyword">return</span> *<span class="hljs-keyword">this</span>;
+  &#125;
+</code></pre>
+<p>What a <em>simpler</em> code!<br>
+真是<em>简单</em>了不少呢！</p>
+<h2 id="And-Rust">And Rust<a class="header-anchor" href="#And-Rust"> ¶</a></h2>
+<p><strong>以及 Rust</strong></p>
+<p>After writing a lot of C++ dark magic, let’s see how Rust’s <code>Option</code> is defined.<br>
+写完了丰富的 C++ 黑魔法，让我们看看 rust 的 <code>Option</code> 是怎么定义的。</p>
+<pre><code class="hljs language-rust"><span class="hljs-keyword">enum</span> <span class="hljs-title class_">Option</span>&lt;T&gt; &#123;
+    <span class="hljs-literal">None</span>,
+    <span class="hljs-title function_ invoke__">Some</span>(T),
+&#125;
+</code></pre>
+<p>Fuck.<br>
+操。</p>
+<h2 id="Conclusion-结论">Conclusion 结论<a class="header-anchor" href="#Conclusion-结论"> ¶</a></h2>
+<p>Don’t use C++.<br>
+别用 C++</p>
+</section><section class="post-meta"><span class="info"><i class="fa fa-calendar"></i> <span class="date">2024-12-22</span>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Code/" title="Code">Code</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/C/" title="C++">C++</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Note/" title="Note">Note</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/%E5%8F%8C%E8%AF%AD/" title="双语">双语</a>  </span></section></article><p class="pagination"><a href="/2024/12/24/cpp-toy-json-parser/" title="用 C++ 写一个玩具 JSON 库">Previous</a><span>  </span><a href="/2024/12/18/pass-test-joke/" title="Introduction to Pass Principles">Next</a></p><article class="comment-container"><div class="comment-container"><script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js" onload="(new Gitalk({&quot;clientID&quot;:&quot;12a250ac67f452906dd6&quot;,&quot;clientSecret&quot;:&quot;7422a9ecdc933d5e6facbc61d546bced40519f0b&quot;,&quot;repo&quot;:&quot;lhcfl.github.io&quot;,&quot;owner&quot;:&quot;lhcfl&quot;,&quot;admin&quot;:[&quot;lhcfl&quot;],&quot;id&quot;:&quot;DIY std::optional: Using Universal References in &quot;,&quot;distractionFreeMode&quot;:false})).render(&quot;gitalk-comment-slot&quot;)"></script><div id="gitalk-comment-slot">Loading...</div></div></article></div><footer class="footer"><br><p class="powered_by">Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> and <a target="_blank" rel="noopener" href="https://github.com/Lhcfl/hexo-theme-sosimple">SoSimple</a></p></footer></body></html>

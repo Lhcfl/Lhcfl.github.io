@@ -1,0 +1,360 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Linca"><title>用 C++ 写一个玩具 JSON 库 · Zero Calorie Drink Shop</title><meta name="description" content="写这个解析器主要是为了看自己的 C++ 水平，毕竟 JSON 是一个同时能做到语法简单的同时考验人的编码水平的 data structure，其次是为了好玩。
+好玩吗？好玩。
+
+结构 ¶
+我们使用 https://www.json.org/json-en.html 作为解析的依据。因为是个玩具，这个"><meta name="keywords" content="Code,C++"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="mobile-web-app-capable" content="yes"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta id="site_data_static" data-url="/"><meta name="renderer" content="webkit"><link rel="shortcut icon" type="image/x-icon" href="/images/logo.png"><link rel="stylesheet" href="/js_complied/bundle.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><script src="/js_complied/bundle.js"></script><script>Utils.loadCSS("https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200..900&family=Noto+Serif+KR:wght@200..900&family=Noto+Serif+SC:wght@200..900&family=Noto+Serif+TC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap");
+Utils.loadCSS("https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css");
+Utils.loadCSS("/css/font-awesome.min.css");</script><meta name="generator" content="Hexo 7.3.0"></head><body class="post-page"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200..900&amp;family=Noto+Serif+KR:wght@200..900&amp;family=Noto+Serif+SC:wght@200..900&amp;family=Noto+Serif+TC:wght@200..900&amp;family=Noto+Serif:ital,wght@0,100..900;1,100..900&amp;display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"></noscript><nav class="nav"><a href="/">Home</a>&nbsp;&nbsp;<a href="/archives">Archives</a>&nbsp;&nbsp;<a href="/tags">Tags</a>&nbsp;&nbsp;<a href="/about">About</a>&nbsp;&nbsp;<a href="/links">Links</a>&nbsp;&nbsp;<a href="/search">Search</a>&nbsp;&nbsp;<a href="javascript:SoSimple.darkLightToggle()">Dark/Light Mode</a></nav><div class="main"><article class="post-container post-full"><header class="post-title"><h1>用 C++ 写一个玩具 JSON 库</h1></header><section class="post-body"><p>写这个解析器主要是为了看自己的 C++ 水平，毕竟 JSON 是一个同时能做到语法简单的同时考验人的编码水平的 data structure，其次是为了好玩。<br>
+好玩吗？好玩。</p>
+<span id="more"></span>
+<h2 id="结构">结构<a class="header-anchor" href="#结构"> ¶</a></h2>
+<p>我们使用 <a target="_blank" rel="noopener" href="https://www.json.org/json-en.html">https://www.json.org/json-en.html</a> 作为解析的依据。因为是个玩具，这个解析器不打算遵循任何标准。</p>
+<p>一个 JSON 的“值” 分为六种可能，也就是</p>
+<ul>
+<li>Null: <code>null</code>, 空值</li>
+<li>Boolean: 布尔值</li>
+<li>Number: 数字</li>
+<li>String: 字符串</li>
+<li>Array: 数组</li>
+<li>Object: key-value 映射</li>
+</ul>
+<p>其中 Array 和 Object 又会存放任何可能的 JSON 值。</p>
+<p><s>由于 C++ 显然会比较难写，先来看一下 Rust 大概会怎么写。</s></p>
+<pre><code class="hljs language-rust"><span class="hljs-keyword">enum</span> <span class="hljs-title class_">JSONNode</span> &#123;
+    Null,
+    <span class="hljs-title function_ invoke__">Bool</span>(<span class="hljs-type">bool</span>),
+    <span class="hljs-title function_ invoke__">Number</span>(<span class="hljs-type">i64</span>),
+    <span class="hljs-title function_ invoke__">String</span>(<span class="hljs-type">String</span>),
+    <span class="hljs-title function_ invoke__">Array</span>(<span class="hljs-type">Vec</span>&lt;JSONNode&gt;),
+    <span class="hljs-title function_ invoke__">Object</span>(HashMap&lt;<span class="hljs-type">String</span>, JSONNode&gt;),
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">parse</span>(sv: &amp;<span class="hljs-type">str</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">Result</span>&lt;JSONNode, <span class="hljs-type">String</span>&gt; &#123;
+    <span class="hljs-keyword">let</span> <span class="hljs-variable">sv</span> = sv.<span class="hljs-title function_ invoke__">trim_start</span>();
+    <span class="hljs-keyword">if</span> <span class="hljs-keyword">let</span> <span class="hljs-variable">Some</span>(first) = sv.<span class="hljs-title function_ invoke__">chars</span>().<span class="hljs-title function_ invoke__">nth</span>(<span class="hljs-number">0</span>) &#123;
+        <span class="hljs-keyword">match</span> first &#123;
+            <span class="hljs-string">&#x27;n&#x27;</span> =&gt; <span class="hljs-title function_ invoke__">Ok</span>(<span class="hljs-title function_ invoke__">parseNull</span>(sv)),
+            <span class="hljs-string">&#x27;t&#x27;</span> =&gt; <span class="hljs-title function_ invoke__">Ok</span>(<span class="hljs-title function_ invoke__">parseBool</span>(sv)),
+            <span class="hljs-string">&#x27;f&#x27;</span> =&gt; <span class="hljs-title function_ invoke__">Ok</span>(<span class="hljs-title function_ invoke__">parseBool</span>(sv)),
+            <span class="hljs-string">&#x27;&quot;&#x27;</span> =&gt; <span class="hljs-title function_ invoke__">Ok</span>(<span class="hljs-title function_ invoke__">parseString</span>(sv)),
+            <span class="hljs-string">&#x27;0&#x27;</span>..<span class="hljs-string">&#x27;9&#x27;</span> =&gt; <span class="hljs-title function_ invoke__">Ok</span>(<span class="hljs-title function_ invoke__">parseNumber</span>(sv)),
+            <span class="hljs-string">&#x27;&#123;&#x27;</span> =&gt; <span class="hljs-title function_ invoke__">Ok</span>(<span class="hljs-title function_ invoke__">parseObject</span>(sv)),
+            <span class="hljs-string">&#x27;[&#x27;</span> =&gt; <span class="hljs-title function_ invoke__">Ok</span>(<span class="hljs-title function_ invoke__">parseArray</span>(sv)),
+            _ =&gt; <span class="hljs-title function_ invoke__">Err</span>(<span class="hljs-built_in">format!</span>(<span class="hljs-string">&quot;unexpected token &#123;first&#125;&quot;</span>))
+        &#125;
+    &#125; <span class="hljs-keyword">else</span> &#123;
+        <span class="hljs-title function_ invoke__">Err</span>(<span class="hljs-string">&quot;expect json value&quot;</span>.<span class="hljs-title function_ invoke__">to_string</span>())
+    &#125;
+&#125;
+</code></pre>
+<p>⬆️ 好了也就是看一下而已。但是对于 C++ 我们没有好的 enum，如果要写得比较方便而不是追求性能的话就要用到虚函数和虚继承。</p>
+<p>首先定义一个节点的可能性：</p>
+<pre><code class="hljs language-cpp"><span class="hljs-keyword">enum class</span> <span class="hljs-title class_">NodeType</span> &#123;
+  Null,
+  Boolean,
+  Number,
+  String,
+  Array,
+  Object,
+&#125;;
+</code></pre>
+<p>JSON 中不会出现不属于上面六类“值”，因此“值”应该是一个虚基类，包含一些纯虚函数</p>
+<pre><code class="hljs language-cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Node</span> &#123;
+<span class="hljs-keyword">public</span>:
+  <span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">static</span> std::unique_ptr&lt;Node&gt; <span class="hljs-title">parse</span><span class="hljs-params">(std::string_view &amp;sv, <span class="hljs-type">int</span> dep)</span> </span>&#123;
+    <span class="hljs-built_in">assert_depth</span>(sv, dep);
+    <span class="hljs-built_in">removeWhiteSpaces</span>(sv);
+    <span class="hljs-keyword">switch</span> (sv[<span class="hljs-number">0</span>]) &#123;
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;n&#x27;</span>:
+      <span class="hljs-keyword">return</span> Null::<span class="hljs-built_in">parse</span>(sv);
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;t&#x27;</span>:
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;f&#x27;</span>:
+      <span class="hljs-keyword">return</span> Boolean::<span class="hljs-built_in">parse</span>(sv);
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;&#123;&#x27;</span>:
+      <span class="hljs-keyword">return</span> Object::<span class="hljs-built_in">parse</span>(sv, dep + <span class="hljs-number">1</span>); <span class="hljs-comment">// 控制递归深度，防止溢出</span>
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;[&#x27;</span>:
+      <span class="hljs-keyword">return</span> Array::<span class="hljs-built_in">parse</span>(sv, dep + <span class="hljs-number">1</span>); <span class="hljs-comment">// 同上</span>
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;&quot;&#x27;</span>:
+      <span class="hljs-keyword">return</span> String::<span class="hljs-built_in">parse</span>(sv);
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;-&#x27;</span>:
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;0&#x27;</span> ... <span class="hljs-string">&#x27;9&#x27;</span>:
+      <span class="hljs-keyword">return</span> Number::<span class="hljs-built_in">parse</span>(sv);
+    <span class="hljs-keyword">default</span>:
+      <span class="hljs-keyword">throw</span> <span class="hljs-built_in">getJSONParseError</span>(sv, <span class="hljs-string">&quot;any JSON value&quot;</span>);
+    &#125;
+  &#125;;
+
+  <span class="hljs-function"><span class="hljs-keyword">virtual</span> <span class="hljs-keyword">inline</span> NodeType <span class="hljs-title">getType</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> <span class="hljs-keyword">noexcept</span> </span>= <span class="hljs-number">0</span>;
+
+  <span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">T</span>&gt;
+    <span class="hljs-function"><span class="hljs-keyword">requires</span> std::is_base_of_v&lt;Node, T&gt;
+  <span class="hljs-keyword">inline</span> T &amp;<span class="hljs-title">cast</span><span class="hljs-params">()</span> <span class="hljs-keyword">noexcept</span> </span>&#123;
+    <span class="hljs-keyword">return</span> *(<span class="hljs-built_in">static_cast</span>&lt;T *&gt;(<span class="hljs-keyword">this</span>));
+  &#125;
+  <span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">T</span>&gt;
+    <span class="hljs-function"><span class="hljs-keyword">requires</span> std::is_base_of_v&lt;Node, T&gt;
+  <span class="hljs-keyword">inline</span> <span class="hljs-type">const</span> T &amp;<span class="hljs-title">cast</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> <span class="hljs-keyword">noexcept</span> </span>&#123;
+    <span class="hljs-keyword">return</span> *(<span class="hljs-built_in">static_cast</span>&lt;<span class="hljs-type">const</span> T *&gt;(<span class="hljs-keyword">this</span>));
+  &#125;
+
+  <span class="hljs-function"><span class="hljs-keyword">virtual</span> <span class="hljs-keyword">inline</span> std::string <span class="hljs-title">dump</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123;
+    <span class="hljs-keyword">switch</span> (<span class="hljs-keyword">this</span>-&gt;<span class="hljs-built_in">getType</span>()) &#123;
+    <span class="hljs-keyword">case</span> NodeType::Null:
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>-&gt;<span class="hljs-built_in">cast</span>&lt;Null&gt;().<span class="hljs-built_in">dump</span>();
+    <span class="hljs-keyword">case</span> NodeType::Boolean:
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>-&gt;<span class="hljs-built_in">cast</span>&lt;Boolean&gt;().<span class="hljs-built_in">dump</span>();
+    <span class="hljs-keyword">case</span> NodeType::Number:
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>-&gt;<span class="hljs-built_in">cast</span>&lt;Number&gt;().<span class="hljs-built_in">dump</span>();
+    <span class="hljs-keyword">case</span> NodeType::String:
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>-&gt;<span class="hljs-built_in">cast</span>&lt;String&gt;().<span class="hljs-built_in">dump</span>();
+    <span class="hljs-keyword">case</span> NodeType::Array:
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>-&gt;<span class="hljs-built_in">cast</span>&lt;Array&gt;().<span class="hljs-built_in">dump</span>();
+    <span class="hljs-keyword">case</span> NodeType::Object:
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>-&gt;<span class="hljs-built_in">cast</span>&lt;Object&gt;().<span class="hljs-built_in">dump</span>();
+    &#125;
+    <span class="hljs-keyword">throw</span> <span class="hljs-built_in">JSONException</span>(<span class="hljs-string">&quot;unreachable: a JSON::Node has no nodetype&quot;</span>);
+  &#125;;
+
+  <span class="hljs-keyword">virtual</span> ~<span class="hljs-built_in">Node</span>() &#123;&#125;;
+&#125;;
+</code></pre>
+<p>一个节点显然最好是独占其资源的所有权的，所以返回一个 <code>std::unique_ptr&lt;Node&gt;</code>，帮我们免除手动释放内存的烦恼。</p>
+<p>因为是指针，可以简单的 cast 到子类，调用子类的方法。</p>
+<p>而一个 <code>JSON</code> 对象什么其它的都不存，只存放这个 <code>std::unique_ptr&lt;Node&gt;</code>，作为一个 <code>unique_ptr&lt;Node&gt;</code> 的包装器而存在。</p>
+<h2 id="Parse">Parse<a class="header-anchor" href="#Parse"> ¶</a></h2>
+<p>null, boolean, number, string 的解析比较显然，略</p>
+<p>array 和 object 有共通性，这里只解释比较复杂的 object</p>
+<pre><code class="hljs language-cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Object</span> : <span class="hljs-keyword">public</span> Node &#123;
+  <span class="hljs-keyword">using</span> ObjectVT = std::unordered_map&lt;std::string, JSON&gt;;
+  ObjectVT value_&#123;&#125;;
+
+<span class="hljs-keyword">public</span>:
+  <span class="hljs-built_in">Object</span>() &#123;&#125;;
+  <span class="hljs-function"><span class="hljs-keyword">explicit</span> <span class="hljs-title">Object</span><span class="hljs-params">(ObjectVT &amp;&amp;val)</span> : value_(std::move(val)) &#123;</span>&#125;;
+  <span class="hljs-built_in">Object</span>(Object &amp;&amp;) = <span class="hljs-keyword">default</span>;
+  <span class="hljs-built_in">Object</span>(<span class="hljs-type">const</span> Object &amp;) = <span class="hljs-keyword">delete</span>; <span class="hljs-comment">// 删掉拷贝构造函数 （虽然本来就被 JSON 删了）</span>
+  Object &amp;<span class="hljs-keyword">operator</span>=(Object &amp;&amp;) = <span class="hljs-keyword">default</span>;
+  Object &amp;<span class="hljs-keyword">operator</span>=(<span class="hljs-type">const</span> Object &amp;) = <span class="hljs-keyword">delete</span>;
+
+  <span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">static</span> std::unique_ptr&lt;Object&gt; <span class="hljs-title">parse</span><span class="hljs-params">(std::string_view &amp;sv, <span class="hljs-type">int</span> dep)</span> </span>&#123;
+    <span class="hljs-built_in">assert_depth</span>(sv, dep);
+    <span class="hljs-built_in">removeWhiteSpaces</span>(sv);
+    <span class="hljs-keyword">if</span> (sv[<span class="hljs-number">0</span>] != <span class="hljs-string">&#x27;&#123;&#x27;</span>)
+      <span class="hljs-keyword">throw</span> <span class="hljs-built_in">getJSONParseError</span>(sv, <span class="hljs-string">&quot;object start `&#123;`&quot;</span>);
+    sv.<span class="hljs-built_in">remove_prefix</span>(<span class="hljs-number">1</span>);
+    <span class="hljs-built_in">removeWhiteSpaces</span>(sv);
+    ObjectVT val;
+    <span class="hljs-type">bool</span> isTComma = <span class="hljs-literal">false</span>; <span class="hljs-comment">// 是不是尾随逗号</span>
+    <span class="hljs-keyword">while</span> (sv[<span class="hljs-number">0</span>] != <span class="hljs-string">&#x27;&#125;&#x27;</span>) &#123;
+      <span class="hljs-keyword">auto</span> key = String::<span class="hljs-built_in">parse</span>(sv); <span class="hljs-comment">// 解析 key</span>
+      <span class="hljs-keyword">if</span> (ENABLE_DUMPLICATED_KEY_DETECT &amp;&amp; val.<span class="hljs-built_in">contains</span>(key-&gt;<span class="hljs-built_in">value</span>())) &#123;
+        <span class="hljs-keyword">throw</span> <span class="hljs-built_in">getJSONParseError</span>(
+            sv, (<span class="hljs-string">&quot;unique key, but got dumplicated key `&quot;</span> + key-&gt;<span class="hljs-built_in">value</span>() + <span class="hljs-string">&quot;`&quot;</span>)
+                    .<span class="hljs-built_in">c_str</span>());
+      &#125; <span class="hljs-keyword">else</span> &#123;
+        <span class="hljs-built_in">removeWhiteSpaces</span>(sv);
+        <span class="hljs-keyword">if</span> (sv[<span class="hljs-number">0</span>] != <span class="hljs-string">&#x27;:&#x27;</span>) <span class="hljs-comment">// 解析 key :</span>
+          <span class="hljs-keyword">throw</span> <span class="hljs-built_in">getJSONParseError</span>(sv, <span class="hljs-string">&quot;object spliter `:`&quot;</span>);
+        sv.<span class="hljs-built_in">remove_prefix</span>(<span class="hljs-number">1</span>);
+        val.<span class="hljs-built_in">insert</span>(&#123;key-&gt;<span class="hljs-built_in">take</span>(), <span class="hljs-built_in">JSON</span>(Node::<span class="hljs-built_in">parse</span>(sv, dep + <span class="hljs-number">1</span>))&#125;);
+        <span class="hljs-built_in">removeWhiteSpaces</span>(sv); <span class="hljs-comment">// 解析 key : value</span>
+        <span class="hljs-keyword">switch</span> (sv[<span class="hljs-number">0</span>]) &#123;
+        <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;&#125;&#x27;</span>: <span class="hljs-comment">// 看看结束了没</span>
+          sv.<span class="hljs-built_in">remove_prefix</span>(<span class="hljs-number">1</span>);
+          <span class="hljs-keyword">return</span> std::<span class="hljs-built_in">make_unique</span>&lt;Object&gt;(std::<span class="hljs-built_in">move</span>(val));
+        <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;,&#x27;</span>:
+          sv.<span class="hljs-built_in">remove_prefix</span>(<span class="hljs-number">1</span>);
+          isTComma = <span class="hljs-literal">true</span>;
+          <span class="hljs-keyword">continue</span>;
+        <span class="hljs-keyword">default</span>:
+          <span class="hljs-keyword">throw</span> <span class="hljs-built_in">getJSONParseError</span>(sv, <span class="hljs-string">&quot;object spliter `,` or object end `&#125;`&quot;</span>);
+        &#125;
+      &#125;
+    &#125;
+    <span class="hljs-keyword">if</span> (isTComma &amp;&amp; !ENABLE_TRAILING_COMMA)
+      <span class="hljs-keyword">throw</span> <span class="hljs-built_in">getJSONParseError</span>(sv, <span class="hljs-string">&quot;next json value&quot;</span>);
+    sv.<span class="hljs-built_in">remove_prefix</span>(<span class="hljs-number">1</span>);
+    <span class="hljs-keyword">return</span> std::<span class="hljs-built_in">make_unique</span>&lt;Object&gt;(std::<span class="hljs-built_in">move</span>(val));
+  &#125;
+
+  <span class="hljs-function"><span class="hljs-keyword">inline</span> NodeType <span class="hljs-title">getType</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> <span class="hljs-keyword">noexcept</span> <span class="hljs-keyword">override</span> </span>&#123;
+    <span class="hljs-keyword">return</span> NodeType::Object;
+  &#125;
+  <span class="hljs-function"><span class="hljs-keyword">inline</span> std::string <span class="hljs-title">dump</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> <span class="hljs-keyword">override</span> </span>&#123;
+    std::string s = <span class="hljs-string">&quot;&#123;&quot;</span>;
+    <span class="hljs-keyword">for</span> (<span class="hljs-type">const</span> <span class="hljs-keyword">auto</span> &amp;[key, val] : value_) &#123;
+      s += String::<span class="hljs-built_in">toJSONString</span>(key);
+      s += <span class="hljs-string">&quot;:&quot;</span>;
+      s += val-&gt;<span class="hljs-built_in">dump</span>();
+      s += <span class="hljs-string">&quot;,&quot;</span>;
+    &#125;
+    <span class="hljs-keyword">if</span> (!value_.<span class="hljs-built_in">empty</span>())
+      s.<span class="hljs-built_in">pop_back</span>();
+    s += <span class="hljs-string">&#x27;&#125;&#x27;</span>;
+    <span class="hljs-keyword">return</span> s;
+  &#125;
+
+  JSON &amp;<span class="hljs-keyword">operator</span>[](<span class="hljs-type">const</span> std::string &amp;s) &#123; <span class="hljs-keyword">return</span> value_[s]; &#125;
+  <span class="hljs-type">const</span> JSON &amp;<span class="hljs-keyword">operator</span>[](<span class="hljs-type">const</span> std::string &amp;s) <span class="hljs-type">const</span> &#123; <span class="hljs-keyword">return</span> value_[s]; &#125;
+&#125;;
+</code></pre>
+<p>多么简单呐（赞赏）只需要用 general 的 Node::parse 解析 object 里面的任意 value，将得到的 value node 移动进自己的 unordered_map (hash map) 就写完了！</p>
+<p>想必看完上面的代码和注释大家都懂了吧（跑路）</p>
+<p>因此整个 json 的 parser 就非常好写了：</p>
+<pre><code class="hljs language-cpp"><span class="hljs-function"><span class="hljs-type">static</span> JSON <span class="hljs-title">parse</span><span class="hljs-params">(std::string_view sv)</span> </span>&#123;
+  <span class="hljs-keyword">auto</span> res = Node::<span class="hljs-built_in">parse</span>(sv, <span class="hljs-number">0</span>);
+  <span class="hljs-built_in">removeWhiteSpaces</span>(sv);
+  <span class="hljs-keyword">if</span> (!sv.<span class="hljs-built_in">empty</span>()) &#123;
+    <span class="hljs-keyword">throw</span> <span class="hljs-built_in">getJSONParseError</span>(sv, <span class="hljs-string">&quot;EOF&quot;</span>); <span class="hljs-comment">// 希望整个 json 只有一个 root node</span>
+  &#125;
+  <span class="hljs-keyword">return</span> <span class="hljs-built_in">JSON</span>(std::<span class="hljs-built_in">move</span>(res));
+&#125;
+</code></pre>
+<h2 id="为了方便使用……">为了方便使用……<a class="header-anchor" href="#为了方便使用……"> ¶</a></h2>
+<p>现在雏形已经出来了，但是每个 JSON 必须要显式用 make_unique 构造，以至于你会看到类似这样的蠢蠢的语法：</p>
+<pre><code class="hljs language-cpp">json[<span class="hljs-string">&quot;some_key&quot;</span>] = std::<span class="hljs-built_in">make_unique</span>&lt;JSON::Boolean&gt;(<span class="hljs-literal">false</span>);
+</code></pre>
+<p>怎么将它简化呢？</p>
+<pre><code class="hljs language-cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">JSON</span> &#123;
+<span class="hljs-keyword">public</span>:
+  <span class="hljs-built_in">JSON</span>() : _uptr(std::<span class="hljs-built_in">make_unique</span>&lt;Null&gt;()) &#123;&#125;; <span class="hljs-comment">// 一个 JSON 默认应该是个 null</span>
+  <span class="hljs-built_in">JSON</span>(JSON &amp;&amp;) = <span class="hljs-keyword">default</span>;
+
+  <span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
+    <span class="hljs-function"><span class="hljs-keyword">requires</span> std::is_base_of_v&lt;Node, T&gt;
+  <span class="hljs-keyword">explicit</span> <span class="hljs-title">JSON</span><span class="hljs-params">(std::unique_ptr&lt;T&gt; &amp;&amp;uptr)</span> : _uptr(std::move(uptr)) &#123;</span>&#125; <span class="hljs-comment">// 用unique ptr构造</span>
+
+  JSON &amp;<span class="hljs-keyword">operator</span>=(JSON &amp;&amp;) = <span class="hljs-keyword">default</span>;
+  JSON &amp;<span class="hljs-keyword">operator</span>=(<span class="hljs-type">const</span> JSON &amp;) = <span class="hljs-keyword">delete</span>;
+
+  <span class="hljs-keyword">inline</span> JSON &amp;<span class="hljs-keyword">operator</span>=(std::unique_ptr&lt;Node&gt; &amp;&amp;uptr) &#123;
+    _uptr = std::<span class="hljs-built_in">move</span>(uptr);
+    <span class="hljs-keyword">return</span> *<span class="hljs-keyword">this</span>;
+  &#125;
+
+  <span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
+    <span class="hljs-function"><span class="hljs-keyword">requires</span> std::is_base_of_v&lt;Node, T&gt;
+  <span class="hljs-keyword">explicit</span> <span class="hljs-title">JSON</span><span class="hljs-params">(T &amp;&amp;node)</span> : _uptr(std::make_unique&lt;T&gt;(std::forward&lt;T&gt;(node))) &#123;</span>&#125; <span class="hljs-comment">// 用 value 的类构造</span>
+
+  <span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
+    <span class="hljs-keyword">requires</span> std::is_base_of_v&lt;Node, T&gt;
+  <span class="hljs-keyword">inline</span> JSON &amp;<span class="hljs-keyword">operator</span>=(T &amp;&amp;node) &#123;
+    _uptr = std::<span class="hljs-built_in">make_unique</span>&lt;T&gt;(std::forward&lt;T&gt;(node));
+    <span class="hljs-keyword">return</span> *<span class="hljs-keyword">this</span>;
+  &#125;
+
+  <span class="hljs-function"><span class="hljs-keyword">explicit</span> <span class="hljs-title">JSON</span><span class="hljs-params">(std::<span class="hljs-type">nullptr_t</span>)</span> : JSON() &#123;</span>&#125;
+  <span class="hljs-keyword">inline</span> JSON &amp;<span class="hljs-keyword">operator</span>=(std::<span class="hljs-type">nullptr_t</span>) &#123; <span class="hljs-comment">// 用 nullptr 赋值</span>
+    _uptr = std::<span class="hljs-built_in">make_unique</span>&lt;Null&gt;();
+    <span class="hljs-keyword">return</span> *<span class="hljs-keyword">this</span>;
+  &#125;
+
+  <span class="hljs-function"><span class="hljs-keyword">explicit</span> <span class="hljs-title">JSON</span><span class="hljs-params">(<span class="hljs-type">bool</span> boolean)</span> : _uptr(std::make_unique&lt;Boolean&gt;(boolean)) &#123;</span>&#125;
+  <span class="hljs-keyword">inline</span> JSON &amp;<span class="hljs-keyword">operator</span>=(<span class="hljs-type">bool</span> boolean) &#123; <span class="hljs-comment">// 用 bool 赋值</span>
+    _uptr = std::<span class="hljs-built_in">make_unique</span>&lt;Boolean&gt;(boolean);
+    <span class="hljs-keyword">return</span> *<span class="hljs-keyword">this</span>;
+  &#125;
+
+  <span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> IntN&gt;
+    <span class="hljs-keyword">requires</span> std::numeric_limits&lt;IntN&gt;::<span class="hljs-function">is_integer
+  <span class="hljs-keyword">explicit</span> <span class="hljs-title">JSON</span><span class="hljs-params">(IntN integer)</span>
+      : _uptr(std::make_unique&lt;Number&gt;(static_cast&lt;int64_t&gt;(integer))) &#123;</span>&#125;
+  <span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> IntN&gt;
+    <span class="hljs-keyword">requires</span> std::numeric_limits&lt;IntN&gt;::is_integer
+  <span class="hljs-keyword">inline</span> JSON &amp;<span class="hljs-keyword">operator</span>=(IntN integer) &#123; <span class="hljs-comment">// 用看上去是 integer 的任何类型赋值</span>
+    _uptr = std::<span class="hljs-built_in">make_unique</span>&lt;Number&gt;(<span class="hljs-built_in">static_cast</span>&lt;<span class="hljs-type">int64_t</span>&gt;(integer));
+    <span class="hljs-keyword">return</span> *<span class="hljs-keyword">this</span>;
+  &#125;
+
+  <span class="hljs-function"><span class="hljs-keyword">explicit</span> <span class="hljs-title">JSON</span><span class="hljs-params">(<span class="hljs-type">double</span> float_number)</span>
+      : _uptr(std::make_unique&lt;Number&gt;(float_number)) &#123;</span>&#125;
+  <span class="hljs-keyword">inline</span> JSON &amp;<span class="hljs-keyword">operator</span>=(<span class="hljs-type">double</span> float_number) &#123; <span class="hljs-comment">// 用 浮点数 赋值</span>
+    _uptr = std::<span class="hljs-built_in">make_unique</span>&lt;Number&gt;(float_number);
+    <span class="hljs-keyword">return</span> *<span class="hljs-keyword">this</span>;
+  &#125;
+
+  <span class="hljs-function"><span class="hljs-keyword">explicit</span> <span class="hljs-title">JSON</span><span class="hljs-params">(std::string str)</span>
+      : _uptr(std::make_unique&lt;String&gt;(std::move(str))) &#123;</span>&#125;
+  <span class="hljs-keyword">inline</span> JSON &amp;<span class="hljs-keyword">operator</span>=(std::string str) &#123; <span class="hljs-comment">// 用 string 赋值（因为总是要复制一遍的，不妨直接用 std::string 然后 move 进去</span>
+    _uptr = std::<span class="hljs-built_in">make_unique</span>&lt;String&gt;(std::<span class="hljs-built_in">move</span>(str));
+    <span class="hljs-keyword">return</span> *<span class="hljs-keyword">this</span>;
+  &#125;
+
+  <span class="hljs-function"><span class="hljs-keyword">explicit</span> <span class="hljs-title">JSON</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span> *c_str)</span> : _uptr(std::make_unique&lt;String&gt;(c_str)) &#123;</span>&#125;
+  <span class="hljs-keyword">inline</span> JSON &amp;<span class="hljs-keyword">operator</span>=(<span class="hljs-type">const</span> <span class="hljs-type">char</span> *c_str) &#123; <span class="hljs-comment">// 用 C 风格 string 赋值</span>
+    _uptr = std::<span class="hljs-built_in">make_unique</span>&lt;String&gt;(c_str);
+    <span class="hljs-keyword">return</span> *<span class="hljs-keyword">this</span>;
+  &#125;
+
+  std::unique_ptr&lt;Node&gt; &amp;<span class="hljs-keyword">operator</span>-&gt;() &#123; <span class="hljs-keyword">return</span> _uptr; &#125; <span class="hljs-comment">// 重载 -&gt;</span>
+  <span class="hljs-type">const</span> std::unique_ptr&lt;Node&gt; &amp;<span class="hljs-keyword">operator</span>-&gt;() <span class="hljs-type">const</span> &#123; <span class="hljs-keyword">return</span> _uptr; &#125;
+&#125;
+</code></pre>
+<p>多么简单呐（赞赏）</p>
+<p>特别的，为了方便写 Array，我们写个 makeArray，用万能引用确保东西原样转发进去：</p>
+<pre><code class="hljs language-cpp"><span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-type">void</span> <span class="hljs-title">pushArray_</span><span class="hljs-params">(Array &amp;)</span> </span>&#123;&#125;
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt; <span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-type">void</span> <span class="hljs-title">pushArray_</span><span class="hljs-params">(Array &amp;arr, T &amp;&amp;t)</span> </span>&#123;
+  arr.value_.<span class="hljs-built_in">emplace_back</span>(<span class="hljs-built_in">JSON</span>(std::forward&lt;T&gt;(t)));
+&#125;
+
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">typename</span>... Args&gt;
+<span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-type">void</span> <span class="hljs-title">pushArray_</span><span class="hljs-params">(Array &amp;arr, T &amp;&amp;t, Args &amp;&amp;...args)</span> </span>&#123;
+  arr.value_.<span class="hljs-built_in">emplace_back</span>(<span class="hljs-built_in">JSON</span>(std::forward&lt;T&gt;(t)));
+  <span class="hljs-built_in">pushArray_</span>(arr, std::forward&lt;Args&gt;(args)...);
+&#125;
+
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span>... Args&gt; <span class="hljs-function"><span class="hljs-type">static</span> Array <span class="hljs-title">makeArray</span><span class="hljs-params">(Args &amp;&amp;...args)</span> </span>&#123;
+  Array res;
+  <span class="hljs-built_in">pushArray_</span>(res, std::forward&lt;Args&gt;(args)...);
+  <span class="hljs-keyword">return</span> res;
+&#125;
+</code></pre>
+<p>现在你可以这样 dump 一个 JSON 了</p>
+<pre><code class="hljs language-cpp">JSON json&#123;std::<span class="hljs-built_in">make_unique</span>&lt;JSON::Object&gt;()&#125;;
+<span class="hljs-keyword">auto</span> &amp;root = json-&gt;<span class="hljs-built_in">cast</span>&lt;JSON::Object&gt;();
+root[<span class="hljs-string">&quot;123&quot;</span>] = <span class="hljs-number">456</span>;
+root[<span class="hljs-string">&quot;\n\n&quot;</span>] = <span class="hljs-string">&quot;hello&quot;</span>;
+root[<span class="hljs-string">&quot;\b\t&quot;</span>] = <span class="hljs-number">114.514</span>;
+root[<span class="hljs-string">&quot;true&quot;</span>] = <span class="hljs-literal">false</span>;
+root[<span class="hljs-string">&quot;null&quot;</span>] = <span class="hljs-literal">nullptr</span>;
+root[<span class="hljs-string">&quot;array&quot;</span>] =
+    JSON::Array::<span class="hljs-built_in">makeArray</span>(<span class="hljs-number">1</span>, <span class="hljs-literal">true</span>, <span class="hljs-number">11514.1919</span>, <span class="hljs-number">-2147483648</span>, <span class="hljs-string">&quot;miao&quot;</span>, <span class="hljs-literal">nullptr</span>);
+root[<span class="hljs-string">&quot;array2&quot;</span>] = JSON::Array::<span class="hljs-built_in">makeArray</span>(
+    <span class="hljs-number">1</span>,
+    JSON::Array::<span class="hljs-built_in">makeArray</span>(<span class="hljs-number">1</span>, JSON::Array::<span class="hljs-built_in">makeArray</span>(<span class="hljs-number">4</span>),
+                           JSON::Array::<span class="hljs-built_in">makeArray</span>(JSON::Array::<span class="hljs-built_in">makeArray</span>(<span class="hljs-number">5</span>)),
+                           JSON::Array::<span class="hljs-built_in">makeArray</span>(<span class="hljs-number">1</span>)),
+    <span class="hljs-number">4</span>, JSON::Array::<span class="hljs-built_in">makeArray</span>());
+
+std::cout &lt;&lt; json-&gt;<span class="hljs-built_in">dump</span>();
+</code></pre>
+<p>输出（美化后）</p>
+<pre><code class="hljs language-json"><span class="hljs-punctuation">&#123;</span>
+  <span class="hljs-attr">&quot;array2&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-number">4</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-punctuation">[</span><span class="hljs-number">5</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;array&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span> <span class="hljs-number">11514.1919</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-2147483648</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;miao&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-literal"><span class="hljs-keyword">null</span></span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;null&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">null</span></span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;\b\t&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">114.514</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;true&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">false</span></span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;\n\n&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;hello&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;123&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">456</span>
+<span class="hljs-punctuation">&#125;</span>
+</code></pre>
+<p>真是简简又单单啊</p>
+<h2 id="完整代码">完整代码<a class="header-anchor" href="#完整代码"> ¶</a></h2>
+<p><a target="_blank" rel="noopener" href="https://github.com/Lhcfl/cpp-json-learn/blob/main/cppjson.h">https://github.com/Lhcfl/cpp-json-learn/blob/main/cppjson.h</a></p>
+<p>684 行，实现了一个还可以的玩具 C++ 解析库，并且能 90% 情况下和 JavaScript 的 JSON 解析保持抛出一致的异常（）</p>
+<h2 id="所以">所以<a class="header-anchor" href="#所以"> ¶</a></h2>
+<p>看到这坨东西的时候 ⬇️ 还写 C++ 吗.png 还写吗</p>
+<pre><code class="hljs language-cpp"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> IntN&gt;
+  <span class="hljs-keyword">requires</span> std::numeric_limits&lt;IntN&gt;::<span class="hljs-function">is_integer
+<span class="hljs-keyword">explicit</span> <span class="hljs-title">JSON</span><span class="hljs-params">(IntN integer)</span>
+    : _uptr(std::make_unique&lt;Number&gt;(static_cast&lt;int64_t&gt;(integer))) &#123;</span>&#125;
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> IntN&gt;
+  <span class="hljs-keyword">requires</span> std::numeric_limits&lt;IntN&gt;::is_integer
+<span class="hljs-keyword">inline</span> JSON &amp;<span class="hljs-keyword">operator</span>=(IntN integer) &#123; <span class="hljs-comment">// 用看上去是 integer 的任何类型赋值</span>
+  _uptr = std::<span class="hljs-built_in">make_unique</span>&lt;Number&gt;(<span class="hljs-built_in">static_cast</span>&lt;<span class="hljs-type">int64_t</span>&gt;(integer));
+  <span class="hljs-keyword">return</span> *<span class="hljs-keyword">this</span>;
+&#125;
+</code></pre>
+<p>别用 C++</p>
+</section><section class="post-meta"><span class="info"><i class="fa fa-calendar"></i> <span class="date">2024-12-24</span>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Code/" title="Code">Code</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/C/" title="C++">C++</a>  </span></section></article><p class="pagination"><a href="/2025/01/06/gleam-intro/" title="仿生电子锈会梦到自己变成纯函数式吗：gleam 语言初见">Previous</a><span>  </span><a href="/2024/12/22/write-your-own-std-optional-universal-ref-in-c/" title="DIY std::optional: Using Universal References in C++">Next</a></p><article class="comment-container"><div class="comment-container"><script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js" onload="(new Gitalk({&quot;clientID&quot;:&quot;12a250ac67f452906dd6&quot;,&quot;clientSecret&quot;:&quot;7422a9ecdc933d5e6facbc61d546bced40519f0b&quot;,&quot;repo&quot;:&quot;lhcfl.github.io&quot;,&quot;owner&quot;:&quot;lhcfl&quot;,&quot;admin&quot;:[&quot;lhcfl&quot;],&quot;id&quot;:&quot;用 C++ 写一个玩具 JSON 库&quot;,&quot;distractionFreeMode&quot;:false})).render(&quot;gitalk-comment-slot&quot;)"></script><div id="gitalk-comment-slot">Loading...</div></div></article></div><footer class="footer"><br><p class="powered_by">Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> and <a target="_blank" rel="noopener" href="https://github.com/Lhcfl/hexo-theme-sosimple">SoSimple</a></p></footer></body></html>
