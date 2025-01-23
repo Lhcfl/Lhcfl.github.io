@@ -1,0 +1,61 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Linca"><title>Hexo 博客添加数学支持 · Zero Calorie Drink Shop</title><meta name="description" content="eiπ=−1e^{i\pi} = -1eiπ=−1
+
+数学支持对于个人博客来说我觉得至关重要，但是默认的 Hexo 渲染 Markdown 的引擎 hexo-render-marked 却不支持。本文讲述如何通过更换 Hexo 的 Markdown 渲染引擎的方式让你的博客支持数学。
+
+警告：在开始"><meta name="keywords" content="Hexo,Blog,Code"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="mobile-web-app-capable" content="yes"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta id="site_data_static" data-url="/"><meta name="renderer" content="webkit"><link rel="shortcut icon" type="image/x-icon" href="/images/logo.png"><link rel="stylesheet" href="/js_complied/bundle.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><script src="/js_complied/bundle.js"></script><script>Utils.loadCSS("https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200..900&family=Noto+Serif+KR:wght@200..900&family=Noto+Serif+SC:wght@200..900&family=Noto+Serif+TC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap");
+Utils.loadCSS("https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css");
+Utils.loadCSS("/css/font-awesome.min.css");</script><meta name="generator" content="Hexo 7.3.0"></head><body class="post-page"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200..900&amp;family=Noto+Serif+KR:wght@200..900&amp;family=Noto+Serif+SC:wght@200..900&amp;family=Noto+Serif+TC:wght@200..900&amp;family=Noto+Serif:ital,wght@0,100..900;1,100..900&amp;display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"></noscript><nav class="nav"><a href="/">Home</a>&nbsp;&nbsp;<a href="/archives">Archives</a>&nbsp;&nbsp;<a href="/tags">Tags</a>&nbsp;&nbsp;<a href="/about">About</a>&nbsp;&nbsp;<a href="/links">Links</a>&nbsp;&nbsp;<a href="/search">Search</a>&nbsp;&nbsp;<a href="javascript:SoSimple.darkLightToggle()">Dark/Light Mode</a></nav><div class="main"><article class="post-container post-full"><header class="post-title"><h1>Hexo 博客添加数学支持</h1></header><section class="post-body"><p><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>e</mi><mrow><mi>i</mi><mi>π</mi></mrow></msup><mo>=</mo><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">e^{i\pi} = -1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8247em;"></span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8247em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">iπ</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">−</span><span class="mord">1</span></span></span></span></p>
+<span id="more"></span>
+<p>数学支持对于个人博客来说我觉得至关重要，但是默认的 Hexo 渲染 Markdown 的引擎 <code>hexo-render-marked</code> 却不支持。本文讲述如何通过更换 Hexo 的 Markdown 渲染引擎的方式让你的博客支持数学。</p>
+<div class="tip">
+警告：在开始本指南之前，请确保您位于 hexo 主目录中。
+</div>
+<p>默认的 Hexo 安装将包括一个使用 <code>marked</code> 的 Markdown renderer（渲染器）插件，因此如果要更换，例如更换成本教程使用的 <code>hexo-renderer-markdown-it</code> ，你应该先卸载它。</p>
+<pre><code class="hljs language-bash">$ npm un hexo-renderer-marked --save
+</code></pre>
+<p>如果您已经删除了默认 renderer 以及您可能添加的其他 renderer，现在可以安全地安装 <code>hexo-renderer-markdown-it</code></p>
+<pre><code class="hljs language-bash">$ npm i hexo-renderer-markdown-it --save
+</code></pre>
+<p>安装 <code>markdown-it</code> 数学插件：</p>
+<pre><code class="hljs language-bash">$ npm install katex @renbaoshuo/markdown-it-katex
+</code></pre>
+<p>在 <code>_config.yml</code> 中添加下列配置：</p>
+<pre><code class="hljs language-yaml"><span class="hljs-attr">markdown:</span>
+  <span class="hljs-attr">preset:</span> <span class="hljs-string">&quot;default&quot;</span>
+  <span class="hljs-attr">render:</span>
+    <span class="hljs-attr">html:</span> <span class="hljs-literal">true</span>
+    <span class="hljs-attr">xhtmlOut:</span> <span class="hljs-literal">false</span>
+    <span class="hljs-attr">langPrefix:</span> <span class="hljs-string">&quot;language-&quot;</span>
+    <span class="hljs-attr">breaks:</span> <span class="hljs-literal">true</span>
+    <span class="hljs-attr">linkify:</span> <span class="hljs-literal">true</span>
+    <span class="hljs-attr">typographer:</span> <span class="hljs-literal">true</span>
+    <span class="hljs-attr">quotes:</span> <span class="hljs-string">&quot;“”‘’&quot;</span>
+  <span class="hljs-attr">enable_rules:</span>
+  <span class="hljs-attr">disable_rules:</span>
+  <span class="hljs-attr">plugins:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">&quot;@renbaoshuo/markdown-it-katex&quot;</span>
+      <span class="hljs-attr">options:</span>
+        <span class="hljs-attr">skipDelimitersCheck:</span> <span class="hljs-literal">true</span>
+  <span class="hljs-attr">anchors:</span>
+    <span class="hljs-attr">level:</span> <span class="hljs-number">2</span>
+    <span class="hljs-attr">collisionSuffix:</span> <span class="hljs-string">&quot;&quot;</span>
+    <span class="hljs-attr">permalink:</span> <span class="hljs-literal">false</span>
+    <span class="hljs-attr">permalinkClass:</span> <span class="hljs-string">&quot;header-anchor&quot;</span>
+    <span class="hljs-attr">permalinkSide:</span> <span class="hljs-string">&quot;left&quot;</span>
+    <span class="hljs-attr">permalinkSymbol:</span> <span class="hljs-string">&quot;¶&quot;</span>
+    <span class="hljs-attr">case:</span> <span class="hljs-number">0</span>
+    <span class="hljs-attr">separator:</span> <span class="hljs-string">&quot;-&quot;</span>
+  <span class="hljs-attr">images:</span>
+    <span class="hljs-attr">lazyload:</span> <span class="hljs-literal">false</span>
+    <span class="hljs-attr">prepend_root:</span> <span class="hljs-literal">false</span>
+    <span class="hljs-attr">post_asset:</span> <span class="hljs-literal">false</span>
+  <span class="hljs-attr">inline:</span> <span class="hljs-literal">false</span> <span class="hljs-comment"># https://markdown-it.github.io/markdown-it/#MarkdownIt.renderInline</span>
+</code></pre>
+<p>可选的，你可能需要去你的主题设置里，添加 KaTeX 样式表：</p>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">link</span>
+  <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
+  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css&quot;</span>
+/&gt;</span>
+</code></pre>
+<p>关于 <code>hexo-renderer-markdown-it</code> 的其他说明，请参考 <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo-renderer-markdown-it">https://github.com/hexojs/hexo-renderer-markdown-it</a></p>
+</section><section class="post-meta"><span class="info"><i class="fa fa-calendar"></i> <span class="date">2023-10-13</span>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Hexo/" title="Hexo">Hexo</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Blog/" title="Blog">Blog</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Code/" title="Code">Code</a>  </span></section></article><p class="pagination"><a href="/2023/10/15/mastodon-monoculture-problem/" title="Mastodon的单一文化问题">Previous</a><span>  </span><a href="/2022/08/04/hitokoto/" title="一言">Next</a></p><article class="comment-container"><div class="comment-container"><script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js" onload="(new Gitalk({&quot;clientID&quot;:&quot;12a250ac67f452906dd6&quot;,&quot;clientSecret&quot;:&quot;7422a9ecdc933d5e6facbc61d546bced40519f0b&quot;,&quot;repo&quot;:&quot;lhcfl.github.io&quot;,&quot;owner&quot;:&quot;lhcfl&quot;,&quot;admin&quot;:[&quot;lhcfl&quot;],&quot;id&quot;:&quot;Hexo 博客添加数学支持&quot;,&quot;distractionFreeMode&quot;:false})).render(&quot;gitalk-comment-slot&quot;)"></script><div id="gitalk-comment-slot">Loading...</div></div></article></div><footer class="footer"><br><p class="powered_by">Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> and <a target="_blank" rel="noopener" href="https://github.com/Lhcfl/hexo-theme-sosimple">SoSimple</a></p></footer></body></html>
