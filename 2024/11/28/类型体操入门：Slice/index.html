@@ -1,0 +1,76 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Linca"><title>类型体操入门：Slice · Zero Calorie Drink Shop</title><meta name="description" content="Extreme 难度的 Slice 过关了，终于可以自称类型体操入门了（喜）
+
+题面 ¶
+type-challenges/questions/00216-extreme-slice/README.md at main · type-challenges/type-challenges
+Slice  "><meta name="keywords" content="Code"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="mobile-web-app-capable" content="yes"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta id="site_data_static" data-url="/"><meta name="renderer" content="webkit"><link rel="shortcut icon" type="image/x-icon" href="/images/logo.png"><link rel="stylesheet" href="/js_complied/bundle.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><script src="/js_complied/bundle.js"></script><script>Utils.loadCSS("https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200..900&family=Noto+Serif+KR:wght@200..900&family=Noto+Serif+SC:wght@200..900&family=Noto+Serif+TC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap");
+Utils.loadCSS("https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css");
+Utils.loadCSS("/css/font-awesome.min.css");</script><meta name="generator" content="Hexo 7.3.0"></head><body class="post-page"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200..900&amp;family=Noto+Serif+KR:wght@200..900&amp;family=Noto+Serif+SC:wght@200..900&amp;family=Noto+Serif+TC:wght@200..900&amp;family=Noto+Serif:ital,wght@0,100..900;1,100..900&amp;display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"></noscript><nav class="nav"><a href="/">Home</a>&nbsp;&nbsp;<a href="/archives">Archives</a>&nbsp;&nbsp;<a href="/tags">Tags</a>&nbsp;&nbsp;<a href="/about">About</a>&nbsp;&nbsp;<a href="/links">Links</a>&nbsp;&nbsp;<a href="/search">Search</a>&nbsp;&nbsp;<a href="javascript:SoSimple.darkLightToggle()">Dark/Light Mode</a></nav><main class="main"><article class="post-container post-full"><header class="post-title"><h1>类型体操入门：Slice</h1></header><section class="post-body"><p>Extreme 难度的 Slice 过关了，终于可以自称类型体操入门了（喜）</p>
+<span id="more"></span>
+<h3 id="题面">题面<a class="header-anchor" href="#题面"> ¶</a></h3>
+<p><a target="_blank" rel="noopener" href="https://github.com/type-challenges/type-challenges/blob/main/questions/00216-extreme-slice/README.md">type-challenges/questions/00216-extreme-slice/README.md at main · type-challenges/type-challenges</a></p>
+<h3 id="Slice-extreme-array">Slice <img src="https://img.shields.io/badge/-extreme-b11b8d" alt="extreme" loading="lazy"> <img src="https://img.shields.io/badge/-%23array-999%22" alt="array" loading="lazy"><a class="header-anchor" href="#Slice-extreme-array"> ¶</a></h3>
+<blockquote>
+<p>by Anthony Fu <a target="_blank" rel="noopener" href="https://github.com/antfu">@antfu</a></p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="https://tsch.js.org/216/play"><img src="https://img.shields.io/badge/-Take%20the%20Challenge-3178c6?logo=typescript&amp;logoColor=white" alt="Take the Challgene" loading="lazy"></a></p>
+<p>Implement the JavaScript <code>Array.slice</code> function in the type system. <code>Slice&lt;Arr, Start, End&gt;</code> takes the three argument. The output should be a subarray of <code>Arr</code> from index <code>Start</code> to <code>End</code>. Indexes with negative numbers should be counted from reversely.</p>
+<p>For example</p>
+<pre><code class="hljs language-ts"><span class="hljs-keyword">type</span> <span class="hljs-title class_">Arr</span> = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>];
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">Result</span> = <span class="hljs-title class_">Slice</span>&lt;<span class="hljs-title class_">Arr</span>, <span class="hljs-number">2</span>, <span class="hljs-number">4</span>&gt;; <span class="hljs-comment">// expected to be [3, 4]</span>
+</code></pre>
+<p><a target="_blank" rel="noopener" href="https://github.com/type-challenges/type-challenges/blob/main/README.md"><img src="https://img.shields.io/badge/-Back-grey" alt="Back" loading="lazy"></a> <a target="_blank" rel="noopener" href="https://tsch.js.org/216/answer"><img src="https://img.shields.io/badge/-Share%20your%20Solutions-teal" alt="Share your Solutions" loading="lazy"></a> <a target="_blank" rel="noopener" href="https://tsch.js.org/216/solutions"><img src="https://img.shields.io/badge/-Check%20out%20Solutions-de5a77?logo=awesome-lists&amp;logoColor=white" alt="Check out Solutions" loading="lazy"></a></p>
+<h3 id="思路">思路<a class="header-anchor" href="#思路"> ¶</a></h3>
+<p>看上去很简单？这真的是 Extreme 难度吗？<br>
+难度主要在数字的转换上。TypeScript 不支持直接做类型的加减法，所以需要体操一下获得 <code>Add1&lt;N&gt;</code> 和 <code>MinusXY&lt;X, Y&gt;</code></p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">type</span> <span class="hljs-title class_">Push1</span>&lt;X <span class="hljs-keyword">extends</span> <span class="hljs-built_in">any</span>[]&gt; = [...X, <span class="hljs-number">1</span>];
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">ArrFrom</span>&lt;N, A <span class="hljs-keyword">extends</span> <span class="hljs-built_in">any</span>[] = []&gt; = A[<span class="hljs-string">&quot;length&quot;</span>] <span class="hljs-keyword">extends</span> N
+  ? A
+  : <span class="hljs-title class_">ArrFrom</span>&lt;N, <span class="hljs-title class_">Push1</span>&lt;A&gt;&gt;;
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">Add1</span>&lt;N&gt; = [...<span class="hljs-title class_">ArrFrom</span>&lt;N&gt;, <span class="hljs-number">1</span>][<span class="hljs-string">&quot;length&quot;</span>];
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">Minus1</span>&lt;N&gt; = <span class="hljs-title class_">ArrFrom</span>&lt;N&gt; <span class="hljs-keyword">extends</span> [infer _1, ...infer <span class="hljs-title class_">Rest</span>]
+  ? <span class="hljs-title class_">Rest</span>[<span class="hljs-string">&quot;length&quot;</span>]
+  : <span class="hljs-built_in">never</span>;
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">MinusXY</span>&lt;X, Y&gt; = Y <span class="hljs-keyword">extends</span> <span class="hljs-number">0</span> ? X : <span class="hljs-title class_">MinusXY</span>&lt;<span class="hljs-title class_">Minus1</span>&lt;X&gt;, <span class="hljs-title class_">Minus1</span>&lt;Y&gt;&gt;;
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">Abs</span>&lt;X <span class="hljs-keyword">extends</span> <span class="hljs-built_in">number</span>&gt; = <span class="hljs-string">`<span class="hljs-subst">$&#123;X&#125;</span>`</span> <span class="hljs-keyword">extends</span> <span class="hljs-string">`-<span class="hljs-subst">$&#123;infer R <span class="hljs-keyword">extends</span> <span class="hljs-built_in">number</span>&#125;</span>`</span>
+  ? R
+  : X;
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">IsNeg</span>&lt;X <span class="hljs-keyword">extends</span> <span class="hljs-built_in">number</span>&gt; = <span class="hljs-title class_">Abs</span>&lt;X&gt; <span class="hljs-keyword">extends</span> X ? <span class="hljs-literal">false</span> : <span class="hljs-literal">true</span>;
+</code></pre>
+<p>剩下的就很简单了</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">type</span> <span class="hljs-title class_">RemoveFirstN</span>&lt;N, <span class="hljs-title class_">Arr</span> <span class="hljs-keyword">extends</span> <span class="hljs-built_in">any</span>[], <span class="hljs-title class_">Removed</span> = <span class="hljs-number">0</span>&gt; = N <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Removed</span>
+  ? <span class="hljs-title class_">Arr</span>
+  : <span class="hljs-title class_">Arr</span> <span class="hljs-keyword">extends</span> [infer _1, ...infer <span class="hljs-title class_">Rest</span> <span class="hljs-keyword">extends</span> <span class="hljs-built_in">any</span>[]]
+  ? <span class="hljs-title class_">RemoveFirstN</span>&lt;N, <span class="hljs-title class_">Rest</span>, <span class="hljs-title class_">Add1</span>&lt;<span class="hljs-title class_">Removed</span>&gt;&gt;
+  : [];
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">KeepFirstN</span>&lt;
+  N,
+  <span class="hljs-title class_">Arr</span> <span class="hljs-keyword">extends</span> <span class="hljs-built_in">any</span>[],
+  <span class="hljs-title class_">Ret</span> <span class="hljs-keyword">extends</span> <span class="hljs-built_in">any</span>[] = [],
+  <span class="hljs-title class_">Kept</span> = <span class="hljs-number">0</span>
+&gt; = <span class="hljs-title class_">Kept</span> <span class="hljs-keyword">extends</span> N
+  ? <span class="hljs-title class_">Ret</span>
+  : <span class="hljs-title class_">Arr</span> <span class="hljs-keyword">extends</span> [infer _1, ...infer <span class="hljs-title class_">Rest</span> <span class="hljs-keyword">extends</span> <span class="hljs-built_in">any</span>[]]
+  ? <span class="hljs-title class_">KeepFirstN</span>&lt;N, <span class="hljs-title class_">Rest</span>, [...<span class="hljs-title class_">Ret</span>, _1], <span class="hljs-title class_">Add1</span>&lt;<span class="hljs-title class_">Kept</span>&gt;&gt;
+  : [];
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">SliceNoNeg</span>&lt;<span class="hljs-title class_">Arr</span> <span class="hljs-keyword">extends</span> <span class="hljs-built_in">any</span>[], <span class="hljs-title class_">From</span>, <span class="hljs-title class_">To</span>&gt; = <span class="hljs-title class_">RemoveFirstN</span>&lt;
+  <span class="hljs-title class_">From</span>,
+  <span class="hljs-title class_">Arr</span>
+&gt; <span class="hljs-keyword">extends</span> infer <span class="hljs-title class_">Res</span> <span class="hljs-keyword">extends</span> <span class="hljs-built_in">any</span>[]
+  ? <span class="hljs-title class_">KeepFirstN</span>&lt;<span class="hljs-title class_">To</span>, <span class="hljs-title class_">Res</span>, [], <span class="hljs-title class_">From</span>&gt;
+  : <span class="hljs-built_in">never</span>;
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">ConvertToPositive</span>&lt;N, X <span class="hljs-keyword">extends</span> <span class="hljs-built_in">number</span>&gt; = <span class="hljs-title class_">IsNeg</span>&lt;X&gt; <span class="hljs-keyword">extends</span> <span class="hljs-literal">true</span>
+  ? <span class="hljs-title class_">MinusXY</span>&lt;N, <span class="hljs-title class_">Abs</span>&lt;X&gt;&gt;
+  : X;
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">Slice</span>&lt;
+  <span class="hljs-title class_">Arr</span> <span class="hljs-keyword">extends</span> <span class="hljs-built_in">any</span>[],
+  <span class="hljs-title class_">From</span> <span class="hljs-keyword">extends</span> <span class="hljs-built_in">number</span> = <span class="hljs-number">0</span>,
+  <span class="hljs-title class_">To</span> <span class="hljs-keyword">extends</span> <span class="hljs-built_in">number</span> = <span class="hljs-title class_">Arr</span>[<span class="hljs-string">&quot;length&quot;</span>]
+&gt; = <span class="hljs-title class_">SliceNoNeg</span>&lt;
+  <span class="hljs-title class_">Arr</span>,
+  <span class="hljs-title class_">ConvertToPositive</span>&lt;<span class="hljs-title class_">Arr</span>[<span class="hljs-string">&quot;length&quot;</span>], <span class="hljs-title class_">From</span>&gt;,
+  <span class="hljs-title class_">ConvertToPositive</span>&lt;<span class="hljs-title class_">Arr</span>[<span class="hljs-string">&quot;length&quot;</span>], <span class="hljs-title class_">To</span>&gt;
+&gt;;
+</code></pre>
+<h3 id="所以">所以<a class="header-anchor" href="#所以"> ¶</a></h3>
+<p>这类型体操纯属在折磨自己了吧</p>
+</section><section class="post-meta"><span class="info"><i class="fa fa-calendar"></i> <span class="date">2024-11-28</span>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Code/" title="Code">Code</a>  </span></section></article><p class="pagination"><a href="/2024/12/03/%E8%AE%A8%E5%8E%8CPython%E7%9A%84N%E4%B8%AA%E7%90%86%E7%94%B1/" title="讨厌Python的N个理由">Previous</a><span>  </span><a href="/2024/11/25/Package%20Manager%20The%20History/" title="Package Manager: The History">Next</a></p><article class="comment-container"><div class="comment-container"><script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js" onload="(new Gitalk({&quot;clientID&quot;:&quot;12a250ac67f452906dd6&quot;,&quot;clientSecret&quot;:&quot;7422a9ecdc933d5e6facbc61d546bced40519f0b&quot;,&quot;repo&quot;:&quot;lhcfl.github.io&quot;,&quot;owner&quot;:&quot;lhcfl&quot;,&quot;admin&quot;:[&quot;lhcfl&quot;],&quot;id&quot;:&quot;类型体操入门：Slice&quot;,&quot;distractionFreeMode&quot;:false})).render(&quot;gitalk-comment-slot&quot;)"></script><div id="gitalk-comment-slot">Loading...</div></div></article></main><footer class="footer"><br><p class="powered_by">Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> and <a target="_blank" rel="noopener" href="https://github.com/Lhcfl/hexo-theme-sosimple">SoSimple</a></p></footer></body></html>
