@@ -1,0 +1,211 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Linca"><title>PFPL 笔记 - VI Dynamic Types · Zero Calorie Drink Shop</title><meta name="description" content="笔记 6
+最详细的一集，因为我要讲解这部分（摊手
+
+The Untyped Lambda Calculus ¶
+许多实际使用的编程语言宣称自己是无类型的（untyped），然而这只是一种假象。这些语言实际上是单一类型的(uni-typed)而非无类型。
+Lambda 演算，丘奇于 1930 年提出。"><meta name="keywords" content="Blog"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="mobile-web-app-capable" content="yes"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta id="site_data_static" data-url="/"><meta name="renderer" content="webkit"><link rel="shortcut icon" type="image/x-icon" href="/images/logo.png"><link rel="stylesheet" href="/js_complied/bundle.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><script src="/js_complied/bundle.js"></script><script>Utils.loadCSS("https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200..900&family=Noto+Serif+KR:wght@200..900&family=Noto+Serif+SC:wght@200..900&family=Noto+Serif+TC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap");
+Utils.loadCSS("https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css");
+Utils.loadCSS("/css/font-awesome.min.css");</script><meta name="generator" content="Hexo 7.3.0"></head><body class="post-page"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200..900&amp;family=Noto+Serif+KR:wght@200..900&amp;family=Noto+Serif+SC:wght@200..900&amp;family=Noto+Serif+TC:wght@200..900&amp;family=Noto+Serif:ital,wght@0,100..900;1,100..900&amp;display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"></noscript><nav class="nav"><a href="/">Home</a>&nbsp;&nbsp;<a href="/archives">Archives</a>&nbsp;&nbsp;<a href="/tags">Tags</a>&nbsp;&nbsp;<a href="/about">About</a>&nbsp;&nbsp;<a href="/links">Links</a>&nbsp;&nbsp;<a href="/search">Search</a>&nbsp;&nbsp;<a href="javascript:SoSimple.darkLightToggle()">Dark/Light Mode</a></nav><main class="main"><article class="post-container post-full"><header class="post-title"><h1>PFPL 笔记 - VI Dynamic Types</h1></header><section class="post-toc"><details open><summary>Menu</summary><div class="toc"><ol class="toclist"><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#The-Untyped-Lambda-Calculus"><span class="toclist-text">The Untyped Lambda Calculus</span></a><ol class="toclist-child"><li class="toclist-item toclist-level-4"><a class="toclist-link" href="#Statics"><span class="toclist-text">Statics</span></a></li><li class="toclist-item toclist-level-4"><a class="toclist-link" href="#Dynamics"><span class="toclist-text">Dynamics</span></a></li><li class="toclist-item toclist-level-4"><a class="toclist-link" href="#Definablity"><span class="toclist-text">Definablity</span></a><ol class="toclist-child"><li class="toclist-item toclist-level-5"><a class="toclist-link" href="#Church-Numerals"><span class="toclist-text">Church Numerals</span></a></li><li class="toclist-item toclist-level-5"><a class="toclist-link" href="#Church-Pairs"><span class="toclist-text">Church Pairs</span></a></li><li class="toclist-item toclist-level-5"><a class="toclist-link" href="#Y-%E7%BB%84%E5%90%88%E5%AD%90"><span class="toclist-text">Y 组合子</span></a></li></ol></li></ol></li></ol></li></ol></div></details></section><section class="post-body"><p>笔记 6<br>
+最详细的一集，因为我要讲解这部分（摊手</p>
+<span id="more"></span>
+<h2 id="The-Untyped-Lambda-Calculus">The Untyped Lambda Calculus<a class="header-anchor" href="#The-Untyped-Lambda-Calculus"> ¶</a></h2>
+<p>许多实际使用的编程语言宣称自己是无类型的（untyped），然而这只是一种假象。这些语言实际上是单一类型的(uni-typed)而非无类型。</p>
+<p>Lambda 演算，丘奇于 1930 年提出。它唯一的“特性”就是高阶函数（higher-order function），即：</p>
+<ul>
+<li>
+<p>一切都是函数，</p>
+</li>
+<li>
+<p>每个表达式都可以被应用于一个参数，而该参数本身也必须是一个函数，</p>
+</li>
+<li>
+<p>最终的结果仍然是一个函数。</p>
+</li>
+</ul>
+<p><img src="/images/lambda_calculus.png" alt="" loading="lazy"></p>
+<p>See also: <a target="_blank" rel="noopener" href="https://learnxinyminutes.com/zh-cn/lambda-calculus/">Learn Lambda Calculus in Y Minutes</a></p>
+<h4 id="Statics">Statics<a class="header-anchor" href="#Statics"> ¶</a></h4>
+<p>The statics of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">L</mi><mo stretchy="false">{</mo><mi>λ</mi><mo stretchy="false">}</mo></mrow><annotation encoding="application/x-tex">\mathcal L\{\lambda\}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal">L</span><span class="mopen">{</span><span class="mord mathnormal">λ</span><span class="mclose">}</span></span></span></span> is defined by general hypothetical judgments of the form</p>
+<pre><code class="hljs">x1 ok, x2 ok, ..., xn ok |- u ok
+</code></pre>
+<p>stating that u is a well-formed expression in volving the variables x1 ~ xn</p>
+<p><img src="/images/statics_of_lambda_cal.png" alt="" loading="lazy"></p>
+<ul>
+<li>若 <code>x</code> 在环境 Γ 中已声明为合法，则 <code>x</code> 本身是合法的。</li>
+<li>若 <code>u₁</code> 和 <code>u₂</code> 都是合法表达式，则它们的应用 <code>ap(u₁; u₂)</code> 也是合法的。</li>
+<li>若在环境 Γ 下 <code>x ok</code> 则 <code>u ok</code> 则 <code>λ(x . u)</code> 也是合法的。</li>
+</ul>
+<h4 id="Dynamics">Dynamics<a class="header-anchor" href="#Dynamics"> ¶</a></h4>
+<p>λ-演算的 dynamics 不是通过传统的 transition system 来定义，而是通过 equaitonally</p>
+<p>Definitional equality for <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi></mrow><annotation encoding="application/x-tex">L</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">L</span></span></span></span> is a judgment of the form <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Γ</mi><mo>⊢</mo><mi>u</mi><mo separator="true">,</mo><msup><mi>u</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow><annotation encoding="application/x-tex">\Gamma \vdash u, u&#x27;</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord">Γ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⊢</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.9463em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">u</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span>, where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Γ</mi><mo>⊢</mo></mrow><annotation encoding="application/x-tex">\Gamma \vdash</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord">Γ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⊢</span></span></span></span> <code>x1 ok,...,xn ok</code> for some n 0, and u and u’ are terms having at most the variables x1 … xn free. It is inductively defined by the following rules</p>
+<ul>
+<li>
+<p>自反性</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mfrac><mrow></mrow><mrow><mi mathvariant="normal">Γ</mi><mo separator="true">,</mo><mi>u</mi><mtext> ok</mtext><mo>⊢</mo><mi>u</mi><mo>≡</mo><mi>u</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">\dfrac{}{\Gamma, u \text{ ok} \vdash u \equiv u}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.5574em;vertical-align:-0.8804em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.677em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">Γ</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">u</span><span class="mord text"><span class="mord"> ok</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⊢</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal">u</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≡</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal">u</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8804em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+</li>
+<li>
+<p>对称性</p>
+</li>
+</ul>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mfrac><mrow><mi mathvariant="normal">Γ</mi><mo separator="true">,</mo><mi>u</mi><mtext> ok</mtext><mo>⊢</mo><mi>u</mi><mo>≡</mo><msup><mi>u</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow><mrow><mi mathvariant="normal">Γ</mi><mo separator="true">,</mo><mi>u</mi><mtext> ok</mtext><mo>⊢</mo><msup><mi>u</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>≡</mo><mi>u</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">\dfrac{\Gamma, u \text{ ok} \vdash u \equiv u&#x27;}{\Gamma, u \text{ ok} \vdash u&#x27; \equiv u}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.3093em;vertical-align:-0.8804em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.4289em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">Γ</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">u</span><span class="mord text"><span class="mord"> ok</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⊢</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6779em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≡</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal">u</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">Γ</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">u</span><span class="mord text"><span class="mord"> ok</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⊢</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal">u</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≡</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8804em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<ul>
+<li>传递性</li>
+</ul>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mfrac><mrow><mi mathvariant="normal">Γ</mi><mo separator="true">,</mo><mi>u</mi><mtext> ok</mtext><mo>⊢</mo><mi>u</mi><mo>≡</mo><msup><mi>u</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mspace width="1em"/><mi mathvariant="normal">Γ</mi><mo separator="true">,</mo><mi>u</mi><mtext> ok</mtext><mo>⊢</mo><msup><mi>u</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>≡</mo><msup><mi>u</mi><mrow><mo mathvariant="normal">′</mo><mo mathvariant="normal">′</mo></mrow></msup></mrow><mrow><mi mathvariant="normal">Γ</mi><mo separator="true">,</mo><mi>u</mi><mtext> ok</mtext><mo>⊢</mo><mi>u</mi><mo>≡</mo><msup><mi>u</mi><mrow><mo mathvariant="normal">′</mo><mo mathvariant="normal">′</mo></mrow></msup></mrow></mfrac></mrow><annotation encoding="application/x-tex">\dfrac
+{\Gamma, u \text{ ok} \vdash u \equiv u&#x27; \quad \Gamma, u \text{ ok} \vdash u&#x27; \equiv u&#x27;&#x27;}
+{\Gamma, u \text{ ok} \vdash u \equiv u&#x27;&#x27;}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.3093em;vertical-align:-0.8804em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.4289em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">Γ</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">u</span><span class="mord text"><span class="mord"> ok</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⊢</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal">u</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≡</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6779em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′′</span></span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">Γ</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">u</span><span class="mord text"><span class="mord"> ok</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⊢</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal">u</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≡</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:1em;"></span><span class="mord">Γ</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">u</span><span class="mord text"><span class="mord"> ok</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⊢</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≡</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′′</span></span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8804em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<ul>
+<li>……</li>
+</ul>
+<p><img src="/images/dynamics_of_lambda_cal.png" alt="" loading="lazy"></p>
+<p>We often write just <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>u</mi><mo>≡</mo><msup><mi>u</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow><annotation encoding="application/x-tex">u \equiv u&#x27;</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4637em;"></span><span class="mord mathnormal">u</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≡</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7519em;"></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span> when the variables involved need not be emphasized or are clear from context.</p>
+<h4 id="Definablity">Definablity<a class="header-anchor" href="#Definablity"> ¶</a></h4>
+<p>无类型 λ-演算的一个重要特性是它的<strong>表达能力</strong>。它是一个<strong>图灵完备（Turing-complete）</strong> 的语言，也就是说，它和任何已知的编程语言一样，都可以表达自然数上的所有可计算函数。</p>
+<p>Chuch’s Law: 任何可计算的函数都有其 Lambda Calculus 等价表达</p>
+<p>作为例子，我们证明 lambda 演算至少和 PCF 一样强：</p>
+<p>我们可以用 lambda 的形式定义自然数，which 叫 丘奇数</p>
+<h5 id="Church-Numerals">Church Numerals<a class="header-anchor" href="#Church-Numerals"> ¶</a></h5>
+<p>为了懒得打 latex 下面用 <code>\a -&gt; b</code> 表示 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mi>b</mi></mrow><annotation encoding="application/x-tex">\lambda(a)b</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">λ</span><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mclose">)</span><span class="mord mathnormal">b</span></span></span></span></p>
+<pre><code class="hljs language-haskell">    <span class="hljs-number">0</span> = \b -&gt; \s -&gt; b
+<span class="hljs-title">n</span> + <span class="hljs-number">1</span> = \b -&gt; \s -&gt; s(n(b)(s))
+</code></pre>
+<p>表示原文的</p>
+<p><img src="/images/church_numerals.png" alt="" loading="lazy"></p>
+<p>注意到，b 可以解释为 blank，或者说初始值， 而 s 可以解释为 successor</p>
+<p>也就是说这里定义了 0 是用 blank 和 successor 两个组合子构造出的一个 lambda，</p>
+<p>这样，运用 successor 到 n(b)(s) i.e. 用 b，s 实例化了的 n 就能得到 n + 1</p>
+<p>另外一个有趣的事情是，当我们得到 n 这个 丘奇数（它自己也是一个函数）的时候，显然 <code>n f g</code> 是 <code>g(g(g(... n个g...(f))))</code>，也就是说这个数字就能用来作为 n-fold</p>
+<p>比如展开后</p>
+<pre><code class="hljs language-haskell"><span class="hljs-number">1</span> = \b -&gt; \s -&gt; s(b)
+<span class="hljs-number">2</span> = \b -&gt; \s -&gt; s(s(b))
+<span class="hljs-number">3</span> = \b -&gt; \s -&gt; s(s(s(b)))
+...
+</code></pre>
+<p>那么自然数运算也就很好理解了</p>
+<p><img src="/images/church_num_op.png" alt="" loading="lazy"></p>
+<p>举例</p>
+<pre><code class="hljs language-haskell"><span class="hljs-title">succ</span> = \x -&gt; \b -&gt; \s -&gt; s(x(b)(s))
+</code></pre>
+<p>故</p>
+<pre><code class="hljs language-haskell"><span class="hljs-title">succ</span> <span class="hljs-number">0</span>  = \b -&gt; \s -&gt; s( <span class="hljs-number">0</span>(b)(s) )
+        = \b -&gt; \s -&gt; s(b)
+        = <span class="hljs-number">1</span>
+</code></pre>
+<pre><code class="hljs language-haskell"><span class="hljs-title">plus</span> = \x -&gt; \y -&gt; y(x)(succ)
+</code></pre>
+<p>可以理解为<br>
+plus x y 就是将 x 作为初始值，调用 y (x) succ 当然就是 “x + y”</p>
+<p>例如，展开 plus 1 2</p>
+<pre><code class="hljs language-haskell">= <span class="hljs-number">1</span>(<span class="hljs-number">2</span>)(succ)
+= (\b -&gt; \s -&gt; s(b))(<span class="hljs-number">2</span>)(succ)
+= succ(s(<span class="hljs-number">2</span>))
+= <span class="hljs-number">3</span>
+</code></pre>
+<p>对于乘法</p>
+<pre><code class="hljs language-haskell"><span class="hljs-title">times</span> = \x -&gt; \y -&gt; y(<span class="hljs-number">0</span>)(plus(x))
+</code></pre>
+<p>则是将原先的 successor 换成了 plus(x) 后的新 y，显然这就是 y * x</p>
+<pre><code class="hljs language-haskell"><span class="hljs-title">times</span> <span class="hljs-number">2</span> <span class="hljs-number">2</span>
+= <span class="hljs-number">2</span>(<span class="hljs-number">0</span>)(plus <span class="hljs-number">2</span>)
+= (\s -&gt; s(s(<span class="hljs-number">0</span>)))(plus <span class="hljs-number">2</span>)
+= plus <span class="hljs-number">2</span> (plus <span class="hljs-number">2</span>) <span class="hljs-number">0</span>
+= <span class="hljs-number">4</span>
+</code></pre>
+<details>
+<summary>一些简单验算</summary>
+```haskell
+ghci> b = 0
+ghci> s x = x+1
+ghci> zero = \b -> \s -> b
+ghci> succ = \x -> \b -> \s -> s(x(b)(s))
+ghci> ghci> succ zero b s
+1
+ghci> plus = \x -> \y -> y(x)(succ)
+ghci> one = succ zero
+ghci> one b s
+1
+ghci> plus one one b s
+2
+ghci> two = succ one
+ghci> plus one two b s
+3
+```
+</details>
+<p>要定义 <code>ifz(u; u0; x.u1)</code> 需要一些技巧，因为我们需要找到一个前驱函数 <code>pred</code></p>
+<pre><code class="hljs language-haskell"><span class="hljs-title">pred</span> <span class="hljs-number">0</span> = <span class="hljs-number">0</span>
+<span class="hljs-title">pred</span> (n + <span class="hljs-number">1</span>) = n
+</code></pre>
+<p>这并不是听起来那么容易 因为相当于我们需要能把一大坨的高阶函数里的 <code>s(n)</code> 的 <code>n</code> 拿出来，而且还需要考虑 0 的存在</p>
+<p>可以借鉴移位的思想，如果有 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mi>n</mi><mo stretchy="false">)</mo><mo>→</mo><mo stretchy="false">(</mo><mi>n</mi><mo separator="true">,</mo><mi>n</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(n-1, n) \to (n, n+1)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span></span></span></span> 的推导就能很容易拿到 n - 1</p>
+<h5 id="Church-Pairs">Church Pairs<a class="header-anchor" href="#Church-Pairs"> ¶</a></h5>
+<p>先定义丘奇风格的 pair</p>
+<p>(括号好多懒得打……不如把 <code>f(a)(b)</code> 写成 <code>f a b</code> 好了)</p>
+<pre><code class="hljs language-haskell"><span class="hljs-title">pair</span> u1 u2 = \f -&gt; f u1 u2
+
+<span class="hljs-title">left</span>  u = u(\x -&gt; \y -&gt; x)
+<span class="hljs-title">right</span> u = u(\x -&gt; \y -&gt; y)
+</code></pre>
+<p><img src="/images/church_style_pair.png" alt="" loading="lazy"></p>
+<p>然后，注意到我们之前定义的 Church Numeric 的 b 和 s 都是可以替换成任意的实例的！因此，只需要把 <code>&lt;0, 0&gt;</code> 作为 b 传入，就能获得一个带有 predecessor 的 Church numberic.</p>
+<p><img src="/images/church_predecessor.png" alt="" loading="lazy"></p>
+<pre><code class="hljs language-haskell"><span class="hljs-title">pred&#x27;</span> = \x -&gt; x ([<span class="hljs-number">0</span>, <span class="hljs-number">0</span>])(\y -&gt; [right y, succ(right y)])
+<span class="hljs-title">pred</span>  = \x -&gt; right (pred&#x27; x)
+</code></pre>
+<p>这样我们就获取了需要的 pred 函数。这样，ifz 也很好定义了</p>
+<pre><code class="hljs">ifz u, u0, x, u1 = u(u0)(\never -&gt; [(pred u)/x] u1)
+</code></pre>
+<p>现在我们还差 general recursion。一如既往地，lambda calculus 的函数是没有名字的，我们需要得到一个 fix 让 general recursion 存在</p>
+<h5 id="Y-组合子">Y 组合子<a class="header-anchor" href="#Y-组合子"> ¶</a></h5>
+<p>最出名的 fix point combinator 是 Y 组合子</p>
+<p><img src="/images/Ycombinator.png" alt="" loading="lazy"></p>
+<pre><code class="hljs language-haskell"><span class="hljs-type">Y</span> = \<span class="hljs-type">F</span> -&gt; (\f -&gt; <span class="hljs-type">F</span>(f(f))) (\f -&gt; <span class="hljs-type">F</span>(f(f)))
+</code></pre>
+<p>验算</p>
+<pre><code class="hljs language-haskell"><span class="hljs-type">Y</span>(<span class="hljs-type">F</span>)
+= (\f -&gt; <span class="hljs-type">F</span>(f(f)))(\f -&gt; <span class="hljs-type">F</span>(f(f)))
+= <span class="hljs-type">F</span>((f)(f)) <span class="hljs-keyword">where</span> f = \f -&gt; <span class="hljs-type">F</span>(f f)
+= <span class="hljs-type">F</span>(
+  (\f -&gt; <span class="hljs-type">F</span>(f(f)))(\f -&gt; <span class="hljs-type">F</span>(f(f)))
+  )
+= <span class="hljs-type">F</span>(<span class="hljs-type">Y</span>(<span class="hljs-type">F</span>))
+</code></pre>
+<p>看到这里我非常的震撼，人们是如何构造出这样神奇的组合子的？原书接下来做了解释：</p>
+<p>让我们抛开内存和地址空间这些不谈。假如有一个函数</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">function</span> fib &#123;
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">fib</span>(x - <span class="hljs-number">1</span>) + <span class="hljs-title function_">fib</span> (x - <span class="hljs-number">2</span>);
+&#125;
+</code></pre>
+<p>现在我们忘记函数可以有名字。为了还能实现递归，自然而然的，我们会尝试加一个参数，self 或者 this 之类的，这样这个函数就知道了自己是什么。</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">tmp</span>(<span class="hljs-params">self, x</span>) &#123;
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">self</span>(x - <span class="hljs-number">1</span>) + <span class="hljs-title function_">self</span>(x - <span class="hljs-number">2</span>);
+&#125;
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">fib</span>(<span class="hljs-params">x</span>) &#123;
+  reutnr <span class="hljs-title function_">tmp</span>(tmp, x);
+&#125;
+</code></pre>
+<p>注意到 <code>tmp(tmp, ...args)</code> 的存在！为了更好看出来，我们把它写成柯里化的 lambda 函数</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> <span class="hljs-title function_">tmp</span> = (<span class="hljs-params">self</span>) =&gt; <span class="hljs-function">(<span class="hljs-params">x</span>) =&gt;</span> &#123;
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">self</span>(x - <span class="hljs-number">1</span>) + <span class="hljs-title function_">self</span>(x - <span class="hljs-number">2</span>);
+&#125;;
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">fib_1</span> = (<span class="hljs-params">x</span>) =&gt; &#123;
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">tmp</span>(tmp)(x);
+&#125;;
+<span class="hljs-comment">// 然后 x 可以消掉</span>
+<span class="hljs-keyword">const</span> fib = <span class="hljs-title function_">tmp</span>(tmp);
+</code></pre>
+<p>因此，对于任何一个我们需要递归的函数 F</p>
+<pre><code class="hljs language-haskell"><span class="hljs-type">F&#x27;</span> = \f -&gt; <span class="hljs-type">F</span>(f(f))
+</code></pre>
+<p>能帮我们把每次 F(f) 的 f 调用换成 F(f(f))</p>
+<p>此时观察到到</p>
+<pre><code class="hljs">F&#x27;(F&#x27;) == F(F&#x27;(F&#x27;))
+</code></pre>
+<p><code>F'(F')</code> 就是我们想要的 F 的不动点。现在把它展开，就得到了</p>
+<pre><code class="hljs">(\f -&gt; F(f(f)))(\f -&gt; F(f(f)))
+</code></pre>
+<p>于是我们就得到了 Y 组合子，可以得到任意 F 的 fixed point</p>
+<p>TODO</p>
+</section><section class="post-meta"><span class="info"><i class="fa fa-calendar"></i> <span class="date">2025-03-22</span>  </span><span class="info"><i class="fa fa-folder-o"></i> <a href="/categories/Practical-Foundations-for-Programming-Languages/" title="Practical Foundations for Programming Languages">Practical Foundations for Programming Languages</a>  </span></section></article><p class="pagination"><a href="/2025/03/21/pfpl-note-5/" title="PFPL 笔记 - V Infinite Data Types">Next</a></p><article class="comment-container"><div class="comment-container"><script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js" onload="(new Gitalk({&quot;clientID&quot;:&quot;12a250ac67f452906dd6&quot;,&quot;clientSecret&quot;:&quot;7422a9ecdc933d5e6facbc61d546bced40519f0b&quot;,&quot;repo&quot;:&quot;lhcfl.github.io&quot;,&quot;owner&quot;:&quot;lhcfl&quot;,&quot;admin&quot;:[&quot;lhcfl&quot;],&quot;id&quot;:&quot;PFPL 笔记 - VI Dynamic Types&quot;,&quot;distractionFreeMode&quot;:false})).render(&quot;gitalk-comment-slot&quot;)"></script><div id="gitalk-comment-slot">Loading...</div></div></article></main><footer class="footer"><br><p class="powered_by">Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> and <a target="_blank" rel="noopener" href="https://github.com/Lhcfl/hexo-theme-sosimple">SoSimple</a></p></footer></body></html>

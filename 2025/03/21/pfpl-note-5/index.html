@@ -1,0 +1,30 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Linca"><title>PFPL 笔记 - V Infinite Data Types · Zero Calorie Drink Shop</title><meta name="description" content="笔记5
+
+Inductive and Co-Inductive Types ¶
+inductive type一个很直观的例子是自然数类型 nat
+之前的定义是
+zero : nat
+n: nat |- succ(n) : nat
+
+现在我们引入新的定义
+Gamma |- e : unit + nat"><meta name="keywords" content="Blog"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="mobile-web-app-capable" content="yes"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta id="site_data_static" data-url="/"><meta name="renderer" content="webkit"><link rel="shortcut icon" type="image/x-icon" href="/images/logo.png"><link rel="stylesheet" href="/js_complied/bundle.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><script src="/js_complied/bundle.js"></script><script>Utils.loadCSS("https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200..900&family=Noto+Serif+KR:wght@200..900&family=Noto+Serif+SC:wght@200..900&family=Noto+Serif+TC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap");
+Utils.loadCSS("https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css");
+Utils.loadCSS("/css/font-awesome.min.css");</script><meta name="generator" content="Hexo 7.3.0"></head><body class="post-page"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200..900&amp;family=Noto+Serif+KR:wght@200..900&amp;family=Noto+Serif+SC:wght@200..900&amp;family=Noto+Serif+TC:wght@200..900&amp;family=Noto+Serif:ital,wght@0,100..900;1,100..900&amp;display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"></noscript><nav class="nav"><a href="/">Home</a>&nbsp;&nbsp;<a href="/archives">Archives</a>&nbsp;&nbsp;<a href="/tags">Tags</a>&nbsp;&nbsp;<a href="/about">About</a>&nbsp;&nbsp;<a href="/links">Links</a>&nbsp;&nbsp;<a href="/search">Search</a>&nbsp;&nbsp;<a href="javascript:SoSimple.darkLightToggle()">Dark/Light Mode</a></nav><main class="main"><article class="post-container post-full"><header class="post-title"><h1>PFPL 笔记 - V Infinite Data Types</h1></header><section class="post-toc"><details open><summary>Menu</summary><div class="toc"><ol class="toclist"><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#Inductive-and-Co-Inductive-Types"><span class="toclist-text">Inductive and Co-Inductive Types</span></a></li></ol></div></details></section><section class="post-body"><p>笔记5</p>
+<span id="more"></span>
+<h3 id="Inductive-and-Co-Inductive-Types">Inductive and Co-Inductive Types<a class="header-anchor" href="#Inductive-and-Co-Inductive-Types"> ¶</a></h3>
+<p>inductive type一个很直观的例子是自然数类型 nat</p>
+<p>之前的定义是</p>
+<pre><code class="hljs">zero : nat
+n: nat |- succ(n) : nat
+</code></pre>
+<p>现在我们引入新的定义</p>
+<pre><code class="hljs">Gamma |- e : unit + nat
+------------------
+Gamma |- fold(nat, e) : nat
+</code></pre>
+<p>fold(nat, e) 是 nat 的唯一引入形式。在这样的表达式里， z 被定义为 fold(nat, l) 而 s(e) 被定义为 fold(nat, e)</p>
+<p>另一个不错的例子是 stream. 熟悉 Haskell 的会知道Haskell内存在无限列表这样的东西。</p>
+<p>在之前，我们的递归类型需要递归到把所有值都计算出来，stream相反，需要什么就计算什么</p>
+<p><img src="/images/stream.png" alt="" loading="lazy"></p>
+<p>其中 hd(e) 为 head of the stream</p>
+</section><section class="post-meta"><span class="info"><i class="fa fa-calendar"></i> <span class="date">2025-03-21</span>  </span><span class="info"><i class="fa fa-folder-o"></i> <a href="/categories/Practical-Foundations-for-Programming-Languages/" title="Practical Foundations for Programming Languages">Practical Foundations for Programming Languages</a>  </span></section></article><p class="pagination"><a href="/2025/03/22/pfpl-note-6/" title="PFPL 笔记 - VI Dynamic Types">Previous</a><span>  </span><a href="/2025/03/07/pfpl-note-4/" title="PFPL 笔记 - IV Finite Data Types">Next</a></p><article class="comment-container"><div class="comment-container"><script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js" onload="(new Gitalk({&quot;clientID&quot;:&quot;12a250ac67f452906dd6&quot;,&quot;clientSecret&quot;:&quot;7422a9ecdc933d5e6facbc61d546bced40519f0b&quot;,&quot;repo&quot;:&quot;lhcfl.github.io&quot;,&quot;owner&quot;:&quot;lhcfl&quot;,&quot;admin&quot;:[&quot;lhcfl&quot;],&quot;id&quot;:&quot;PFPL 笔记 - V Infinite Data Types&quot;,&quot;distractionFreeMode&quot;:false})).render(&quot;gitalk-comment-slot&quot;)"></script><div id="gitalk-comment-slot">Loading...</div></div></article></main><footer class="footer"><br><p class="powered_by">Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> and <a target="_blank" rel="noopener" href="https://github.com/Lhcfl/hexo-theme-sosimple">SoSimple</a></p></footer></body></html>
