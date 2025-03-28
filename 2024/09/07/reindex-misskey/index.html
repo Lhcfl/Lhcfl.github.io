@@ -1,0 +1,85 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Linca"><title>为 Misskey 开启 Meilisearch 后，重新索引过去的帖子 · Zero Calorie Drink Shop</title><meta name="description" content="一篇简短的笔记，为 Misskey 开启 Meilisearch 后，重新索引过去的帖子。
+
+首先编写这样一个 SQL 文件
+SELECT json_agg(row_to_json(n.*)) FROM (
+      SELECT &amp;quot;id&amp;quot;, &amp;quot;userId&amp;quot"><meta name="keywords" content="Code,Fediverse,Misskey"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="mobile-web-app-capable" content="yes"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta id="site_data_static" data-url="/"><meta name="renderer" content="webkit"><link rel="shortcut icon" type="image/x-icon" href="/images/logo.png"><link rel="stylesheet" href="/js_complied/bundle.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><style>:root { --normal-font-face: LXGW WenKai, LXGW WenKai TC, 'Times New Roman', Times, serif; }</style><script src="/js_complied/bundle.js"></script><script>Utils.loadCSS("https://testingcf.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css");
+Utils.loadCSS("https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&display=swap");
+Utils.loadCSS("https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css");
+Utils.loadCSS("/css/font-awesome.min.css");</script><meta name="generator" content="Hexo 7.3.0"></head><body class="post-page"><noscript><link rel="stylesheet" href="https://testingcf.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&amp;display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"></noscript><nav class="nav"><a href="/">Home</a>&nbsp;&nbsp;<a href="/archives">Archives</a>&nbsp;&nbsp;<a href="/tags">Tags</a>&nbsp;&nbsp;<a href="/about">About</a>&nbsp;&nbsp;<a href="/links">Links</a>&nbsp;&nbsp;<a href="/search">Search</a>&nbsp;&nbsp;<a href="javascript:SoSimple.darkLightToggle()">Dark/Light Mode</a></nav><main class="main"><article class="post-container post-full"><header class="post-title"><h1>为 Misskey 开启 Meilisearch 后，重新索引过去的帖子</h1></header><section class="post-body"><p>一篇简短的笔记，为 Misskey 开启 Meilisearch 后，重新索引过去的帖子。</p>
+<span id="more"></span>
+<p>首先编写这样一个 SQL 文件</p>
+<pre><code class="hljs language-sql"><span class="hljs-keyword">SELECT</span> json_agg(row_to_json(n.<span class="hljs-operator">*</span>)) <span class="hljs-keyword">FROM</span> (
+      <span class="hljs-keyword">SELECT</span> &quot;id&quot;, &quot;userId&quot;, &quot;channelId&quot;, &quot;cw&quot;, &quot;text&quot;, &quot;tags&quot;
+      <span class="hljs-keyword">FROM</span> &quot;note&quot;
+      <span class="hljs-keyword">WHERE</span> (&quot;note&quot;.&quot;visibility&quot; <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;public&#x27;</span> <span class="hljs-keyword">OR</span> &quot;note&quot;.&quot;visibility&quot; <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;home&#x27;</span>) <span class="hljs-keyword">AND</span>
+      (&quot;note&quot;.&quot;text&quot; <span class="hljs-keyword">IS</span> <span class="hljs-keyword">NOT NULL</span>) <span class="hljs-keyword">AND</span>
+      (&quot;note&quot;.&quot;uri&quot; <span class="hljs-keyword">IS</span> <span class="hljs-keyword">NULL</span>)
+      <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> id <span class="hljs-keyword">desc</span>
+) n
+</code></pre>
+<p>我们不妨保存它为 <code>get_notes.sql</code></p>
+<p>这个 SQL 的意思很显然，就是从帖子表中找到 <code>public</code> 或 <code>home</code> 可见性的本地帖子 (<code>uri is null</code>) 并输出成 JSON</p>
+<p>然后执行它，得到一个 <code>notes.json</code></p>
+<pre><code class="hljs language-bash">psql -d &#123;your_db_name&#125; -t -f get_notes.sql &gt; notes.json
+</code></pre>
+<p>然后创建一个 <code>send_notes.mjs</code>。最前方的 config 请用你的 misskey 的 <code>.config/default.yml</code> 内关于 Meilisearch 的部分替换。</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">import</span> fs <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;fs&quot;</span>;
+
+<span class="hljs-keyword">const</span> config = &#123;
+  <span class="hljs-attr">ms_url</span>: <span class="hljs-string">&quot;http://127.0.0.1:7700&quot;</span>,
+  <span class="hljs-attr">api_key</span>: <span class="hljs-string">&quot;YOUR_API_KEY&quot;</span>,
+  <span class="hljs-attr">index</span>: <span class="hljs-string">&quot;YOUR_INDEX&quot;</span>,
+&#125;;
+
+<span class="hljs-keyword">const</span> headers = &#123;
+  <span class="hljs-string">&quot;Content-Type&quot;</span>: <span class="hljs-string">&quot;application/json&quot;</span>,
+  <span class="hljs-title class_">Authorization</span>: <span class="hljs-string">`Bearer <span class="hljs-subst">$&#123;config.api_key&#125;</span>`</span>,
+&#125;;
+
+<span class="hljs-comment">/** <span class="hljs-doctag">@typedef</span> &#123;&#123;id: string, userId: string, channelId: string, cw: string | null, text: string, tags: string[]&#125;&#125; &#123;Note&#125; */</span>
+
+<span class="hljs-comment">/** <span class="hljs-doctag">@type</span> &#123;<span class="hljs-type">Note[]</span>&#125; */</span>
+<span class="hljs-keyword">const</span> notes = <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">parse</span>(fs.<span class="hljs-title function_">readFileSync</span>(<span class="hljs-string">&quot;notes.json&quot;</span>));
+
+<span class="hljs-comment">/**
+ * <span class="hljs-doctag">@see</span> https://github.com/misskey-dev/misskey/blob/4b295088fd6b4bead05087537415b10419eee78f/packages/backend/src/misc/id/aid.ts#L34
+ */</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">parseAid</span>(<span class="hljs-params">id</span>) &#123;
+  <span class="hljs-keyword">const</span> <span class="hljs-title class_">TIME2000</span> = <span class="hljs-number">946684800000</span>;
+  <span class="hljs-keyword">const</span> time = <span class="hljs-built_in">parseInt</span>(id.<span class="hljs-title function_">slice</span>(<span class="hljs-number">0</span>, <span class="hljs-number">8</span>), <span class="hljs-number">36</span>) + <span class="hljs-title class_">TIME2000</span>;
+  <span class="hljs-keyword">return</span> time;
+&#125;
+
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> note <span class="hljs-keyword">of</span> notes) &#123;
+  note.<span class="hljs-property">createdAt</span> = <span class="hljs-title function_">parseAid</span>(note.<span class="hljs-property">id</span>);
+  note.<span class="hljs-property">userHost</span> = <span class="hljs-literal">null</span>;
+&#125;
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Reindexing&quot;</span>, notes.<span class="hljs-property">length</span>, <span class="hljs-string">&quot;notes&quot;</span>);
+
+<span class="hljs-title function_">fetch</span>(
+  config.<span class="hljs-property">ms_url</span> + <span class="hljs-string">`/indexes/<span class="hljs-subst">$&#123;config.index&#125;</span>---notes/documents?primaryKey=id`</span>,
+  &#123;
+    <span class="hljs-attr">method</span>: <span class="hljs-string">&quot;POST&quot;</span>,
+    headers,
+    <span class="hljs-attr">body</span>: <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(notes),
+  &#125;
+)
+  .<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">res</span>) =&gt;</span> res.<span class="hljs-title function_">text</span>())
+  .<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">text</span>) =&gt;</span> &#123;
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(text);
+  &#125;);
+</code></pre>
+<p>执行 <code>node send_note.mjs</code>, 如果成功把帖子送给了 Meilisearch 进行索引，我们应该能看到像这样的输出内容：</p>
+<pre><code class="hljs language-json"><span class="hljs-punctuation">&#123;</span>
+  <span class="hljs-attr">&quot;taskUid&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">9241</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;indexUid&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;shonk_social---notes&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;enqueued&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;documentAdditionOrUpdate&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;enqueuedAt&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2024-09-07T06:31:44.177026811Z&quot;</span>
+<span class="hljs-punctuation">&#125;</span>
+</code></pre>
+<p>如果要查看索引进度，记下 <code>taskUid</code>。使用像这样命令就可以查看索引进度了：</p>
+<pre><code class="hljs language-bash">curl -s <span class="hljs-string">&#x27;http://localhost:7700/tasks/&#123;taskUid&#125;&#x27;</span> -H <span class="hljs-string">&quot;Authorization: Bearer &#123;your_api_key&#125;&quot;</span> | jq .
+</code></pre>
+</section><section class="post-meta"><span class="info"><i class="fa fa-calendar"></i> <span class="date">2024-09-07</span>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Code/" title="Code">Code</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Fediverse/" title="Fediverse">Fediverse</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Misskey/" title="Misskey">Misskey</a>  </span></section></article><p class="pagination"><a href="/2024/11/13/so-simple/" title="一晚上搓出的 So Simple 博客主题">Previous</a><span>  </span><a href="/2024/09/05/sayonara-firefish/" title="再见 Firefish (Firefish 迁移 Sharkey 指北)">Next</a></p><article class="comment-container"><div class="comment-container"><script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js" onload="(new Gitalk({&quot;clientID&quot;:&quot;12a250ac67f452906dd6&quot;,&quot;clientSecret&quot;:&quot;7422a9ecdc933d5e6facbc61d546bced40519f0b&quot;,&quot;repo&quot;:&quot;lhcfl.github.io&quot;,&quot;owner&quot;:&quot;lhcfl&quot;,&quot;admin&quot;:[&quot;lhcfl&quot;],&quot;id&quot;:&quot;为 Misskey 开启 Meilisearch 后，重新索引过去的帖子&quot;,&quot;distractionFreeMode&quot;:false})).render(&quot;gitalk-comment-slot&quot;)"></script><div id="gitalk-comment-slot">Loading...</div></div></article></main><footer class="footer"><br><p class="powered_by">Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> and <a target="_blank" rel="noopener" href="https://github.com/Lhcfl/hexo-theme-sosimple">SoSimple</a></p></footer></body></html>
