@@ -1,0 +1,250 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Linca"><title>小数据的时候 `std::vector&lt;int&gt;` 删除首元素比 deque 和 list 还快 · Zero Calorie Drink Shop</title><meta name="description" content="链表可以当成双端队列来使用——至少在渐进时空复杂度上，它们是相同的。
+但在现代化的 CPU 的支持下，std::vector 由于内存的连贯性，在小规模数据下甚至可以做到比 std::deque 更好的性能，更别提在随机访问上 std::vector 有巨大优势了。
+
+灵感来源： C++ list "><meta name="keywords" content="Code,C++"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="mobile-web-app-capable" content="yes"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta id="site_data_static" data-url="/"><meta name="renderer" content="webkit"><link rel="shortcut icon" type="image/x-icon" href="/images/logo.png"><link rel="stylesheet" href="/js_complied/bundle.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><style>:root { --normal-font-face: LXGW WenKai, LXGW WenKai TC, 'Times New Roman', Times, serif; }</style><script src="/js_complied/bundle.js"></script><script>Utils.loadCSS("https://testingcf.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css");
+Utils.loadCSS("https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&display=swap");
+Utils.loadCSS("https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css");
+Utils.loadCSS("/css/font-awesome.min.css");</script><meta name="generator" content="Hexo 7.3.0"></head><body class="post-page"><noscript><link rel="stylesheet" href="https://testingcf.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&amp;display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"></noscript><nav class="nav"><a href="/">Home</a>&nbsp;&nbsp;<a href="/archives">Archives</a>&nbsp;&nbsp;<a href="/tags">Tags</a>&nbsp;&nbsp;<a href="/about">About</a>&nbsp;&nbsp;<a href="/links">Links</a>&nbsp;&nbsp;<a href="/search">Search</a>&nbsp;&nbsp;<a href="javascript:SoSimple.darkLightToggle()">Dark/Light Mode</a></nav><main class="main"><article class="post-container post-full"><header class="post-title"><h1>小数据的时候 `std::vector&lt;int&gt;` 删除首元素比 deque 和 list 还快</h1></header><section class="post-body"><p>链表可以当成双端队列来使用——至少在渐进时空复杂度上，它们是相同的。</p>
+<p>但在现代化的 CPU 的支持下，<code>std::vector</code> 由于内存的连贯性，在小规模数据下甚至可以做到比 <code>std::deque</code> 更好的性能，更别提在随机访问上 <code>std::vector</code> 有巨大优势了。</p>
+<span id="more"></span>
+<p>灵感来源： C++ list vs vector 性能测试 - 君实的文章 - 知乎 <a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/1888283969994336101">https://zhuanlan.zhihu.com/p/1888283969994336101</a></p>
+<p>测试代码：</p>
+<pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;algorithm&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;chrono&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;cstdint&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;cstdlib&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;deque&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;list&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;string&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;type_traits&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;vector&gt;</span></span>
+
+<span class="hljs-keyword">constexpr</span> <span class="hljs-type">int</span> TEST_ITERS = <span class="hljs-number">100000</span>;
+
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
+  <span class="hljs-keyword">requires</span> std::is_same_v&lt;T, std::list&lt;<span class="hljs-type">int</span>&gt;&gt; ||
+           std::is_same_v&lt;T, std::vector&lt;<span class="hljs-type">int</span>&gt;&gt; ||
+           std::is_same_v&lt;T, std::deque&lt;<span class="hljs-type">int</span>&gt;&gt;
+<span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">test_for</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span> *name, <span class="hljs-type">int</span> count)</span> </span>&#123;
+  <span class="hljs-keyword">auto</span> t_0 = std::chrono::system_clock::<span class="hljs-built_in">now</span>();
+  T container;
+  <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; count; i++) &#123;
+    container.<span class="hljs-built_in">push_back</span>(i);
+  &#125;
+  <span class="hljs-keyword">auto</span> t_initialized = std::chrono::system_clock::<span class="hljs-built_in">now</span>();
+  <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; TEST_ITERS; i++) &#123;
+    <span class="hljs-type">int</span> elem = <span class="hljs-built_in">rand</span>() % count;
+    <span class="hljs-keyword">auto</span> iter = std::ranges::<span class="hljs-built_in">find</span>(container, elem);
+    container.<span class="hljs-built_in">erase</span>(iter);
+    container.<span class="hljs-built_in">push_back</span>(elem);
+  &#125;
+  <span class="hljs-keyword">auto</span> t_random_test = std::chrono::system_clock::<span class="hljs-built_in">now</span>();
+  <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; TEST_ITERS; i++) &#123;
+    <span class="hljs-keyword">auto</span> elem = *container.<span class="hljs-built_in">begin</span>();
+    container.<span class="hljs-built_in">erase</span>(container.<span class="hljs-built_in">begin</span>());
+    container.<span class="hljs-built_in">push_back</span>(elem);
+  &#125;
+  <span class="hljs-keyword">auto</span> t_pop_front_test = std::chrono::system_clock::<span class="hljs-built_in">now</span>();
+
+  std::cout &lt;&lt; <span class="hljs-string">&quot;====================================================\n&quot;</span>
+            &lt;&lt; <span class="hljs-string">&quot;test final for &quot;</span> &lt;&lt; name &lt;&lt; <span class="hljs-string">&quot; with count: &quot;</span> &lt;&lt; count &lt;&lt; <span class="hljs-string">&quot;\n&quot;</span>
+            &lt;&lt; <span class="hljs-string">&quot;\ttime_init = &quot;</span> &lt;&lt; t_initialized - t_0 &lt;&lt; <span class="hljs-string">&quot;\n&quot;</span>
+            &lt;&lt; <span class="hljs-string">&quot;\ttime_random_erase = &quot;</span> &lt;&lt; t_random_test - t_initialized &lt;&lt; <span class="hljs-string">&quot;\n&quot;</span>
+            &lt;&lt; <span class="hljs-string">&quot;\ttime_pop_front = &quot;</span> &lt;&lt; t_pop_front_test - t_random_test &lt;&lt; <span class="hljs-string">&quot;\n&quot;</span>
+            &lt;&lt; std::endl;
+&#125;
+
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt; <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">test_for_str</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span> *name, <span class="hljs-type">int</span> count)</span> </span>&#123;
+  <span class="hljs-keyword">auto</span> t_0 = std::chrono::system_clock::<span class="hljs-built_in">now</span>();
+  T container;
+  <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; count; i++) &#123;
+    container.<span class="hljs-built_in">push_back</span>(std::<span class="hljs-built_in">to_string</span>(i));
+  &#125;
+  <span class="hljs-keyword">auto</span> t_initialized = std::chrono::system_clock::<span class="hljs-built_in">now</span>();
+  <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; TEST_ITERS; i++) &#123;
+    <span class="hljs-keyword">auto</span> elem = *container.<span class="hljs-built_in">begin</span>();
+    container.<span class="hljs-built_in">erase</span>(container.<span class="hljs-built_in">begin</span>());
+    container.<span class="hljs-built_in">push_back</span>(elem);
+  &#125;
+  <span class="hljs-keyword">auto</span> t_pop_front_test = std::chrono::system_clock::<span class="hljs-built_in">now</span>();
+
+  std::cout &lt;&lt; <span class="hljs-string">&quot;====================================================\n&quot;</span>
+            &lt;&lt; <span class="hljs-string">&quot;test final for &quot;</span> &lt;&lt; name &lt;&lt; <span class="hljs-string">&quot; with count: &quot;</span> &lt;&lt; count &lt;&lt; <span class="hljs-string">&quot;\n&quot;</span>
+            &lt;&lt; <span class="hljs-string">&quot;\ttime_init = &quot;</span> &lt;&lt; t_initialized - t_0 &lt;&lt; <span class="hljs-string">&quot;\n&quot;</span>
+            &lt;&lt; <span class="hljs-string">&quot;\ttime_pop_front = &quot;</span> &lt;&lt; t_pop_front_test - t_initialized &lt;&lt; <span class="hljs-string">&quot;\n&quot;</span>
+            &lt;&lt; std::endl;
+&#125;
+
+<span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;
+  test_for&lt;std::vector&lt;<span class="hljs-type">int</span>&gt;&gt;(<span class="hljs-string">&quot;std::vector&lt;int&gt;&quot;</span>, <span class="hljs-number">16</span>);
+  test_for&lt;std::list&lt;<span class="hljs-type">int</span>&gt;&gt;(<span class="hljs-string">&quot;std::list&lt;int&gt;&quot;</span>, <span class="hljs-number">16</span>);
+  test_for&lt;std::deque&lt;<span class="hljs-type">int</span>&gt;&gt;(<span class="hljs-string">&quot;std::deque&lt;int&gt;&quot;</span>, <span class="hljs-number">16</span>);
+  test_for&lt;std::vector&lt;<span class="hljs-type">int</span>&gt;&gt;(<span class="hljs-string">&quot;std::vector&lt;int&gt;&quot;</span>, <span class="hljs-number">256</span>);
+  test_for&lt;std::list&lt;<span class="hljs-type">int</span>&gt;&gt;(<span class="hljs-string">&quot;std::list&lt;int&gt;&quot;</span>, <span class="hljs-number">256</span>);
+  test_for&lt;std::deque&lt;<span class="hljs-type">int</span>&gt;&gt;(<span class="hljs-string">&quot;std::deque&lt;int&gt;&quot;</span>, <span class="hljs-number">256</span>);
+  test_for&lt;std::vector&lt;<span class="hljs-type">int</span>&gt;&gt;(<span class="hljs-string">&quot;std::vector&lt;int&gt;&quot;</span>, <span class="hljs-number">4096</span>);
+  test_for&lt;std::list&lt;<span class="hljs-type">int</span>&gt;&gt;(<span class="hljs-string">&quot;std::list&lt;int&gt;&quot;</span>, <span class="hljs-number">4096</span>);
+  test_for&lt;std::deque&lt;<span class="hljs-type">int</span>&gt;&gt;(<span class="hljs-string">&quot;std::deque&lt;int&gt;&quot;</span>, <span class="hljs-number">4096</span>);
+  test_for&lt;std::vector&lt;<span class="hljs-type">int</span>&gt;&gt;(<span class="hljs-string">&quot;std::vector&lt;int&gt;&quot;</span>, <span class="hljs-number">32768</span>);
+  test_for&lt;std::list&lt;<span class="hljs-type">int</span>&gt;&gt;(<span class="hljs-string">&quot;std::list&lt;int&gt;&quot;</span>, <span class="hljs-number">32768</span>);
+  test_for&lt;std::deque&lt;<span class="hljs-type">int</span>&gt;&gt;(<span class="hljs-string">&quot;std::deque&lt;int&gt;&quot;</span>, <span class="hljs-number">32768</span>);
+
+  test_for_str&lt;std::vector&lt;std::string&gt;&gt;(<span class="hljs-string">&quot;std::vector&lt;std::string&gt;&quot;</span>, <span class="hljs-number">16</span>);
+  test_for_str&lt;std::list&lt;std::string&gt;&gt;(<span class="hljs-string">&quot;std::list&lt;std::string&gt;&quot;</span>, <span class="hljs-number">16</span>);
+  test_for_str&lt;std::deque&lt;std::string&gt;&gt;(<span class="hljs-string">&quot;std::deque&lt;std::string&gt;&quot;</span>, <span class="hljs-number">16</span>);
+  test_for_str&lt;std::vector&lt;std::string&gt;&gt;(<span class="hljs-string">&quot;std::vector&lt;std::string&gt;&quot;</span>, <span class="hljs-number">256</span>);
+  test_for_str&lt;std::list&lt;std::string&gt;&gt;(<span class="hljs-string">&quot;std::list&lt;std::string&gt;&quot;</span>, <span class="hljs-number">256</span>);
+  test_for_str&lt;std::deque&lt;std::string&gt;&gt;(<span class="hljs-string">&quot;std::deque&lt;std::string&gt;&quot;</span>, <span class="hljs-number">256</span>);
+  test_for_str&lt;std::vector&lt;std::string&gt;&gt;(<span class="hljs-string">&quot;std::vector&lt;std::string&gt;&quot;</span>, <span class="hljs-number">8192</span>);
+  test_for_str&lt;std::list&lt;std::string&gt;&gt;(<span class="hljs-string">&quot;std::list&lt;std::string&gt;&quot;</span>, <span class="hljs-number">8192</span>);
+  test_for_str&lt;std::deque&lt;std::string&gt;&gt;(<span class="hljs-string">&quot;std::deque&lt;std::string&gt;&quot;</span>, <span class="hljs-number">8192</span>);
+  test_for_str&lt;std::vector&lt;std::string&gt;&gt;(<span class="hljs-string">&quot;std::vector&lt;std::string&gt;&quot;</span>, <span class="hljs-number">32768</span>);
+  test_for_str&lt;std::list&lt;std::string&gt;&gt;(<span class="hljs-string">&quot;std::list&lt;std::string&gt;&quot;</span>, <span class="hljs-number">32768</span>);
+  test_for_str&lt;std::deque&lt;std::string&gt;&gt;(<span class="hljs-string">&quot;std::deque&lt;std::string&gt;&quot;</span>, <span class="hljs-number">32768</span>);
+&#125;
+</code></pre>
+<p>测试输出</p>
+<pre><code class="hljs language-log">====================================================
+test final for std::vector&lt;int&gt; with count: 16
+        time_init = 4500ns
+        time_random_erase = 2478100ns
+        time_pop_front = 548300ns
+
+====================================================
+test final for std::list&lt;int&gt; with count: 16
+        time_init = 2200ns
+        time_random_erase = 4760000ns
+        time_pop_front = 2577000ns
+
+====================================================
+test final for std::deque&lt;int&gt; with count: 16
+        time_init = 1300ns
+        time_random_erase = 3194600ns
+        time_pop_front = 938800ns
+
+====================================================
+test final for std::vector&lt;int&gt; with count: 256
+        time_init = 4300ns
+        time_random_erase = 5934600ns
+        time_pop_front = 1134400ns
+
+====================================================
+test final for std::list&lt;int&gt; with count: 256
+        time_init = 27900ns
+        time_random_erase = 19486100ns
+        time_pop_front = 2807300ns
+
+====================================================
+test final for std::deque&lt;int&gt; with count: 256
+        time_init = 13300ns
+        time_random_erase = 10613400ns
+        time_pop_front = 980900ns
+
+====================================================
+test final for std::vector&lt;int&gt; with count: 4096
+        time_init = 43400ns
+        time_random_erase = 190562800ns
+        time_pop_front = 313020900ns
+
+====================================================
+test final for std::list&lt;int&gt; with count: 4096
+        time_init = 134500ns
+        time_random_erase = 634532100ns
+        time_pop_front = 3362300ns
+
+====================================================
+test final for std::deque&lt;int&gt; with count: 4096
+        time_init = 6900ns
+        time_random_erase = 99171000ns
+        time_pop_front = 879800ns
+
+====================================================
+test final for std::vector&lt;int&gt; with count: 32768
+        time_init = 81800ns
+        time_random_erase = 1844930700ns
+        time_pop_front = 2943559900ns
+
+====================================================
+test final for std::list&lt;int&gt; with count: 32768
+        time_init = 902000ns
+        time_random_erase = 6683027100ns
+        time_pop_front = 3578600ns
+
+====================================================
+test final for std::deque&lt;int&gt; with count: 32768
+        time_init = 69700ns
+        time_random_erase = 790749400ns
+        time_pop_front = 886100ns
+
+====================================================
+test final for std::vector&lt;std::string&gt; with count: 16
+        time_init = 3100ns
+        time_pop_front = 3449700ns
+
+====================================================
+test final for std::list&lt;std::string&gt; with count: 16
+        time_init = 1800ns
+        time_pop_front = 2865500ns
+
+====================================================
+test final for std::deque&lt;std::string&gt; with count: 16
+        time_init = 17200ns
+        time_pop_front = 672300ns
+
+====================================================
+test final for std::vector&lt;std::string&gt; with count: 256
+        time_init = 147700ns
+        time_pop_front = 48857700ns
+
+====================================================
+test final for std::list&lt;std::string&gt; with count: 256
+        time_init = 19900ns
+        time_pop_front = 2907400ns
+
+====================================================
+test final for std::deque&lt;std::string&gt; with count: 256
+        time_init = 5600ns
+        time_pop_front = 758500ns
+
+====================================================
+test final for std::vector&lt;std::string&gt; with count: 8192
+        time_init = 254700ns
+        time_pop_front = 1175939400ns
+
+====================================================
+test final for std::list&lt;std::string&gt; with count: 8192
+        time_init = 303600ns
+        time_pop_front = 2826500ns
+
+====================================================
+test final for std::deque&lt;std::string&gt; with count: 8192
+        time_init = 172300ns
+        time_pop_front = 646900ns
+
+====================================================
+test final for std::vector&lt;std::string&gt; with count: 32768
+        time_init = 679900ns
+        time_pop_front = 5407818600ns
+
+====================================================
+test final for std::list&lt;std::string&gt; with count: 32768
+        time_init = 1202400ns
+        time_pop_front = 3050200ns
+
+====================================================
+test final for std::deque&lt;std::string&gt; with count: 32768
+        time_init = 639600ns
+        time_pop_front = 712600ns
+</code></pre>
+<p>分析测试数据可以发现，在 16 和 256 的 int 数据这样极小的数据中，已知迭代器的擦写 <code>vector&lt;int&gt;</code> 甚至可以比 <code>deque&lt;int&gt;</code> 还快，更别提 cache miss 吃满的 <code>list&lt;int&gt;</code>。</p>
+<p>但是在 <code>std::string</code> 的容器中，由于 <code>string</code> 移动常数明显地比 <code>int</code> 大很多，即使是 16 这样的小容器也是 vector 更慢一些。</p>
+<p>对于常用的 先 find 再 remove （即，remove-if）的过程，更是很难说有什么不用 vector 的理由。直到 4096 这样的数字，vector 随机删除会移动后续所有元素的性质才开始与 deque 拉开距离。<code>deque&lt;int&gt;</code> 在 256 的时候随机删除仍然不如 <code>vector&lt;int&gt;</code></p>
+<p>而链表，顺序迭代的速度更是费拉不堪，比 <code>vector</code> 和 <code>deque</code> 可能慢 3 倍有余。</p>
+<blockquote>
+<p>链表在工程上已经失去了绝大多数的用武之地。</p>
+</blockquote>
+<p>或许只有你需要保持迭代器的有效性的同时，还要在已知迭代器的情况下进行随机删除的时候 <code>std::list</code> 是一个不错的选择。</p>
+<hr>
+<p>版权声明： CC BY-SA 4.0</p>
+</section><section class="post-meta"><span class="info"><i class="fa fa-calendar"></i> <span class="date">2025-03-30</span>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Code/" title="Code">Code</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/C/" title="C++">C++</a>  </span></section></article><p class="pagination"><a href="/2025/03/27/learn-monads/" title="所以这个 Monads 到底是什么啊之让我学学">Next</a></p><article class="comment-container"><div class="comment-container"><script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js" onload="(new Gitalk({&quot;clientID&quot;:&quot;12a250ac67f452906dd6&quot;,&quot;clientSecret&quot;:&quot;7422a9ecdc933d5e6facbc61d546bced40519f0b&quot;,&quot;repo&quot;:&quot;lhcfl.github.io&quot;,&quot;owner&quot;:&quot;lhcfl&quot;,&quot;admin&quot;:[&quot;lhcfl&quot;],&quot;id&quot;:&quot;小数据的时候 `std::vector&lt;int&gt;` 删除首元素比 deque 和 list 还快&quot;,&quot;distractionFreeMode&quot;:false})).render(&quot;gitalk-comment-slot&quot;)"></script><div id="gitalk-comment-slot">Loading...</div></div></article></main><footer class="footer"><br><p class="powered_by">Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> and <a target="_blank" rel="noopener" href="https://github.com/Lhcfl/hexo-theme-sosimple">SoSimple</a></p></footer></body></html>
