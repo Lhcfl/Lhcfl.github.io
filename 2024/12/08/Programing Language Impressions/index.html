@@ -1,0 +1,224 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Linca"><title>Programing Language Impressions · Zero Calorie Drink Shop</title><meta name="description" content="Impressions of the programming languages I have come across
+
+C ¶
+老登语言，不如说我非常难以理解为什么这玩意几乎就是个汇编的封装器却会成为各大高校的入门教材……？
+C 语言根本谈不上什么设计，因为它可以说就是没有设计。它就是个被造出来的"><meta name="keywords" content="Code"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="mobile-web-app-capable" content="yes"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta id="site_data_static" data-url="/"><meta name="renderer" content="webkit"><link rel="shortcut icon" type="image/x-icon" href="/images/logo.png"><link rel="stylesheet" href="/js_complied/bundle.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><style>:root { --normal-font-face: LXGW WenKai, LXGW WenKai TC, 'Times New Roman', Times, serif; }</style><script src="/js_complied/bundle.js"></script><script>Utils.loadCSS("https://testingcf.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css");
+Utils.loadCSS("https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&display=swap");
+Utils.loadCSS("https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css");
+Utils.loadCSS("/css/font-awesome.min.css");</script><meta name="generator" content="Hexo 7.3.0"></head><body class="post-page"><noscript><link rel="stylesheet" href="https://testingcf.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&amp;display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"></noscript><nav class="nav"><a href="/">Home</a>&nbsp;&nbsp;<a href="/archives">Archives</a>&nbsp;&nbsp;<a href="/tags">Tags</a>&nbsp;&nbsp;<a href="/about">About</a>&nbsp;&nbsp;<a href="/links">Links</a>&nbsp;&nbsp;<a href="/search">Search</a>&nbsp;&nbsp;<a href="javascript:SoSimple.darkLightToggle()">Dark/Light Mode</a></nav><main class="main"><article class="post-container post-full"><header class="post-title"><h1>Programing Language Impressions</h1></header><section class="post-toc"><details open><summary>Menu</summary><div class="toc"><ol class="toclist"><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#C"><span class="toclist-text">C</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#C-2"><span class="toclist-text">C++</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#Crystal"><span class="toclist-text">Crystal</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#Elixir"><span class="toclist-text">Elixir</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#Gleam"><span class="toclist-text">Gleam</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#Haskell"><span class="toclist-text">Haskell</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#Javascript-Typescript"><span class="toclist-text">Javascript &#x2F; Typescript</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#Julia"><span class="toclist-text">Julia</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#Lean-4"><span class="toclist-text">Lean 4</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#Lua"><span class="toclist-text">Lua</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#MoonBit"><span class="toclist-text">MoonBit</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#OCaml"><span class="toclist-text">OCaml</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#Python"><span class="toclist-text">Python</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#Ruby"><span class="toclist-text">Ruby</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#Rust"><span class="toclist-text">Rust</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#Zig"><span class="toclist-text">Zig</span></a></li></ol></div></details></section><section class="post-body"><p>Impressions of the programming languages I have come across</p>
+<span id="more"></span>
+<h3 id="C">C<a class="header-anchor" href="#C"> ¶</a></h3>
+<p>老登语言，不如说我非常难以理解为什么这玩意几乎就是个汇编的封装器却会成为各大高校的入门教材……？</p>
+<p>C 语言根本谈不上什么设计，因为它可以说就是没有设计。它就是个被造出来的人类可读的汇编简记法，然后碰巧火了而已。所以我不承认什么 C 的优秀，C 优秀根本就不在于它是 C，而在于用 C 写的那些 killer app，比如 UNIX。</p>
+<p>的确，实事求是的说，C 语言是最通用、最可移植的语言，但是这并不是因为 C 的设计优秀，恰恰相反其实是因为 C 就是一个汇编的封装，可移植的其实不是“优秀的语法”，而是汇编。如果你要说 C 优秀，那么汇编也优秀。</p>
+<p>关于 C 语言的缺点也许我能说一箩筐。在这里说几个很重要的</p>
+<ul>
+<li>
+<p><strong>类型环绕</strong>： C 的变量类型既不是后置也不是前置，可以说完全就是反人类的环置。C 语言为了省几个标记，整出了一套奇丑无比的类型标记。让我们举个例子</p>
+<pre><code class="hljs language-c"><span class="hljs-type">void</span> (*signal(<span class="hljs-type">int</span>, <span class="hljs-type">void</span>(*)(<span class="hljs-type">int</span>)))(<span class="hljs-type">int</span>);
+</code></pre>
+<p>猜猜它是什么？一个浸淫 C 语言多年的人或许能马上说出来，但我懒得用 C 的类型规则详细解释。总而言之，它的作用是</p>
+<pre><code class="hljs language-rust"><span class="hljs-keyword">fn</span> <span class="hljs-title function_">signal</span>(x: <span class="hljs-type">i32</span>, f: <span class="hljs-title function_ invoke__">fn</span> (sig: <span class="hljs-type">i32</span>)) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">fn</span>(a: <span class="hljs-type">i32</span>);
+</code></pre>
+<pre><code class="hljs language-zig"><span class="hljs-keyword">fn</span><span class="hljs-function"> signal</span>(s: <span class="hljs-type">i32</span>, f: <span class="hljs-operator">*</span><span class="hljs-keyword">const</span> <span class="hljs-keyword">fn</span><span class="hljs-function"> (a</span>: <span class="hljs-type">i32</span>) <span class="hljs-type">void</span>) <span class="hljs-operator">*</span><span class="hljs-keyword">const</span> <span class="hljs-keyword">fn</span><span class="hljs-function"> (a</span>: <span class="hljs-type">i32</span>) <span class="hljs-type">void</span>
+</code></pre>
+<p>类型扭曲成环状，需要你瞻前顾后，解方程一样地解出一个 variable 到底是什么类型。你可别说这是什么构造出的用不上的东西。这是 signal 库函数，《C 陷阱与缺陷》讲过如何逐渐写出这样一个类型。</p>
+<p>这种环置的做法不仅成为了经久不衰的 C 语言考题（在现代的语言里你都不需要考——类型非常直观），而且给 C++ 带来了极大的麻烦，让 C++ 的文法不得不非常复杂。可笑的是，不少习惯了 C 语言的人觉得这种扭曲的环状类型才是自然，反而觉得 typescript 那样的类型后置是错误。</p>
+</li>
+<li>
+<p><strong>简陋</strong>：图灵完备又怎么样？要知道 brainfuck 也是图灵完备的。C 的一大缺点就是它简陋的没话说。没有泛型，很难避免 <code>void*</code> 满天飞。没有 namespace，随时要小心名字冲突。没有哪怕是 <code>defer</code> 这样的东西，错误处理/垃圾回收纯靠 goto 仙人，或者写宏手动把代码压栈这样的奇妙技巧。当然你可以说写 C 就是为了底层为了手动操作内存为了对机器有全面控制——先不说“我能管好内存”的自信带来了多少亿美元的损失，多少个印象深远的 0 day，C 也不是真正的底层啊？<a target="_blank" rel="noopener" href="https://dl.acm.org/doi/pdf/10.1145/3212477.3212479">C Is Not a Low-level Language: Your computer is not a fast PDP-11.</a> 这篇文章讲述了理由：</p>
+<blockquote>
+<p>低级语言的一个共同属性是它们速度很快。特别是，它们应该易于转换为快速代码，而不需要特别复杂的编译器。一个足够聪明的编译器可以使语言变得快的论点是 C 语言的支持者在谈论其他语言时经常不屑一顾的论点。<br>
+不幸的是，提供快速代码的简单翻译对于 C 来说并非如此。尽管处理器架构师投入了英勇的努力来尝试设计能够快速运行 C 代码的芯片，但 C 程序员期望的性能水平只能通过极其复杂的编译器转换才能实现。Clang 编译器（包括 LLVM 的相关部分）大约有 200 万行代码。即使只计算使 C 快速运行所需的分析和转换传递，加起来也接近 200,000 行（不包括注释和空行）。</p>
+</blockquote>
+<p>C 在它诞生的年代确实是底层语言——但现在 ​ 已经 53 年过去了。PDB-11 早就已经成老古董了。现在随便哪家流行 CPU 都有一堆复杂的指令预测，三级缓存，向量计算，而所有这些东西在 C 语言里都需要付出更多的努力来完成，例如，像 Zig 和 Rust 这样的现代底层语言早就提供了原生的向量运算。Rust 的所有权系统也允许编译器做极其激进的优化，where C/C++ 许多人口口相传的是“不要开 O3”——为什么？当然是因为语言提供的约束不足，编译器无从做优化假设，甚至有时候程序员还直接写了未定义行为。</p>
+<p>C 语言程序员，嵌入式的或许不算，但是通用架构下 C 语言根本就很难说是在接近底层。它只是给了人底层的幻觉。</p>
+</li>
+</ul>
+<h3 id="C-2">C++<a class="header-anchor" href="#C-2"> ¶</a></h3>
+<p>Awesome language only when for algorithm competitions. 内存泄露？让它漏呗我们要的是超快速度！</p>
+<p>但是除了算法竞赛以外 C++ 实在是拉胯得让人无话可说。</p>
+<p>其实 C++ 挺遗憾的，C++0x 几乎就是个废物，在 90 年代末相对高级的语言群魔乱舞起来的时候只有 C++ 在那里不思进取吃老本，终于等 C++11 出来了挺大江山已经流失了，笑</p>
+<p>你很难找到一门语言又进步又过时，既简单又难……除了 C++</p>
+<p>可以说 C++ 其实很 fancy，它融入了很多新概念，但是它融入得不够好。都怪那该死的兼容性（乐）。到现在 C++ 的语法可以称得上一句沉重，但是沉重中又没有多少用得上的……</p>
+<p>举个例子吧 <code>std::optional&lt;T&gt;</code>. 这玩意好吗？太好了。Null 的发明者都亲口说 null 完全是<a target="_blank" rel="noopener" href="https://www.infoq.com/presentations/Null-References-The-Billion-Dollar-Mistake-Tony-Hoare/">一次数十亿美元级的错误</a>了。而我得说 C++ 简直就是这场错误的集大成者。C++ 里到处都是类似 Null 的东西。拿特殊的值标记无效的内存区域。灾难中的灾难。</p>
+<p>为此明明有 Rust 可以学的，结果 C++ 就学了一个皮毛——把 <code>optional&lt;T&gt;</code> 抄过来了，然后就不管了。<code>std::map</code> 都有好多不同的取值方式了，什么 <code>[]</code> 在 key 不存在的时候返回默认 constructor，什么 <code>at</code> 抛出 <code>std::out_of_range</code> 异常， <code>find</code> 返回 <code>end</code> 迭代器，妈呀结果就是没有用上 STL 自己的 <code>optional&lt;T&gt;</code> 的——excuse me？所以你弄一个 <code>optional&lt;T&gt;</code> 是为了走时髦吗？</p>
+<p>至于 C++ 很难的问题，其实倒是可以接受，因为 C++ 简单——你可以同时觉得 C++ 简单和难得要死。听上去很离谱，但是是 C++，倒也正常.png</p>
+<p>C++ 就是那种非常适合算法竞赛、非常适合学生上课的语言。反正内存安全去他爹，裸指针乱飞，嵌套结构稍微学学就会，性能还超级高，还封装了一堆常用数据结构，它不火谁火.png</p>
+<p>但是复杂度摆在那里。如果要简单，那就一定有复杂在反面等着你。一门面向底层的语言，讲究极致压榨性能极致压榨空间甚至到处都是直接操作内存、还有超级多历史包袱的语言居然还能做到让一个初学编程的人轻松写出一坨狗屎也能通过编译，那要写出“优雅”的代码它肯定会很难，这一点也不难理解吧。就是它有点难过头了而已。</p>
+<p>很难说如果 C++再这样赶时髦地加入新功能下去是不是某种自取灭亡，只能说希望不是吧</p>
+<details>
+<summary>以下是说怪话时间</summary>
+<p>C++ 真是一门<sup><i>优美</i></sup></big>又<sub><u>简洁</u></sub>的语言啊 真是优优又美美啊</p>
+<p>你看别的语言还在 <code>&lt;T extends U | V&gt;</code> 真是难难又懂懂啊 extends 是什么？竖线又是什么？真是不说人话让人<sup>难</sup>以理<sub>解</sub>呢</p>
+<p>再看我们 C++ 啊跟念诗一样</p>
+<pre><code class="hljs language-cpp"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;
+<span class="hljs-title">requires</span> <span class="hljs-params">(std::is_base_of_v(T, U) <span class="hljs-keyword">or</span> std::is_base_of_v(T, V))</span>
+bar <span class="hljs-title">foo</span><span class="hljs-params">(T&amp;&amp; xyz)</span></span>;
+</code></pre>
+<p>你看我写了一个 T 啊当然是模板啊 又 requires 啊 is base of 就是基类啊 用 or 取代竖线英英又语语啊 哪怕是不懂 C++ 的人看到也能马 ↑ 上 ↓ 理解这是在说什么呢</p>
+<p>真是容易理解呢呢呢这就是我们 C++ 啊真是 CC 又加加啊</p>
+</details>
+<h3 id="Crystal">Crystal<a class="header-anchor" href="#Crystal"> ¶</a></h3>
+<p>截止到本文的上次编辑 Crystal 还是一门非常初生（？）的语言，嗯就是语法描述也不全，生态少得可怜，连编辑器提示都没有，各种地方都透露着种种不成熟</p>
+<p>但这玩意确实是个静态、native 语言，还是 native 语言中的异类，在 native 中做到了可以尽可能地少写类型，而且居然还有类 Ruby 语法，弄得这语言跟个动态语言似的</p>
+<p>非常喜欢的是 Crystal 继承自 Ruby 的一个特性，你可以随意 Reopen 一个 class 然后添加进去自己的方法。甚至官方库都是这样做的，比如 JSON 库：它直接把 int 打开了然后往里面塞了一个 <code>to_json</code> 的成员函数，然后所有 int 就能 to_json 了，非常的好用</p>
+<pre><code class="hljs language-crystal"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Int</span></span>
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">to_json</span></span>(json : <span class="hljs-symbol">JSON:</span>:Builder) : Nil
+    json.number(<span class="hljs-keyword">self</span>)
+  <span class="hljs-keyword">end</span>
+
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">to_json_object_key</span></span> : String
+    to_s
+  <span class="hljs-keyword">end</span>
+<span class="hljs-keyword">end</span>
+</code></pre>
+<p>这个真的很妙，虽然它有一个众所周知的缺点，要克制，小心和别的库添加了冲突的成员函数。但是相比之下这个带来的简直是致命的诱惑，可以通过 reopen 创造非常具有表达力的语法，就像 Rails 做的那样。</p>
+<h3 id="Elixir">Elixir<a class="header-anchor" href="#Elixir"> ¶</a></h3>
+<p>认识 Elixir 是因为在 Fediverse 上知道了 Pleroma 这个软件。Elixir 似乎是借鉴了许多 Ruby 的写法和不错的地方。</p>
+<h3 id="Gleam">Gleam<a class="header-anchor" href="#Gleam"> ¶</a></h3>
+<p>灵感来源于 Rust 的函数式语言。虽然但是，感觉有点……简陋……</p>
+<p>在 tour 里一开始被它的长相骗了，直到看到 Gleam is an <strong>immutable</strong> language, so using the record update syntax does not mutate or otherwise change the original record 才惊觉欸 www 怎么是 immutable 的</p>
+<p>暂且还非常不成熟，所以呈观望态度吧。</p>
+<p>Gleam 语言初见文章见：<a href="/2025/01/06/gleam-intro/">仿生电子锈会梦到自己变成纯函数式吗：gleam 语言初见</a></p>
+<h3 id="Haskell">Haskell<a class="header-anchor" href="#Haskell"> ¶</a></h3>
+<p>纯函数式编程教科书级别语言。</p>
+<p>Haskell 的语法写起来和不是函数式的语言真的完全不一样！在 haskell 里面 <code>a = x</code> 完全不是赋值啊是定义了一个函数 <code>a</code> 返回 <code>x</code> xd</p>
+<h3 id="Javascript-Typescript">Javascript / Typescript<a class="header-anchor" href="#Javascript-Typescript"> ¶</a></h3>
+<p>JavaScript 系的缺点太多我觉得没必要说了，毕竟一个 10 天写出来的语言，蹭 Java 的热度，然后意外成了互联网标准这种事情……只能说这就是现实（）</p>
+<p>简单说些不好的地方：</p>
+<ul>
+<li>没法重载运算符，写带计算的代码很丑陋（不过作为为网页服务的语言，遇到大量计算就上 WASM 了</li>
+<li>你永远不知道是坨什么的 <code>this</code></li>
+<li>到现在都没扯皮出公认的标准，都是 ES6 和 CommonJS 分立</li>
+<li><code>==</code></li>
+</ul>
+<p>JavaScript 系最大的优点大概是非常原生非常友好的 async/await。单线程的设计又让你根本不用在乎资源加锁之类的异步噩梦。</p>
+<p>而且 JavaScript 可能可以说是流行语言里最把 lambda 函数发扬光大的语言。也是动态类型语言里类型标记做的最好的——它甚至演化出了专门的 typescript</p>
+<p>也是因此，TypeScript 的类型系统实在是过于完备了，以至于大家仍然某种习惯于 JS 写法然后通过复杂的体操来保证 JS 写法是类型安全的，这其实有点呃呃</p>
+<p>并且 TypeScript 其实不完全是 null safe 的，比如说</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> <span class="hljs-attr">a</span>: <span class="hljs-built_in">string</span>[] = [];
+a[<span class="hljs-number">1</span>]; <span class="hljs-comment">// ts says string, but actually undefined</span>
+</code></pre>
+<p>typescript 不检查 out of range 的可能性，以至于当你给出 <code>string[]</code> 这样的类型的时候 ts 会认为任何一个 <code>number</code> 作为 index 传入都能得到一个 <code>string</code> —— 但致命的是，实际上翻译出的 js 它可能是 undefined</p>
+<p>这个非常的坑，可以说是 TypeScript 上巨大的一个洞，直接导致 undefined 可以打穿 ts 的类型系统。可惜木已成舟便是了。</p>
+<h3 id="Julia">Julia<a class="header-anchor" href="#Julia"> ¶</a></h3>
+<p>没学了.png</p>
+<p>不太喜欢它把一些常用函数丢到全局里面（比如 length），不过这语言也不是很工业的语言（？），似乎也没什么问题</p>
+<p>函数能管道调用，好评，就爱管道调用（）</p>
+<h3 id="Lean-4">Lean 4<a class="header-anchor" href="#Lean-4"> ¶</a></h3>
+<p>在学.png</p>
+<p>之前一直被这玩意恐怖的语法和恐怖的 unicode 符号吓退了不敢学，但是学起来发现还是很有趣（？</p>
+<p>可以当成定理证明器，也能作为 fp 用</p>
+<p>Lean 4 的开发环境是真的爽啊，右侧直接显示当前所在光标位置需要什么类型，给出的是什么类型（虽然这就是定理证明器要干的事情吧（））</p>
+<p>据说 Haskell 适合学习函数式编程，Lean 4 适合作为实践。实际上感觉……确实（？），Lean 4 的 std 是安装好的，所有类型都可以直接跑去看 std 的源码，享受 clangd/rust analyzer 级别的顶级 lsp 体验（）</p>
+<p>显然这玩意完全就不是一门工程语言，所以就不在工程上评价了，但是 Lean 4 无论是平时做题还是研究抽象还是学习 functional programing 都是极好的！赞了</p>
+<p>虽然入门的时候讨厌符号因为不知道怎么打和是什么意思 但是用起来的时候只能说真香 数学符号真好用（）</p>
+<p>以及，作为 pure functional 语言有 <code>for</code> 和 <code>let mut</code> 这些东西（内部似乎是靠 rebind 和/或 state monad 做到的？），爽爽的，不像 Haskell 上手真的很……需要思维大变（（</p>
+<p>以及，作为学习函数式编程的语言的话，Lean4 编程真的好爽啊！！！！作为交互式定理证明器的它提供了一个非常爽的界面和 <code>#check</code> 和 <code>#eval</code> 接口，允许你快速检查一些复杂表达式的类型和求值。举个例子，看到 <code>List.span</code> 的描述：</p>
+<blockquote>
+<p><code>O(|l|)</code>. <code>span p l</code> splits the list <code>l</code> into two parts, where the first part contains the longest initial segment for which <code>p</code> returns true and the second part is everything else.</p>
+</blockquote>
+<p>你可以随手就写一个</p>
+<pre><code class="hljs language-lean">#eval <span class="hljs-string">&quot;12345abced12345&quot;</span>.data.span (·.isDigit)
+</code></pre>
+<p>右侧就会直接显示运算结果</p>
+<pre><code class="hljs language-lean">([<span class="hljs-string">&#x27;1&#x27;</span>, <span class="hljs-string">&#x27;2&#x27;</span>, <span class="hljs-string">&#x27;3&#x27;</span>, <span class="hljs-string">&#x27;4&#x27;</span>, <span class="hljs-string">&#x27;5&#x27;</span>], [<span class="hljs-string">&#x27;a&#x27;</span>, <span class="hljs-string">&#x27;b&#x27;</span>, <span class="hljs-string">&#x27;c&#x27;</span>, <span class="hljs-string">&#x27;e&#x27;</span>, <span class="hljs-string">&#x27;d&#x27;</span>, <span class="hljs-string">&#x27;1&#x27;</span>, <span class="hljs-string">&#x27;2&#x27;</span>, <span class="hljs-string">&#x27;3&#x27;</span>, <span class="hljs-string">&#x27;4&#x27;</span>, <span class="hljs-string">&#x27;5&#x27;</span>])
+</code></pre>
+<p>这可比 REPL 要爽多了！！！可以说连 jupyter notebook 都做不到这么爽实时交互（毕竟 Lean4 本职工作之一就是交互式定理证明器 233）</p>
+<h3 id="Lua">Lua<a class="header-anchor" href="#Lua"> ¶</a></h3>
+<p>TODO</p>
+<h3 id="MoonBit">MoonBit<a class="header-anchor" href="#MoonBit"> ¶</a></h3>
+<p><a target="_blank" rel="noopener" href="https://www.moonbitlang.com/">https://www.moonbitlang.com/</a></p>
+<p>中国自研编程语言，长得很像带 GC 的 Rust，实际上看上去也确实是带 GC 的 Rust</p>
+<p>语法看下来可以说几乎全抄的 Rust，改改说不定都能直接 cargo run 了（雾），但我完全不觉得这是 MoonBit 的缺点，反而觉得是优点</p>
+<p>如果 MoonBit 能通过各种各样的原因发达起来，一个是继承了 Rust 的各种特性的它基本上可以算作 ML 家族，直接几乎避免了类型错误出现的可能性，相信一定能一定程度上获得人的喜爱，另一方面可以说是像 Rust 和 ML 的敲门砖。觉得 Rust 太难的人或许可以用 MoonBit，二者相辅相成，同时 MoonBit 若能流行又能一定程度上扭转 C family 和 OOP 语言带来的一些走偏了的刻板印象，或能带动人们更加接受 functional 的思想，</p>
+<p>另外 MoonBit 的 functional 似乎比 Rust 做得还好诶，这是官网的示例，可以看出为函数式的写法做了不少优化：</p>
+<pre><code class="hljs language-moonbit"><span class="hljs-keyword">enum</span> <span class="hljs-title class_">Resource</span> &#123;
+  <span class="hljs-title function_ invoke__">Text</span>(<span class="hljs-type">String</span>)
+  <span class="hljs-title function_ invoke__">CSV</span>(content~: <span class="hljs-type">String</span>)
+  Executable
+&#125;
+
+<span class="hljs-keyword">let</span> <span class="hljs-variable">resources</span> : Map[<span class="hljs-type">String</span>, Resource] = &#123;
+  <span class="hljs-string">&quot;hello.txt&quot;</span>: <span class="hljs-title function_ invoke__">Text</span>(<span class="hljs-string">&quot;Hello, world! A long text.&quot;</span>),
+  <span class="hljs-string">&quot;test.csv&quot;</span>: <span class="hljs-title function_ invoke__">CSV</span>(content=<span class="hljs-string">&quot;name, age\nAlice, 25\nBob, 30&quot;</span>),
+  <span class="hljs-string">&quot;ls.exe&quot;</span>: Executable
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span> &#123;
+  resources
+  .<span class="hljs-title function_ invoke__">iter</span>()
+   .<span class="hljs-title function_ invoke__">map_option</span>(<span class="hljs-keyword">fn</span> &#123;
+    (name, <span class="hljs-title function_ invoke__">Text</span>(<span class="hljs-type">str</span>)) | (name, <span class="hljs-title function_ invoke__">CSV</span>(content=<span class="hljs-type">str</span>)) =&gt; <span class="hljs-title function_ invoke__">Some</span>((name, <span class="hljs-type">str</span>))
+    (_, Executable) =&gt; <span class="hljs-literal">None</span>
+  &#125;)
+  .<span class="hljs-title function_ invoke__">map</span>(<span class="hljs-keyword">fn</span> &#123;
+    (name, content) =&gt; &#123;
+      <span class="hljs-keyword">let</span> <span class="hljs-variable">name</span> = name.<span class="hljs-title function_ invoke__">pad_start</span>(<span class="hljs-number">10</span>, <span class="hljs-string">&#x27; &#x27;</span>)
+      <span class="hljs-keyword">let</span> <span class="hljs-variable">content</span> = content
+        .<span class="hljs-title function_ invoke__">pad_end</span>(<span class="hljs-number">10</span>, <span class="hljs-string">&#x27; &#x27;</span>)
+        .<span class="hljs-title function_ invoke__">replace_all</span>(old=<span class="hljs-string">&quot;\n&quot;</span>, new=<span class="hljs-string">&quot; &quot;</span>)
+        .<span class="hljs-title function_ invoke__">substring</span>(start=<span class="hljs-number">0</span>, end=<span class="hljs-number">10</span>)
+      <span class="hljs-string">&quot;\&#123;name&#125;: \&#123;content&#125; ...&quot;</span>
+    &#125;
+  &#125;)
+  .<span class="hljs-title function_ invoke__">intersperse</span>(<span class="hljs-string">&quot;\n&quot;</span>)
+  .<span class="hljs-title function_ invoke__">fold</span>(init=<span class="hljs-string">&quot;Summary:\n&quot;</span>, <span class="hljs-type">String</span>::op_add)
+  |&gt; println
+&#125;
+</code></pre>
+<p>我很喜欢的 <code>|&gt;</code> 记号也是有的</p>
+<h3 id="OCaml">OCaml<a class="header-anchor" href="#OCaml"> ¶</a></h3>
+<p>在学.png</p>
+<p>是 ML(<strong>M</strong>eta <strong>L</strong>anguage)的方言，并非 pure 的函数式语言。</p>
+<p>感觉像是试图变得工业一点，但没完全变（？）。感觉 OCaml 很适合一个已经被 OOP 和 过程式调教好了的人去接触函数式语言，毕竟它不是纯的，只要你想就能爆改状态，但是又鼓励用函数式的方法解决问题。感觉很适合学习函数式（大概吧，学的时候其实我已经逐渐开始函数式化了 可能感受不到之前那种整个世界都不再熟悉的感觉了（）</p>
+<h3 id="Python">Python<a class="header-anchor" href="#Python"> ¶</a></h3>
+<p>Python 的火爆完全来自于优秀的库而不是优秀的语言设计，夸张点说 Python 完全展示了什么叫糟糕的语言设计硬被优秀的库带飞。</p>
+<p>完全不觉得 Python 是很适合工程实践的语言。它更多的是一门教科书语言，类似以前的 BASIC，很适合初学者浅尝辄止地入门，但是稍微复杂一点就完全是噩梦，更何况 Python 的语言设计还很糟糕</p>
+<p>我不喜欢 Python 设计者的审美，比如认为 lambda 函数没有必要可以用具名函数取代。也不喜欢缩进表示一个块。</p>
+<p>并且 Python 真的不思进取。换其它语言如果有这么多优秀的库这么多资金绝对不会放任自己的性能烂成这样，但是 Python 到写下这一段的时候都还没有成熟的 JIT。</p>
+<h3 id="Ruby">Ruby<a class="header-anchor" href="#Ruby"> ¶</a></h3>
+<p>相当优雅的设计，动态到叛逆。我对 Ruby 最大的好感来自它不试图用各种什么哲学什么风格指南约束程序员，如果 Ruby 有哲学，那就是最大的让程序员幸福</p>
+<p>因此写 Ruby 代码确实很舒服——如果抛开过于动态导致的特别容易出运行时类型错误不谈的话……</p>
+<p>Ruby 最使我影响深刻的或许是类似这样的代码</p>
+<pre><code class="hljs language-ruby"><span class="hljs-number">3</span>.times <span class="hljs-keyword">do</span>
+  say <span class="hljs-string">&quot;hello!&quot;</span>
+  sleep <span class="hljs-number">1</span>.seconds
+<span class="hljs-keyword">end</span>
+</code></pre>
+<p>这是我在其他任何语言都没感受到的神奇的 magic，或者说其它语言当然也能写出类似的代码，但只有 Ruby 鼓励这样做，并且到处都是这样做，让整个代码特别具有“阅读感”，哪怕一个什么都不知道的新人看到这样的代码估计也能瞬间理解它在干什么，只是可能不知道具体是什么原理而已。</p>
+<p><a target="_blank" rel="noopener" href="https://rubyonrails.org/doctrine/zh_cn#optimize-for-programmer-happiness">Rails 宣言有说</a>：</p>
+<blockquote>
+<p>另一个例子仅用了些许代码实现，却几乎引发了惊愕的程度。<code>Array#second</code> 到 <code>#fifth</code>（以及挑衅意味的 <code>#forty_two</code>）。这些别名的存取器，非常严重地冒犯了常发表意见的支持者，他们说：这简直太过度设计了（几乎是编程时代的结束），这些写成 <code>Array#[1]</code>、<code>Array#[2]</code>（以及 <code>Array[41]</code>）不就可以了嘛。</p>
+<p>但时至今日，主要的抉择还是，让我自己开心。我喜欢在终端或测试里编写 <code>people.third</code>。不，这不合理，也不高效。可能我有病吧，但这仍能让我发自内心地微笑，满足了这个理念，也丰富了我的人生，帮我在过了 12 年之后，还仍继续参与 Rails。</p>
+</blockquote>
+<p>这个真的非常叛逆，在许多语言都在宣传“做事情只有一个最好的方式”（盯 Python），甚至直接在程序语言上拒绝和故意劣化某些风格的时候，Ruby 的想法缺是做事情可以有很多种方式，程序员来选择最让自己幸福的方式。大家都在把程序员当成 <code>思路 -&gt; 代码</code> 的翻译工具，而 Ruby 选择将程序员视为作家。Ruby 的放纵让人感到某种幸福。</p>
+<p>另外一个令我有些感动的是 Ruby 到现在已经逐渐不再流行，但是仍然在努力做出改善，Ruby YJIT 已经可以进入生产环境并且被 Rails 默认开启。以前 Ruby 最大的诟病是它慢，慢地出奇，比 Python 还慢，但是现在 Ruby 的速度已经逐渐追上的 Python。</p>
+<p>说完优点，Ruby 一个很大的缺点是：你家语言三个闭包.png</p>
+<p>在 Ruby 中有三种不同方式去声明一个闭包，我觉得这完全是没必要的，</p>
+<h3 id="Rust">Rust<a class="header-anchor" href="#Rust"> ¶</a></h3>
+<p>虽然 Rust 社群的名声不好 <s>语言原神</s>，但是不得不承认的是 Rust 是一门非常优秀的语言。我对 Rust 最大的好感度其实不是内存安全性 —— 毕竟合格的程序员应该能用任何语言写出内存安全的代码 —— 而是 Rust 非常优秀的模式匹配和语法。</p>
+<p><code>Option&lt;T&gt;</code> 是现代且优秀的思路，我觉得所有可能带 null 的语言都应该引入它。而 Rust 在这一类功能上做得非常好。虽然 <code>Result&lt;T, E&gt;</code> 和异常的优劣可能有待商榷。但是大部分情况，Rust 的 enum 的设计做得非常的不错，完全改变了 enum 曾经只是个不蕴含实际信息的“标记”的情况。</p>
+<p>如果 rust 没有内存安全作为梗小鬼的吹嘘资本，哪怕是优秀的语法设计也能让它成为一门优秀的语言。</p>
+<p>更新：后面我发现这是来自于 ML 语言家族的特征（xd</p>
+<p>Rust 或许不够优雅（确实不够），但它是 C++ 竞争生态位上的唯一选手（zig 是和 C 在竞争）。原先底层语言+没有 GC 很大程度上就意味着即使是顶尖高手也可能失手写出缓冲区溢出、use after free、线程不安全等种种问题，Rust 提供了一种哪怕是初学者也能保证程序安全的方案，这是它最大的好处，也是最大的竞争力所在。</p>
+<p>同时，Rust 的高性能还直接带来了更多在应用层使用与 C++ 接近的性能的无 GC 原生语言的可能。比如 <a target="_blank" rel="noopener" href="https://discord.com/blog/why-discord-is-switching-from-go-to-rust">Discord 为什么从 Go 迁移到 Rust</a>，在延迟敏感网络服务器上，GC 逐渐变得难以承受的时候，Rust 提供了一种安全的选择从有 GC 迁移到无 GC，这之前很大概率需要更加经验丰富的 C++ 程序员花费更多时间来确保安全性。</p>
+<h3 id="Zig">Zig<a class="header-anchor" href="#Zig"> ¶</a></h3>
+<p>better c，相比 C 而言有出色得多的设计。</p>
+<p>比较喜欢 zig 似乎是从 go 上继承来的思路： <code>defer</code> 关键字，保证在各种情况下退出当前 scope 的时候执行，这意味着相比于 C，Zig 能更简单的确保内存分配总是伴随着释放，更不容易写出内存问题</p>
+<p>比如经常可能看到这样的 zig 代码：</p>
+<pre><code class="hljs language-zig"><span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span><span class="hljs-function"> create</span>(
+    alloc: Allocator,
+) CreateError<span class="hljs-operator">!</span><span class="hljs-operator">*</span>App &#123;
+    <span class="hljs-keyword">var</span> app = <span class="hljs-keyword">try</span> alloc.create(App);
+    <span class="hljs-keyword">errdefer</span> alloc.destroy(app);
+
+    <span class="hljs-comment">// ...</span>
+&#125;
+</code></pre>
+<p>defer 比傻傻的手动在函数最后释放，一不小心还可能忘掉可高级太多了！</p>
+<p>不那么喜欢的是 zig 不支持方便的闭包，或者说，虽然可以写出闭包来但是很麻烦。</p>
+<p>然后 zig 的 compiletime 非常的神奇，我很喜欢这个，编译期间执行任意函数，把编译期干的活和普通代码融合在一起，简直太好用了</p>
+<p>专门为 zig 写了一篇 intro，见：<a href="/2025/02/06/zig-first-experience/">更好的 C 语言：Zig 初体验</a></p>
+</section><section class="post-meta"><span class="info"><i class="fa fa-calendar"></i> <span class="date">2024-12-08</span>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Code/" title="Code">Code</a>  </span></section></article><p class="pagination"><a href="/2024/12/18/pass-test-joke/" title="Introduction to Pass Principles">Previous</a><span>  </span><a href="/2024/12/03/%E8%AE%A8%E5%8E%8CPython%E7%9A%84N%E4%B8%AA%E7%90%86%E7%94%B1/" title="讨厌Python的N个理由">Next</a></p><article class="comment-container"><div class="comment-container"><script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js" onload="(new Gitalk({&quot;clientID&quot;:&quot;12a250ac67f452906dd6&quot;,&quot;clientSecret&quot;:&quot;7422a9ecdc933d5e6facbc61d546bced40519f0b&quot;,&quot;repo&quot;:&quot;lhcfl.github.io&quot;,&quot;owner&quot;:&quot;lhcfl&quot;,&quot;admin&quot;:[&quot;lhcfl&quot;],&quot;id&quot;:&quot;Programing Language Impressions&quot;,&quot;distractionFreeMode&quot;:false})).render(&quot;gitalk-comment-slot&quot;)"></script><div id="gitalk-comment-slot">Loading...</div></div></article></main><footer class="footer"><br><p class="powered_by">Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> and <a target="_blank" rel="noopener" href="https://github.com/Lhcfl/hexo-theme-sosimple">SoSimple</a></p></footer></body></html>

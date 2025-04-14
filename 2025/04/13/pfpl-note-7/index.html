@@ -1,0 +1,52 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Linca"><title>PFPL 笔记 - VI Dynamic Types · Zero Calorie Drink Shop</title><meta name="description" content="笔记 7
+
+Girard’s System F ¶
+之前我们讨论的语言都非常地单态，每个表达式都有独立的一个类型，不支持多态。
+这一章讲了通过 System F i.e. polymorphic typed lambda calculus 如何实现多态的。
+引入一种全称类型，∀ t . τ
+Λ t "><meta name="keywords" content="Blog"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="mobile-web-app-capable" content="yes"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta id="site_data_static" data-url="/"><meta name="renderer" content="webkit"><link rel="shortcut icon" type="image/x-icon" href="/images/logo.png"><link rel="stylesheet" href="/js_complied/bundle.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><style>:root { --normal-font-face: LXGW WenKai, LXGW WenKai TC, 'Times New Roman', Times, serif; }</style><script src="/js_complied/bundle.js"></script><script>Utils.loadCSS("https://testingcf.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css");
+Utils.loadCSS("https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&display=swap");
+Utils.loadCSS("https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css");
+Utils.loadCSS("/css/font-awesome.min.css");</script><meta name="generator" content="Hexo 7.3.0"></head><body class="post-page"><noscript><link rel="stylesheet" href="https://testingcf.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&amp;display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"></noscript><nav class="nav"><a href="/">Home</a>&nbsp;&nbsp;<a href="/archives">Archives</a>&nbsp;&nbsp;<a href="/tags">Tags</a>&nbsp;&nbsp;<a href="/about">About</a>&nbsp;&nbsp;<a href="/links">Links</a>&nbsp;&nbsp;<a href="/search">Search</a>&nbsp;&nbsp;<a href="javascript:SoSimple.darkLightToggle()">Dark/Light Mode</a></nav><main class="main"><article class="post-container post-full"><header class="post-title"><h1>PFPL 笔记 - VI Dynamic Types</h1></header><section class="post-body"><p>笔记 7</p>
+<span id="more"></span>
+<h3 id="Girard’s-System-F">Girard’s System F<a class="header-anchor" href="#Girard’s-System-F"> ¶</a></h3>
+<p>之前我们讨论的语言都非常地单态，每个表达式都有独立的一个类型，不支持多态。</p>
+<p>这一章讲了通过 System F i.e. polymorphic typed lambda calculus 如何实现多态的。</p>
+<p>引入一种全称类型，<code>∀ t . τ</code></p>
+<p><code>Λ t . e</code> 是一个泛型函数，它的类型是一个 <code>∀ t . τ</code></p>
+<p>比如</p>
+<pre><code class="hljs">Λ t . λ (x : t) ↦ x
+</code></pre>
+<p>是一个 polymorphic identity function 具有类型</p>
+<pre><code class="hljs">∀ t . t ↦ t
+</code></pre>
+<p>我们自然的可以把它叫作 unit， 而上面那个函数其实就是 <code>⟨ ⟩</code> 它完全就是 null tuple 因为它是这个类型的唯一个元素</p>
+<p>二元组也能被很好的定义，和 Chapter 17 untyped lambda calculus 一样：</p>
+<pre><code class="hljs">τ₁ × τ₂  ≝ ∀ r . (τ₁ → τ₂ → r) → r
+⟨e₁, e₂⟩ ≝ Λ r . λ (x : τ₁ → τ₂ → r) ↦ x e₁ e₂
+e.l      ≝ e[τ₁] λ (x : τ₁) (y: τ₂) ↦ x
+e.l      ≝ e[τ₂] λ (x : τ₁) (y: τ₂) ↦ y
+</code></pre>
+<p>容易看出这就是 17 章定义的 pair 加上了泛型类型。</p>
+<p>sum type 也是容易定义的，只需要看出来 sum type 可以看作一个函数链，其中只有一个函数是能被调的</p>
+<p><img src="/images/systemf_binary_sum.png" alt="" loading="lazy"></p>
+<p>还有自然数。容易把自然数看成对于泛型 t 的</p>
+<pre><code class="hljs">t -&gt; (t -&gt; t) -&gt; t
+</code></pre>
+<p>比如</p>
+<pre><code class="hljs">zero :: t -&gt; (t -&gt; t) -&gt; t
+zero z s = z
+succ :: nat -&gt; nat
+succ e z s = s(e z s)
+</code></pre>
+<p>由此可知， <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">L</mi><mrow><mo>→</mo><mi mathvariant="normal">∀</mi></mrow></mrow><annotation encoding="application/x-tex">\mathcal{L}{\rightarrow \forall}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathcal">L</span><span class="mord"><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">∀</span></span></span></span></span> 至少具有和 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">L</mi><mrow><mtext>nat </mtext><mo>→</mo></mrow></mrow><annotation encoding="application/x-tex">\mathcal{L}{\text{nat }\rightarrow}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathcal">L</span><span class="mord"><span class="mord text"><span class="mord">nat </span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span></span></span></span></span> 一样的表达力。事实上，它的表达力更强。</p>
+<p>注意到，多态性仅靠类型就能一定程度上推断出行为。例如对于类型 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">∀</mi><mo stretchy="false">(</mo><mi>t</mi><mi mathvariant="normal">.</mi><mi>t</mi><mo>→</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\forall (t. t \to t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∀</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mord">.</span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">t</span><span class="mclose">)</span></span></span></span> 因为我们没有任何关于 t 的信息，为了总是能成立，它只能是 identity function <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Λ</mi><mo stretchy="false">(</mo><mi>t</mi><mi mathvariant="normal">.</mi><mi>λ</mi><mo stretchy="false">(</mo><mi>x</mi><mo>:</mo><mi>t</mi><mo stretchy="false">)</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\Lambda (t. \lambda (x:t) x)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">Λ</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mord">.</span><span class="mord mathnormal">λ</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">t</span><span class="mclose">)</span><span class="mord mathnormal">x</span><span class="mclose">)</span></span></span></span></p>
+<p>参数化理论意味着，我们能够仅凭程序类型推导出关于程序行为的定理。这类定理有时被称为自由定理，因为它们是类型推导的“免费”结果，无需程序分析或验证即可推导。这些定理支撑了多态语言的卓越体验，即类型良好的程序在执行时往往能按预期运行。也就是说，满足类型检查器是正确性的充分条件。参数化对程序行为的限制非常严格，以至于只有相对较少的同类型程序会表现出非预期的行为，从而排除了编写代码时经常出现的一大类错误</p>
+<h3 id="Abstract-Types">Abstract Types<a class="header-anchor" href="#Abstract-Types"> ¶</a></h3>
+<h4 id="Existential-Types">Existential Types<a class="header-anchor" href="#Existential-Types"> ¶</a></h4>
+<p>有了 forall 类型当然就有 exist 类型对吧。</p>
+<p>据说 existential type 在 rust 里的对应是 <code>dyn Trait</code> —— 你不知道具体是什么类型 但是保证了这里存在一个类型 T 满足 Trait. 或者说，存在类型对应一个 trait 而它的一个实例对应一个 impl</p>
+<p>所以</p>
+<p><img src="/images/existential_type.png" alt="" loading="lazy"></p>
+<p>其实 pack 就是构造了一个存在类型</p>
+</section><section class="post-meta"><span class="info"><i class="fa fa-calendar"></i> <span class="date">2025-04-13</span>  </span><span class="info"><i class="fa fa-folder-o"></i> <a href="/categories/Practical-Foundations-for-Programming-Languages/" title="Practical Foundations for Programming Languages">Practical Foundations for Programming Languages</a>  </span></section></article><p class="pagination"><a href="/2025/04/13/lean4-parser-combinator/" title="学习在 Lean4 中使用 Parser Combinator">Next</a></p><article class="comment-container"><div class="comment-container"><script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js" onload="(new Gitalk({&quot;clientID&quot;:&quot;12a250ac67f452906dd6&quot;,&quot;clientSecret&quot;:&quot;7422a9ecdc933d5e6facbc61d546bced40519f0b&quot;,&quot;repo&quot;:&quot;lhcfl.github.io&quot;,&quot;owner&quot;:&quot;lhcfl&quot;,&quot;admin&quot;:[&quot;lhcfl&quot;],&quot;id&quot;:&quot;PFPL 笔记 - VI Dynamic Types&quot;,&quot;distractionFreeMode&quot;:false})).render(&quot;gitalk-comment-slot&quot;)"></script><div id="gitalk-comment-slot">Loading...</div></div></article></main><footer class="footer"><br><p class="powered_by">Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> and <a target="_blank" rel="noopener" href="https://github.com/Lhcfl/hexo-theme-sosimple">SoSimple</a></p></footer></body></html>
