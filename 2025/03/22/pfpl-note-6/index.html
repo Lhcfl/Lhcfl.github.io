@@ -1,0 +1,458 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Linca"><title>PFPL 笔记 - VI Dynamic Types · Zero Calorie Drink Shop</title><meta name="description" content="笔记 6
+最详细的一集，因为我要讲解这部分（摊手
+但是读得很开心！这章真是让我受益匪浅啊！
+
+Chapter 17 The Untyped Lambda Calculus ¶
+许多实际使用的编程语言宣称自己是无类型的（untyped），然而这只是一种假象。这些语言实际上是单一类型的(uni-type"><meta name="keywords" content="Blog"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="mobile-web-app-capable" content="yes"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta id="site_data_static" data-url="/"><meta name="renderer" content="webkit"><link rel="shortcut icon" type="image/x-icon" href="/images/logo.png"><link rel="stylesheet" href="/js_complied/bundle.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><style>:root { --normal-font-face: LXGW WenKai, LXGW WenKai TC, 'Times New Roman', Times, serif; }</style><script src="/js_complied/bundle.js"></script><script>Utils.loadCSS("https://testingcf.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css");
+Utils.loadCSS("https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&display=swap");
+Utils.loadCSS("https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css");
+Utils.loadCSS("/css/font-awesome.min.css");</script><meta name="generator" content="Hexo 7.3.0"></head><body class="post-page"><noscript><link rel="stylesheet" href="https://testingcf.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&amp;display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"></noscript><nav class="nav"><a href="/">Home</a>&nbsp;&nbsp;<a href="/archives">Archives</a>&nbsp;&nbsp;<a href="/tags">Tags</a>&nbsp;&nbsp;<a href="/about">About</a>&nbsp;&nbsp;<a href="/links">Links</a>&nbsp;&nbsp;<a href="/search">Search</a>&nbsp;&nbsp;<a href="javascript:SoSimple.darkLightToggle()">Dark/Light Mode</a></nav><main class="main"><article class="post-container post-full"><header class="post-title"><h1>PFPL 笔记 - VI Dynamic Types</h1></header><section class="post-toc"><details open><summary>Menu</summary><div class="toc"><ol class="toclist"><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#Chapter-17-The-Untyped-Lambda-Calculus"><span class="toclist-text">Chapter 17 The Untyped Lambda Calculus</span></a><ol class="toclist-child"><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#Statics"><span class="toclist-text">Statics</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#Dynamics"><span class="toclist-text">Dynamics</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#Definablity"><span class="toclist-text">Definablity</span></a><ol class="toclist-child"><li class="toclist-item toclist-level-4"><a class="toclist-link" href="#Church-Numerals"><span class="toclist-text">Church Numerals</span></a></li><li class="toclist-item toclist-level-4"><a class="toclist-link" href="#Church-Pairs"><span class="toclist-text">Church Pairs</span></a></li><li class="toclist-item toclist-level-4"><a class="toclist-link" href="#Y-%E7%BB%84%E5%90%88%E5%AD%90"><span class="toclist-text">Y 组合子</span></a></li></ol></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#Scott%E2%80%99s-Theorem"><span class="toclist-text">Scott’s Theorem</span></a><ol class="toclist-child"><li class="toclist-item toclist-level-4"><a class="toclist-link" href="#%E8%BF%99%E9%87%8C%E6%94%BE%E7%82%B9%E6%88%91%E8%87%AA%E5%B7%B1%E7%9A%84%E6%80%9D%E8%80%83%E4%B8%8D%E7%9F%A5%E9%81%93%E5%AF%B9%E4%B8%8D%E5%AF%B9"><span class="toclist-text">这里放点我自己的思考不知道对不对</span></a></li><li class="toclist-item toclist-level-4"><a class="toclist-link" href="#%E8%BF%98%E6%9C%89%E4%B8%80%E4%BA%9B%E6%9C%89%E8%B6%A3%E7%9A%84%E8%A1%A5%E5%85%85"><span class="toclist-text">还有一些有趣的补充</span></a></li></ol></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#Untyped-MeansUni-Typed"><span class="toclist-text">Untyped MeansUni-Typed</span></a></li></ol></li><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#Chapter-18-Dynamic-Typing"><span class="toclist-text">Chapter 18 Dynamic Typing</span></a><ol class="toclist-child"><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#Dynamically-Typed-PCF"><span class="toclist-text">Dynamically Typed PCF</span></a><ol class="toclist-child"><li class="toclist-item toclist-level-4"><a class="toclist-link" href="#Statics-2"><span class="toclist-text">Statics</span></a></li><li class="toclist-item toclist-level-4"><a class="toclist-link" href="#Dynamics-2"><span class="toclist-text">Dynamics</span></a></li></ol></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#Variations-and-Extensions"><span class="toclist-text">Variations and Extensions</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#Critique-of-Dynamic-Typing-%E5%AF%B9%E5%8A%A8%E6%80%81%E7%B1%BB%E5%9E%8B%E7%9A%84%E6%89%B9%E5%88%A4"><span class="toclist-text">Critique of Dynamic Typing - 对动态类型的批判</span></a></li></ol></li><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#Chapter-19-Hybrid-Typing"><span class="toclist-text">Chapter 19 Hybrid Typing</span></a><ol class="toclist-child"><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#A-Hybrid-Language"><span class="toclist-text">A Hybrid Language</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#Dynamic-as-Static-Typing"><span class="toclist-text">Dynamic as Static Typing</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#Optimization-of-Dynamic-Typing"><span class="toclist-text">Optimization of Dynamic Typing</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#Static-Versus-Dynamic-Typing"><span class="toclist-text">Static Versus Dynamic Typing</span></a></li></ol></li></ol></div></details></section><section class="post-body"><p>笔记 6<br>
+最详细的一集，因为我要讲解这部分（摊手<br>
+但是读得很开心！这章真是让我受益匪浅啊！</p>
+<span id="more"></span>
+<h2 id="Chapter-17-The-Untyped-Lambda-Calculus">Chapter 17 The Untyped Lambda Calculus<a class="header-anchor" href="#Chapter-17-The-Untyped-Lambda-Calculus"> ¶</a></h2>
+<p>许多实际使用的编程语言宣称自己是无类型的（untyped），然而这只是一种假象。这些语言实际上是单一类型的(uni-typed)而非无类型。</p>
+<p>Lambda 演算，丘奇于 1930 年提出。它唯一的“特性”就是高阶函数（higher-order function），即：</p>
+<ul>
+<li>
+<p>一切都是函数，</p>
+</li>
+<li>
+<p>每个表达式都可以被应用于一个参数，而该参数本身也必须是一个函数，</p>
+</li>
+<li>
+<p>最终的结果仍然是一个函数。</p>
+</li>
+</ul>
+<p><img src="/images/lambda_calculus.png" alt="" loading="lazy"></p>
+<p>See also: <a target="_blank" rel="noopener" href="https://learnxinyminutes.com/zh-cn/lambda-calculus/">Learn Lambda Calculus in Y Minutes</a></p>
+<h3 id="Statics">Statics<a class="header-anchor" href="#Statics"> ¶</a></h3>
+<p>The statics of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">L</mi><mo stretchy="false">{</mo><mi>λ</mi><mo stretchy="false">}</mo></mrow><annotation encoding="application/x-tex">\mathcal L\{\lambda\}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal">L</span><span class="mopen">{</span><span class="mord mathnormal">λ</span><span class="mclose">}</span></span></span></span> is defined by general hypothetical judgments of the form</p>
+<pre><code class="hljs">x1 ok, x2 ok, ..., xn ok |- u ok
+</code></pre>
+<p>stating that u is a well-formed expression involving the variables x1 ~ xn</p>
+<p><img src="/images/statics_of_lambda_cal.png" alt="" loading="lazy"></p>
+<ul>
+<li>若 <code>x</code> 在环境 Γ 中已声明为合法，则 <code>x</code> 本身是合法的。</li>
+<li>若 <code>u₁</code> 和 <code>u₂</code> 都是合法表达式，则它们的应用 <code>ap(u₁; u₂)</code> 也是合法的。</li>
+<li>若在环境 Γ 下 <code>x ok</code> 则 <code>u ok</code> 则 <code>λ(x . u)</code> 也是合法的。</li>
+</ul>
+<h3 id="Dynamics">Dynamics<a class="header-anchor" href="#Dynamics"> ¶</a></h3>
+<p>λ-演算的 dynamics 不是通过传统的 transition system 来定义，而是通过 equaitonally（至少 PFPL 里这样定义）</p>
+<p>Definitional equality for <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi></mrow><annotation encoding="application/x-tex">L</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">L</span></span></span></span> is a judgment of the form <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Γ</mi><mo>⊢</mo><mi>u</mi><mo separator="true">,</mo><msup><mi>u</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow><annotation encoding="application/x-tex">\Gamma \vdash u, u&#x27;</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord">Γ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⊢</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.9463em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">u</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span>, where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Γ</mi><mo>⊢</mo></mrow><annotation encoding="application/x-tex">\Gamma \vdash</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord">Γ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⊢</span></span></span></span> <code>x1 ok,...,xn ok</code> for some n 0, and u and u’ are terms having at most the variables x1 … xn free. It is inductively defined by the following rules</p>
+<ul>
+<li>
+<p>自反性</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mfrac><mrow></mrow><mrow><mi mathvariant="normal">Γ</mi><mo separator="true">,</mo><mi>u</mi><mtext> ok</mtext><mo>⊢</mo><mi>u</mi><mo>≡</mo><mi>u</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">\dfrac{}{\Gamma, u \text{ ok} \vdash u \equiv u}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.5574em;vertical-align:-0.8804em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.677em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">Γ</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">u</span><span class="mord text"><span class="mord"> ok</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⊢</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal">u</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≡</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal">u</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8804em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+</li>
+<li>
+<p>对称性</p>
+</li>
+</ul>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mfrac><mrow><mi mathvariant="normal">Γ</mi><mo separator="true">,</mo><mi>u</mi><mtext> ok</mtext><mo>⊢</mo><mi>u</mi><mo>≡</mo><msup><mi>u</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow><mrow><mi mathvariant="normal">Γ</mi><mo separator="true">,</mo><mi>u</mi><mtext> ok</mtext><mo>⊢</mo><msup><mi>u</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>≡</mo><mi>u</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">\dfrac{\Gamma, u \text{ ok} \vdash u \equiv u&#x27;}{\Gamma, u \text{ ok} \vdash u&#x27; \equiv u}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.3093em;vertical-align:-0.8804em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.4289em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">Γ</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">u</span><span class="mord text"><span class="mord"> ok</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⊢</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6779em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≡</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal">u</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">Γ</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">u</span><span class="mord text"><span class="mord"> ok</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⊢</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal">u</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≡</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8804em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<ul>
+<li>传递性</li>
+</ul>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mfrac><mrow><mi mathvariant="normal">Γ</mi><mo separator="true">,</mo><mi>u</mi><mtext> ok</mtext><mo>⊢</mo><mi>u</mi><mo>≡</mo><msup><mi>u</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mspace width="1em"/><mi mathvariant="normal">Γ</mi><mo separator="true">,</mo><mi>u</mi><mtext> ok</mtext><mo>⊢</mo><msup><mi>u</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>≡</mo><msup><mi>u</mi><mrow><mo mathvariant="normal">′</mo><mo mathvariant="normal">′</mo></mrow></msup></mrow><mrow><mi mathvariant="normal">Γ</mi><mo separator="true">,</mo><mi>u</mi><mtext> ok</mtext><mo>⊢</mo><mi>u</mi><mo>≡</mo><msup><mi>u</mi><mrow><mo mathvariant="normal">′</mo><mo mathvariant="normal">′</mo></mrow></msup></mrow></mfrac></mrow><annotation encoding="application/x-tex">\dfrac
+{\Gamma, u \text{ ok} \vdash u \equiv u&#x27; \quad \Gamma, u \text{ ok} \vdash u&#x27; \equiv u&#x27;&#x27;}
+{\Gamma, u \text{ ok} \vdash u \equiv u&#x27;&#x27;}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.3093em;vertical-align:-0.8804em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.4289em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">Γ</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">u</span><span class="mord text"><span class="mord"> ok</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⊢</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal">u</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≡</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6779em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′′</span></span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">Γ</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">u</span><span class="mord text"><span class="mord"> ok</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⊢</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal">u</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≡</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:1em;"></span><span class="mord">Γ</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">u</span><span class="mord text"><span class="mord"> ok</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⊢</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≡</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′′</span></span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8804em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<ul>
+<li>……</li>
+</ul>
+<p><img src="/images/dynamics_of_lambda_cal.png" alt="" loading="lazy"></p>
+<p>We often write just <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>u</mi><mo>≡</mo><msup><mi>u</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow><annotation encoding="application/x-tex">u \equiv u&#x27;</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4637em;"></span><span class="mord mathnormal">u</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≡</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7519em;"></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span> when the variables involved need not be emphasized or are clear from context.</p>
+<h3 id="Definablity">Definablity<a class="header-anchor" href="#Definablity"> ¶</a></h3>
+<p>无类型 λ-演算的一个重要特性是它的<strong>表达能力</strong>。它是一个<strong>图灵完备（Turing-complete）</strong> 的语言，也就是说，它和任何已知的编程语言一样，都可以表达自然数上的所有可计算函数。</p>
+<p>Chuch’s Law: 任何可计算的函数都有其 Lambda Calculus 等价表达</p>
+<p>作为例子，我们证明 lambda 演算至少和 PCF 一样强：</p>
+<p>我们可以用 lambda 的形式定义自然数，which 叫 丘奇数</p>
+<h4 id="Church-Numerals">Church Numerals<a class="header-anchor" href="#Church-Numerals"> ¶</a></h4>
+<p>为了懒得打 latex 下面用 <code>\a -&gt; b</code> 表示 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo><mi>b</mi></mrow><annotation encoding="application/x-tex">\lambda(a)b</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">λ</span><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mclose">)</span><span class="mord mathnormal">b</span></span></span></span></p>
+<pre><code class="hljs language-haskell">    <span class="hljs-number">0</span> = \b -&gt; \s -&gt; b
+<span class="hljs-title">n</span> + <span class="hljs-number">1</span> = \b -&gt; \s -&gt; s(n(b)(s))
+</code></pre>
+<p>表示原文的</p>
+<p><img src="/images/church_numerals.png" alt="" loading="lazy"></p>
+<p>注意到，b 可以解释为 blank，或者说初始值， 而 s 可以解释为 successor</p>
+<p>也就是说这里定义了 0 是用 blank 和 successor 两个组合子构造出的一个 lambda，</p>
+<p>这样，运用 successor 到 n(b)(s) i.e. 用 b，s 实例化了的 n 就能得到 n + 1</p>
+<p>另外一个有趣的事情是，当我们得到 n 这个 丘奇数（它自己也是一个函数）的时候，显然 <code>n f g</code> 是 <code>g(g(g(... n个g...(f))))</code>，也就是说这个数字就能用来作为 n-fold</p>
+<p>比如展开后</p>
+<pre><code class="hljs language-haskell"><span class="hljs-number">1</span> = \b -&gt; \s -&gt; s(b)
+<span class="hljs-number">2</span> = \b -&gt; \s -&gt; s(s(b))
+<span class="hljs-number">3</span> = \b -&gt; \s -&gt; s(s(s(b)))
+...
+</code></pre>
+<p>那么自然数运算也就很好理解了</p>
+<p><img src="/images/church_num_op.png" alt="" loading="lazy"></p>
+<p>举例</p>
+<pre><code class="hljs language-haskell"><span class="hljs-title">succ</span> = \x -&gt; \b -&gt; \s -&gt; s(x(b)(s))
+</code></pre>
+<p>故</p>
+<pre><code class="hljs language-haskell"><span class="hljs-title">succ</span> <span class="hljs-number">0</span>  = \b -&gt; \s -&gt; s( <span class="hljs-number">0</span>(b)(s) )
+        = \b -&gt; \s -&gt; s(b)
+        = <span class="hljs-number">1</span>
+</code></pre>
+<pre><code class="hljs language-haskell"><span class="hljs-title">plus</span> = \x -&gt; \y -&gt; y(x)(succ)
+</code></pre>
+<p>可以理解为<br>
+plus x y 就是将 x 作为初始值，调用 y (x) succ 当然就是 “x + y”</p>
+<p>例如，展开 plus 1 2</p>
+<pre><code class="hljs language-haskell">= <span class="hljs-number">1</span>(<span class="hljs-number">2</span>)(succ)
+= (\b -&gt; \s -&gt; s(b))(<span class="hljs-number">2</span>)(succ)
+= succ(s(<span class="hljs-number">2</span>))
+= <span class="hljs-number">3</span>
+</code></pre>
+<p>对于乘法</p>
+<pre><code class="hljs language-haskell"><span class="hljs-title">times</span> = \x -&gt; \y -&gt; y(<span class="hljs-number">0</span>)(plus(x))
+</code></pre>
+<p>则是将原先的 successor 换成了 plus(x) 后的新 y，显然这就是 y * x</p>
+<pre><code class="hljs language-haskell"><span class="hljs-title">times</span> <span class="hljs-number">2</span> <span class="hljs-number">2</span>
+= <span class="hljs-number">2</span>(<span class="hljs-number">0</span>)(plus <span class="hljs-number">2</span>)
+= (\s -&gt; s(s(<span class="hljs-number">0</span>)))(plus <span class="hljs-number">2</span>)
+= plus <span class="hljs-number">2</span> (plus <span class="hljs-number">2</span>) <span class="hljs-number">0</span>
+= <span class="hljs-number">4</span>
+</code></pre>
+<details>
+<summary>一些简单验算</summary>
+<pre><code class="hljs language-haskell"><span class="hljs-title">ghci</span>&gt; b = <span class="hljs-number">0</span>
+<span class="hljs-title">ghci</span>&gt; s x = x+<span class="hljs-number">1</span>
+<span class="hljs-title">ghci</span>&gt; zero = \b -&gt; \s -&gt; b
+<span class="hljs-title">ghci</span>&gt; succ = \x -&gt; \b -&gt; \s -&gt; s(x(b)(s))
+<span class="hljs-title">ghci</span>&gt; ghci&gt; succ zero b s
+<span class="hljs-number">1</span>
+<span class="hljs-title">ghci</span>&gt; plus = \x -&gt; \y -&gt; y(x)(succ)
+<span class="hljs-title">ghci</span>&gt; one = succ zero
+<span class="hljs-title">ghci</span>&gt; one b s
+<span class="hljs-number">1</span>
+<span class="hljs-title">ghci</span>&gt; plus one one b s
+<span class="hljs-number">2</span>
+<span class="hljs-title">ghci</span>&gt; two = succ one
+<span class="hljs-title">ghci</span>&gt; plus one two b s
+<span class="hljs-number">3</span>
+</code></pre>
+</details>
+<p>要定义 <code>ifz(u; u0; x.u1)</code> 需要一些技巧，因为我们需要找到一个前驱函数 <code>pred</code></p>
+<pre><code class="hljs language-haskell"><span class="hljs-title">pred</span> <span class="hljs-number">0</span> = <span class="hljs-number">0</span>
+<span class="hljs-title">pred</span> (n + <span class="hljs-number">1</span>) = n
+</code></pre>
+<p>这并不是听起来那么容易 因为相当于我们需要能把一大坨的高阶函数里的 <code>s(n)</code> 的 <code>n</code> 拿出来，而且还需要考虑 0 的存在</p>
+<p>可以借鉴移位的思想，如果有 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mi>n</mi><mo stretchy="false">)</mo><mo>→</mo><mo stretchy="false">(</mo><mi>n</mi><mo separator="true">,</mo><mi>n</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(n-1, n) \to (n, n+1)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span></span></span></span> 的推导就能很容易拿到 n - 1</p>
+<h4 id="Church-Pairs">Church Pairs<a class="header-anchor" href="#Church-Pairs"> ¶</a></h4>
+<p>先定义丘奇风格的 pair</p>
+<p>(括号好多懒得打……不如把 <code>f(a)(b)</code> 写成 <code>f a b</code> 好了)</p>
+<pre><code class="hljs language-haskell"><span class="hljs-title">pair</span> u1 u2 = \f -&gt; f u1 u2
+
+<span class="hljs-title">left</span>  u = u(\x -&gt; \y -&gt; x)
+<span class="hljs-title">right</span> u = u(\x -&gt; \y -&gt; y)
+</code></pre>
+<p><img src="/images/church_style_pair.png" alt="" loading="lazy"></p>
+<p>然后，注意到我们之前定义的 Church Numeric 的 b 和 s 都是可以替换成任意的实例的！因此，只需要把 <code>&lt;0, 0&gt;</code> 作为 b 传入，就能获得一个带有 predecessor 的 Church numberic.</p>
+<p><img src="/images/church_predecessor.png" alt="" loading="lazy"></p>
+<pre><code class="hljs language-haskell"><span class="hljs-title">pred&#x27;</span> = \x -&gt; x ([<span class="hljs-number">0</span>, <span class="hljs-number">0</span>])(\y -&gt; [right y, succ(right y)])
+<span class="hljs-title">pred</span>  = \x -&gt; right (pred&#x27; x)
+</code></pre>
+<p>这样我们就获取了需要的 pred 函数。这样，ifz 也很好定义了</p>
+<pre><code class="hljs">ifz u, u0, x, u1 = u(u0)(\never -&gt; [(pred u)/x] u1)
+</code></pre>
+<p>现在我们还差 general recursion。一如既往地，lambda calculus 的函数是没有名字的，我们需要得到一个 fix 让 general recursion 存在</p>
+<h4 id="Y-组合子">Y 组合子<a class="header-anchor" href="#Y-组合子"> ¶</a></h4>
+<p>最出名的 fix point combinator 是 Y 组合子</p>
+<p><img src="/images/Ycombinator.png" alt="" loading="lazy"></p>
+<pre><code class="hljs language-haskell"><span class="hljs-type">Y</span> = \<span class="hljs-type">F</span> -&gt; (\f -&gt; <span class="hljs-type">F</span>(f(f))) (\f -&gt; <span class="hljs-type">F</span>(f(f)))
+</code></pre>
+<p>验算</p>
+<pre><code class="hljs language-haskell"><span class="hljs-type">Y</span>(<span class="hljs-type">F</span>)
+= (\f -&gt; <span class="hljs-type">F</span>(f(f)))(\f -&gt; <span class="hljs-type">F</span>(f(f)))
+= <span class="hljs-type">F</span>((f)(f)) <span class="hljs-keyword">where</span> f = \f -&gt; <span class="hljs-type">F</span>(f f)
+= <span class="hljs-type">F</span>(
+  (\f -&gt; <span class="hljs-type">F</span>(f(f)))(\f -&gt; <span class="hljs-type">F</span>(f(f)))
+  )
+= <span class="hljs-type">F</span>(<span class="hljs-type">Y</span>(<span class="hljs-type">F</span>))
+</code></pre>
+<p>看到这里我非常的震撼，人们是如何构造出这样神奇的组合子的？原书接下来做了解释：</p>
+<p>让我们抛开内存和地址空间这些不谈。假如有一个函数</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">fib</span>(<span class="hljs-params">x</span>) &#123;
+  <span class="hljs-keyword">return</span> x &gt; <span class="hljs-number">1</span> ? <span class="hljs-title function_">fib</span>(x - <span class="hljs-number">1</span>) + <span class="hljs-title function_">fib</span>(x - <span class="hljs-number">2</span>) : <span class="hljs-number">1</span>;
+&#125;
+</code></pre>
+<p>现在我们忘记函数可以有名字。为了还能实现递归，自然而然的，我们会尝试加一个参数，self 或者 this 之类的，这样这个函数就知道了自己是什么。</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">tmp</span>(<span class="hljs-params">self, x</span>) &#123;
+  <span class="hljs-keyword">return</span> x &gt; <span class="hljs-number">1</span> ? <span class="hljs-title function_">self</span>(self, x - <span class="hljs-number">1</span>) + <span class="hljs-title function_">self</span>(self, x - <span class="hljs-number">2</span>) : <span class="hljs-number">1</span>;
+&#125;
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">fib</span>(<span class="hljs-params">x</span>) &#123;
+  reutnr <span class="hljs-title function_">tmp</span>(tmp, x);
+&#125;
+</code></pre>
+<p>注意到 <code>tmp(tmp, ...args)</code> 的存在！为了更好看出来，我们把它写成柯里化的 lambda 函数</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> <span class="hljs-title function_">tmp</span> = (<span class="hljs-params">self</span>) =&gt; <span class="hljs-function">(<span class="hljs-params">x</span>) =&gt;</span> &#123;
+  <span class="hljs-keyword">return</span> x &gt; <span class="hljs-number">1</span> ? <span class="hljs-title function_">self</span>(self)(x - <span class="hljs-number">1</span>) + <span class="hljs-title function_">self</span>(self)(x - <span class="hljs-number">2</span>) : <span class="hljs-number">1</span>;
+&#125;;
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">fib_1</span> = (<span class="hljs-params">x</span>) =&gt; &#123;
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">tmp</span>(tmp)(x);
+&#125;;
+<span class="hljs-comment">// 然后 x 可以消掉</span>
+<span class="hljs-keyword">const</span> fib = <span class="hljs-title function_">tmp</span>(tmp);
+<span class="hljs-comment">// fib</span>
+</code></pre>
+<p>因此，对于任何一个我们需要递归的函数 <code>F = \self -&gt; 函数体</code>, 构造</p>
+<pre><code class="hljs language-haskell"><span class="hljs-type">F&#x27;</span> = \f -&gt; <span class="hljs-type">F</span>(f(f))
+</code></pre>
+<p>能帮我们把每次 F 里的 self 换成 self(self)</p>
+<p>此时观察到</p>
+<pre><code class="hljs">F&#x27;(F&#x27;) == F(F&#x27;(F&#x27;))
+</code></pre>
+<p><code>F'(F')</code> 就是我们想要的 F 的不动点。现在把它展开，就得到了</p>
+<pre><code class="hljs">(\f -&gt; F(f(f)))(\f -&gt; F(f(f)))
+</code></pre>
+<p>于是我们就得到了 Y 组合子，可以得到任意 F 的 fixed point</p>
+<h3 id="Scott’s-Theorem">Scott’s Theorem<a class="header-anchor" href="#Scott’s-Theorem"> ¶</a></h3>
+<p>Scott 定理表明：</p>
+<blockquote>
+<p>在无类型 λ-演算中，定义相等性是不可判定的，即不存在算法可以确定两个 λ-项是否相等。</p>
+</blockquote>
+<p><strong>inseparability</strong></p>
+<p><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="script">A</mi><mn>0</mn></msub></mrow><annotation encoding="application/x-tex">\mathcal A_0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathcal">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 和 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="script">A</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">\mathcal A_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathcal">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 是 insparability (不可区分的)，当且仅当没有一个决定性的属性 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">B</mi></mrow><annotation encoding="application/x-tex">\mathcal B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathcal" style="margin-right:0.03041em;">B</span></span></span></span> such that</p>
+<ul>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="script">A</mi><mn>0</mn></msub><mtext> </mtext><mi>u</mi></mrow><annotation encoding="application/x-tex">\mathcal A_0 \ u</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathcal">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace"> </span><span class="mord mathnormal">u</span></span></span></span> implies <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">B</mi><mtext> </mtext><mi>u</mi></mrow><annotation encoding="application/x-tex">\mathcal B \ u</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathcal" style="margin-right:0.03041em;">B</span><span class="mspace"> </span><span class="mord mathnormal">u</span></span></span></span></li>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="script">A</mi><mn>1</mn></msub><mtext> </mtext><mi>u</mi></mrow><annotation encoding="application/x-tex">\mathcal A_1 \ u</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathcal">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace"> </span><span class="mord mathnormal">u</span></span></span></span> implies not the case that <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">B</mi><mtext> </mtext><mi>u</mi></mrow><annotation encoding="application/x-tex">\mathcal B \ u</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathcal" style="margin-right:0.03041em;">B</span><span class="mspace"> </span><span class="mord mathnormal">u</span></span></span></span></li>
+</ul>
+<p><strong>behavioral</strong></p>
+<p><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">A</mi></mrow><annotation encoding="application/x-tex">\mathcal A</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathcal">A</span></span></span></span> 是 behavioral (行为属性)，当且仅当 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>u</mi><mo>≡</mo><msup><mi>u</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow><annotation encoding="application/x-tex">u \equiv u&#x27;</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4637em;"></span><span class="mord mathnormal">u</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≡</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7519em;"></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span> 则 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">A</mi></mrow><annotation encoding="application/x-tex">\mathcal A</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathcal">A</span></span></span></span> iff <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi mathvariant="script">u</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow><annotation encoding="application/x-tex">\mathcal u&#x27;</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7519em;"></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span></p>
+<p>Scott 定理有两部分：</p>
+<ul>
+<li><img src="/images/scott_theorem_1.png" alt="" loading="lazy"></li>
+<li>任何两个非平凡的属性 A 和 B 是不可区分的</li>
+</ul>
+<p>（如果某个属性对所有 untyped terms 都成立，或者对任何 untyped terms 都不成立，则该属性被称为平凡的。）</p>
+<p><img src="/images/lemma17-1.png" alt="" loading="lazy"><br>
+<img src="/images/lemma-17-2.png" alt="" loading="lazy"></p>
+<p>也就是说这里引入了一个构造 v 是 w(x) 的反面，同时根据 lemma 17.1 它又得能接受一个自身到自身，所以矛盾了</p>
+<h4 id="这里放点我自己的思考不知道对不对">这里放点我自己的思考不知道对不对<a class="header-anchor" href="#这里放点我自己的思考不知道对不对"> ¶</a></h4>
+<p>我们应该也能用图灵机的停机问题的思想去证明 Scott 定理。（虽然维基百科说 Scott’s Theorem 比停机问题还早 XD）</p>
+<blockquote>
+<p>在 1936 年邱奇利用 λ 演算给出了对于判定性问题（Entscheidungsproblem）的否定：关于两个 lambda 表达式是否等价的命题，无法由一个“通用的算法”判断，这是不可判定性能够证明的头一个问题，甚至还在停机问题之先。 ——<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%CE%9B%E6%BC%94%E7%AE%97">维基百科</a></p>
+</blockquote>
+<p>首先，Lambda 演算的停机问题也是不可判定的，可以直接照搬图灵机的证明</p>
+<p>定义 λ-演算的停机：给定一个 λ-项 M 如果经过有限步 β-归约后到达一个正常形式（normal-form），即不再能进行 β-约简，则称 M 停机。</p>
+<pre><code class="hljs">如果存在 lambda 演算 Halt 可以判定一个 lambda 演算 F 在参数 args 的时候是否停机，比如
+
+Halt(F)(args) = 0 当F停机
+Halt(F)(args) = 1 当F不停机
+
+则我们可以构造一个 U
+U = \P -&gt; ifz(Halt(P)(P); Y(Y); 0)
+
+则考虑 Halt(U)(U)，
+若 Halt(U)(U) = 0，则 U(U) 应当跑一个无限递归，矛盾
+若 Halt(U)(U) = 1，则 U(U) 应当直接返回0，不停机，矛盾
+
+所以不存在一个lambda演算 Halt 可以判定任意 lambda 演算 F 在参数 args 的时候是否停机。
+</code></pre>
+<p>利用停机问题不可判定性，</p>
+<pre><code class="hljs">如果 lambda 演算 Equiv 能判定两个 lambda 演算是否相同 （相同返回0，不同返回1）
+则构造
+
+A = \f -&gt; \args -&gt; 0
+B = \f -&gt; \args -&gt; ifz(f(args); 0; 0)
+
+（我们假定 f(args) 应该在停机的时候得到一个 church numeral）
+
+那么A 和 B 相同当且仅当 f(args) 停机。Equiv 规约到停机问题，故不存在。
+</code></pre>
+<h4 id="还有一些有趣的补充">还有一些有趣的补充<a class="header-anchor" href="#还有一些有趣的补充"> ¶</a></h4>
+<blockquote>
+<p>无类型的 λ 演算系统被证明在用于逻辑系统的时候是不自洽的——在 1935 年斯蒂芬·科尔·克莱尼和 J. B. Rosser 举出了 Kleene-Rosser 悖论</p>
+</blockquote>
+<p>考虑 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo>=</mo><mi>λ</mi><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">)</mo><mi mathvariant="normal">¬</mi><mi>f</mi><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">P = \lambda (f) \neg f(f)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">λ</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mclose">)</span><span class="mord">¬</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mclose">)</span></span></span></span> 则 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo stretchy="false">(</mo><mi>P</mi><mo stretchy="false">)</mo><mo>=</mo><mi mathvariant="normal">¬</mi><mi>P</mi><mo stretchy="false">(</mo><mi>P</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">P(P) = \neg P(P)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">¬</span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mclose">)</span></span></span></span> 所以我们可以找到一个等于其否定的项。</p>
+<p>这提醒我们，有必要清楚地区分哪些 lambda 项可以代表命题，哪些 lambda 不能，这导致了项的类型概念。</p>
+<h3 id="Untyped-MeansUni-Typed">Untyped MeansUni-Typed<a class="header-anchor" href="#Untyped-MeansUni-Typed"> ¶</a></h3>
+<p>无类型的 λ 演算可以被忠实地嵌入到具有递归类型的类型语言中。这意味着每个无类型 λ 项都可以表示为一个带类型的表达式，使得表示的执行对应于项自身的执行。</p>
+<p>这种嵌入并不是通过在 L 中编写一个解释器（这当然是可以实现的），而是通过直接将无类型 λ 项表示为具有递归类型的带类型表达式。</p>
+<p>关键观察是：无类型的 λ 演算实际上是单类型的 λ 演算。赋予其强大功能的并非类型缺失，而是它只有一个类型，即递归类型</p>
+<pre><code class="hljs">D = μt.t → t
+</code></pre>
+<p>D 类型的值形式为 fold(e)，其中 e 是 D→D 类型的值——一个其定义域和值域均为 D 的函数。-任何这样的函数都可以“卷起”被视为 D 类型的值，而任何 D 类型的值都可以“展开”转换为函数。递归类型通常可以被视为类型同构方程的解，此处的方程是 D = D → D。这表明 D 是一个与其自身上的函数空间同构的类型，这在传统的集合论中是不可能的，但在基于计算的 λ 演算环境中是可行的。</p>
+<p><img src="/images/lambda_into_lang.png" alt="" loading="lazy"></p>
+<p>由此可见，所谓的无类型语言 L{ lambda } 尽管在术语上与类型语言相对立，实际上仍然是一种带类型的语言。无类型语言并非消除了类型，而是将无限集合的类型合并为一个递归类型。这使得静态类型检查变得 trivial，但代价是在值与递归类型之间进行强制转换时带来了显著的动态开销。</p>
+<p>在第 18 章中，我们将更进一步，允许许多不同类型的值（而不仅仅是函数），每种类型都是“主”递归类型的组成部分。这表明所谓的动态类型语言实际上是静态类型语言。因此，这一传统区别几乎不能被视为对立，因为动态语言不过是静态语言的一种特殊形式，强调了一个递归类型。</p>
+<h2 id="Chapter-18-Dynamic-Typing">Chapter 18 Dynamic Typing<a class="header-anchor" href="#Chapter-18-Dynamic-Typing"> ¶</a></h2>
+<p>17 章介绍了 untyped lambda calculus，其中所有 term 都同构于一个函数。因此，不会因为值的误用而发生运行时错误，因为所有参数都是函数。</p>
+<p>但一旦语言中允许不止一类值，这个特性就会失效。例如，如果我们将自然数作为 primitive 添加到无类型演算中（而不是通过 Church 编码定义它们），那么尝试将数字应用于参数或将函数添加到数字时可能会引发运行时错误。</p>
+<p>语言设计中的一种思想流派是将这种缺点转化为优点，即采用一种具有单一类型 (type), 多个值类 (value class) 的计算模型。这种语言被称为动态类型语言，与静态类型语言相对立。但这种所谓的对立是虚幻的：正如所谓的 untyped 演算实际上是 uni-typed 类型的一样，动态语言最终也只是静态语言的受限形式。这句话非常重要，值得重复：<strong>每种动态语言本质上都是静态语言，我们将自己限制在（不必要的）受限类型规则中以确保安全。</strong></p>
+<h3 id="Dynamically-Typed-PCF">Dynamically Typed PCF<a class="header-anchor" href="#Dynamically-Typed-PCF"> ¶</a></h3>
+<p>Dynamically typed version of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">L</mi><mo stretchy="false">{</mo><mtext>nat</mtext><mo>⇀</mo><mo stretchy="false">}</mo></mrow><annotation encoding="application/x-tex">\mathcal L \{\text{nat} \rightharpoonup \}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal">L</span><span class="mopen">{</span><span class="mord text"><span class="mord">nat</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⇀</span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mclose">}</span></span></span></span> called <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">L</mi><mo stretchy="false">{</mo><mi>d</mi><mi>y</mi><mi>n</mi><mo stretchy="false">}</mo></mrow><annotation encoding="application/x-tex">\mathcal L \{dyn\}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal">L</span><span class="mopen">{</span><span class="mord mathnormal">d</span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mord mathnormal">n</span><span class="mclose">}</span></span></span></span></p>
+<p><img src="/images/dynamically_typed_pcf.png" alt="" loading="lazy"></p>
+<p>现在我们有两种 value： numbers 和 functions。succ 和 zero 不是值，在这里是一种算符，来产生 value.</p>
+<p>递归虽然可以用 fixed point combinator 定义，但是我们这里把它定义成原型类型 (primitive) 来简化 chapter 18.3 中的分析。</p>
+<p>对于这些动态语言来说，具体语法往往具有欺骗性，因为它掩盖了抽象语法的一个重要细节：即每个值都标有一个在运行时发挥重要作用的分类器(classifier)（我们很快就会看到）。</p>
+<p>因此，尽管数字 n 的具体语法只是单纯地 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>n</mi><mo stretchy="true">‾</mo></mover></mrow><annotation encoding="application/x-tex">\overline n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6306em;"></span><span class="mord overline"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6306em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">n</span></span></span><span style="top:-3.5506em;"><span class="pstrut" style="height:3em;"></span><span class="overline-line" style="border-bottom-width:0.04em;"></span></span></span></span></span></span></span></span></span> ，但抽象语法表明该数字被标记为<strong>类别(class)</strong> num，以表明该值属于数字类别。这样做是为了将其与函数值区分开来，函数值具体具有形式 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mi>d</mi></mrow><annotation encoding="application/x-tex">\lambda (x) d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">λ</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mord mathnormal">d</span></span></span></span>，但其抽象语法 fun 表示要用标签 fun 对其进行分类，以将其与数字区分开来。</p>
+<blockquote>
+<p>注：这里你可以认为 tag 是变量类别 class（而非类型，type）的 id</p>
+</blockquote>
+<p>这种标记在任何动态语言中都是至关重要的，因此，在下文中密切关注抽象形式非常重要。</p>
+<h4 id="Statics-2">Statics<a class="header-anchor" href="#Statics-2"> ¶</a></h4>
+<p>显然。而之前一样，只需要检验一下 expression 里面有没有自由变量就行。</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub><mtext> ok</mtext><mo separator="true">,</mo><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mo separator="true">,</mo><msub><mi>x</mi><mi>n</mi></msub><mtext> ok</mtext><mo>⊢</mo><mi>d</mi><mtext> ok</mtext></mrow><annotation encoding="application/x-tex">x_1 \text{ ok}, ..., x_n \text{ ok} \vdash d \text{ ok}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord text"><span class="mord"> ok</span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">...</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord text"><span class="mord"> ok</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⊢</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">d</span><span class="mord text"><span class="mord"> ok</span></span></span></span></span></span></p>
+<h4 id="Dynamics-2">Dynamics<a class="header-anchor" href="#Dynamics-2"> ¶</a></h4>
+<p>作为动态语言的 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">L</mi><mo stretchy="false">{</mo><mi>d</mi><mi>y</mi><mi>n</mi><mo stretchy="false">}</mo></mrow><annotation encoding="application/x-tex">\mathcal L \{dyn\}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal">L</span><span class="mopen">{</span><span class="mord mathnormal">d</span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mord mathnormal">n</span><span class="mclose">}</span></span></span></span> 需要检查之前 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">L</mi><mo stretchy="false">{</mo><mtext>nat</mtext><mo>⇀</mo><mo stretchy="false">}</mo></mrow><annotation encoding="application/x-tex">\mathcal L \{\text{nat} \rightharpoonup \}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal">L</span><span class="mopen">{</span><span class="mord text"><span class="mord">nat</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⇀</span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mclose">}</span></span></span></span> 永远不可能发生的一些错误。比如，函数调用的时候需要判断一下那个被调用的是不是真的是一个函数。</p>
+<p><img src="/images/dynamics_of_dynamic_pcf.png" alt="" loading="lazy"></p>
+<p>注意后四条判断只有在 d val 的时候有意义。这些 affirmative class checking judgments 第二个参数代表的是 value 的底层结构，它本身不是 value。</p>
+<p><img src="/images/judgments_dynamic_pcf.png" alt="" loading="lazy"></p>
+<p><strong>Lemma 18.1</strong> (Class Checking) 如果 d val 则</p>
+<ul>
+<li>either d is_num for some n or d isnt_num;</li>
+<li>either d is_fun x.d’ for some x and d’, or d isnt_fun</li>
+</ul>
+<p>证明显然。</p>
+<p><strong>Theorem 18.2</strong> (Progress): If d ok then either d val or d err, or there exists d’ such that <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo>↦</mo><msup><mi>d</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow><annotation encoding="application/x-tex">d \mapsto d&#x27;</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7054em;vertical-align:-0.011em;"></span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">↦</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7519em;"></span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span></p>
+<p><strong>Theorem 18.3</strong> (Exclusivity): 对此语言中的任意 d ，下面恰有一个成立：d val, d err, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo>↦</mo><msup><mi>d</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow><annotation encoding="application/x-tex">d \mapsto d&#x27;</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7054em;vertical-align:-0.011em;"></span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">↦</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7519em;"></span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span> for some d’</p>
+<h3 id="Variations-and-Extensions">Variations and Extensions<a class="header-anchor" href="#Variations-and-Extensions"> ¶</a></h3>
+<p>在之前的 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">L</mi><mo stretchy="false">{</mo><mtext>nat</mtext><mo>⇀</mo><mo stretchy="false">}</mo></mrow><annotation encoding="application/x-tex">\mathcal L \{\text{nat} \rightharpoonup \}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal">L</span><span class="mopen">{</span><span class="mord text"><span class="mord">nat</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⇀</span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mclose">}</span></span></span></span> 中我们使用 zero 和 succ 来定义 nat。在 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">L</mi><mo stretchy="false">{</mo><mi>d</mi><mi>y</mi><mi>n</mi><mo stretchy="false">}</mo></mrow><annotation encoding="application/x-tex">\mathcal L \{dyn\}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal">L</span><span class="mopen">{</span><span class="mord mathnormal">d</span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mord mathnormal">n</span><span class="mclose">}</span></span></span></span> 中，我们直接定义了 numberals。这样做是为了确保只有一个数字类，而不是 zero 和 succ 两个单独的 class。</p>
+<p>另一种方法是将 zero 和 succ(d) 视为两个单独 class 的值，并为它们分别引入 class checking 判断。这会使错误检查规则复杂化，并允许出现有问题的值，例如 <code>succ(lambda (x)d)</code>，但它允许我们避免使用 class of numbers。当以这种风格书写时，条件分支的 dynamics 如下所示：</p>
+<p><img src="/images/variations_and_extensions_1.png" alt="" loading="lazy"></p>
+<p>注意 successor class 的前驱不一定要是一个 number，虽然我们前面的公式不可能产生这种可能性。</p>
+<p>接下来结构化数据也是容易加入的。</p>
+<p><img src="/images/variations_and_extensions_2.png" alt="" loading="lazy"></p>
+<p>注意上面这个函数，显然，你可以直接把任何值用在这两个函数上，无论它们是不是列表。如果 arg1 不是列表，会产生错误并终止，但是该函数不会遍历参数 arg2，所以 arg2 是任何值都可以。</p>
+<p>有人会觉得，用 null 来分辨 pair 不是合适的，因为这语言包含不止这两种 classes。一种可能的手段是，完全放弃 pattern matching 想法，直接用 general 的 conditional branch 去分辨 null</p>
+<p><img src="/images/variations_and_extensions_3.png" alt="" loading="lazy"></p>
+<blockquote>
+<p>此处引入一个小插曲：为什么叫 cons 和 car 和 cdr 呢？<s>小编也很好奇</s></p>
+<p>这是来自 lisp 的习惯，在 1950s Lisp 最早被实现的时候，car 和 cdr 分别是两个寄存器：</p>
+<ul>
+<li>car (“contents of the address part of register number”) “寄存器号地址部分的内容”</li>
+<li>cdr (“contents of the decrement part of register number”), “寄存器号递减部分的内容”</li>
+</ul>
+<p>而 cons 直接是 constructor 的缩写，指的是 list 的构造子</p>
+</blockquote>
+<p>现在 append 可以用下面的公式给出：</p>
+<pre><code class="hljs">fix a is \x -&gt; \y -&gt; cond(x; cons(car(x); a(cdr(x))(y)); y)
+</code></pre>
+<details>
+<summary>看不太清的话就是</summary>
+<pre><code class="hljs language-haskell"><span class="hljs-title">append</span> x y = <span class="hljs-keyword">case</span> cond x <span class="hljs-keyword">of</span>
+  anyhow -&gt; cons (car x) (append (cdr x) y)
+  nil -&gt; y
+</code></pre>
+</details>
+<p>这种 append 公式的行为与之前的公式没有什么不同；唯一的区别是，我们不再根据值是否为 nil 或 pair 来进行分派，而是根据值的谓词来进行区分，其中包括特殊情况的检查。</p>
+<p>还有另一种方式，即增强而非限制条件分支，让它包含语言中所有可能的值类别，比如在具有 <code>num</code>, <code>fun</code>, <code>null</code>, <code>pair</code> 的的语言中，条件将会有四个分支。这种方法的困难是，现实语言中会有许多数据类型，这样会非常笨重。</p>
+<p>此外，即使我们已经对值的类别进行了指派，与该类别的原始操作也需要进行运行时检查，例如，我们可以确定值 d 属于数字类，但没有办法将此信息传播到条件分支中。加法运算仍然必须检查 d 的类别，获取底层数字，并创建一个新的数字类值。这是动态语言的固有限制，它不允许处理除分类值之外的其他值</p>
+<h3 id="Critique-of-Dynamic-Typing-对动态类型的批判">Critique of Dynamic Typing - 对动态类型的批判<a class="header-anchor" href="#Critique-of-Dynamic-Typing-对动态类型的批判"> ¶</a></h3>
+<p>像 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">L</mi><mo stretchy="false">{</mo><mi>d</mi><mi>y</mi><mi>n</mi><mo stretchy="false">}</mo></mrow><annotation encoding="application/x-tex">\mathcal L \{dyn\}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal">L</span><span class="mopen">{</span><span class="mord mathnormal">d</span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mord mathnormal">n</span><span class="mclose">}</span></span></span></span> 这样的语言的 safety theorem 经常被宣传为动态类型相比于静态类型的优势。与排除了某些类型错误的静态语言不同， <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">L</mi><mo stretchy="false">{</mo><mi>d</mi><mi>y</mi><mi>n</mi><mo stretchy="false">}</mo></mrow><annotation encoding="application/x-tex">\mathcal L \{dyn\}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal">L</span><span class="mopen">{</span><span class="mord mathnormal">d</span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mord mathnormal">n</span><span class="mclose">}</span></span></span></span> 中的每一段抽象语法基本上都是格式良好的，因此，根据定理 18.2，具有定义良好的动态性。</p>
+<p>但这也可以看作是一个缺点，因为在 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">L</mi><mo stretchy="false">{</mo><mi>d</mi><mi>y</mi><mi>n</mi><mo stretchy="false">}</mo></mrow><annotation encoding="application/x-tex">\mathcal L \{dyn\}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal">L</span><span class="mopen">{</span><span class="mord mathnormal">d</span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mord mathnormal">n</span><span class="mclose">}</span></span></span></span> 中，本该通过类型检查在编译时排除的错误直到运行时才会显现。并且为了实现这一点， <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">L</mi><mo stretchy="false">{</mo><mi>d</mi><mi>y</mi><mi>n</mi><mo stretchy="false">}</mo></mrow><annotation encoding="application/x-tex">\mathcal L \{dyn\}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal">L</span><span class="mopen">{</span><span class="mord mathnormal">d</span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mord mathnormal">n</span><span class="mclose">}</span></span></span></span> 的 dynamic 必须强制执行静态类型语言中不需要检查的条件。</p>
+<p>考虑加法</p>
+<pre><code class="hljs">\x -&gt; fix p is \y -&gt; ifz y &#123; zero =&gt; x | succ(y&#x27;) =&gt; succ(p(y&#x27;))&#125;
+</code></pre>
+<p>注意到，fix pointer 把 p 绑定到了该函数，这意味着在递归调用中，ap(p) 的动态检查总是会成功，但是 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">L</mi><mo stretchy="false">{</mo><mi>d</mi><mi>y</mi><mi>n</mi><mo stretchy="false">}</mo></mrow><annotation encoding="application/x-tex">\mathcal L \{dyn\}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal">L</span><span class="mopen">{</span><span class="mord mathnormal">d</span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mord mathnormal">n</span><span class="mclose">}</span></span></span></span> 没有办法取消这种冗余检查，因为它没有能力表达 that “p 始终的将绑定到一个不变的 function”。</p>
+<p>其次，内部的 lambda-abstraction 的 apply 要么是 x，要么是 x 的递归的 successor。也就是说除了基本情况外后面的情况都可以保证通过 class check，但我们没有能力表达这一点，successor 只能每次都老老实实地进行 class check</p>
+<p>Classification 不是免费的——tag 需要存储空间，每次使用时都需要花时间将类与值分离，每次创建类时又需要花时间将类附加到值上。虽然分类的开销不是渐近显著的（它只会使程序变慢一个常数），但它仍然是不可忽略的，应该尽可能消除。但这在 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">L</mi><mo stretchy="false">{</mo><mi>d</mi><mi>y</mi><mi>n</mi><mo stretchy="false">}</mo></mrow><annotation encoding="application/x-tex">\mathcal L \{dyn\}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal">L</span><span class="mopen">{</span><span class="mord mathnormal">d</span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mord mathnormal">n</span><span class="mclose">}</span></span></span></span> 中是不可能的，因为它无法表达所需不变量所需的限制。</p>
+<p>为此，我们需要一个静态类型系统。</p>
+<h2 id="Chapter-19-Hybrid-Typing">Chapter 19 Hybrid Typing<a class="header-anchor" href="#Chapter-19-Hybrid-Typing"> ¶</a></h2>
+<p>混合语言是一种将静态类型和动态类型相结合的语言，它通过为静态类型语言添加一个独特的动态值类型 dyn 来丰富它。</p>
+<p>第 18 章中讨论的动态类型语言可以通过将动态类型程序视为 dyn 类型的静态类型程序来嵌入到混合语言中。这表明静态类型和动态类型并不相互对立，而是可以和谐共存。</p>
+<p>然而，混合语言的概念本身就是虚幻的，因为 dyn 类型实际上是一种特殊的递归类型。不需要任何特殊的机制来支持动态类型。相反，它们可以从更一般的递归类型概念中派生出来。此外，这表明<strong>动态类型只是静态类型的一种使用方式</strong>。因此，动态类型和静态类型之间的所谓对立是一种谬论。动态类型只是静态类型的一种特殊情况。</p>
+<h3 id="A-Hybrid-Language">A Hybrid Language<a class="header-anchor" href="#A-Hybrid-Language"> ¶</a></h3>
+<p><img src="/images/hybrid_language.png" alt="" loading="lazy"></p>
+<p>这里的 new 当然和 C++ 里的不一样，这里的 new 是添加一个 classifier 到 value，而 cast 是检查这个 classifier，然后返回对应的 value。</p>
+<p><img src="/images/statics_and_dynamics_of_hybrid_language.png" alt="" loading="lazy"></p>
+<p>几个定理：</p>
+<p><img src="/images/lemmas_and_theorems_of_hybrid_language.png" alt="" loading="lazy"></p>
+<p>有 sum type 和 recursive type 的语言里 dyn 不需要是一个 primitive。</p>
+<p><img src="/images/dyn_by_sum_and_recursive_type.png" alt="" loading="lazy"></p>
+<h3 id="Dynamic-as-Static-Typing">Dynamic as Static Typing<a class="header-anchor" href="#Dynamic-as-Static-Typing"> ¶</a></h3>
+<p><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">L</mi><mo stretchy="false">{</mo><mi>d</mi><mi>y</mi><mi>n</mi><mo stretchy="false">}</mo></mrow><annotation encoding="application/x-tex">\mathcal L \{dyn\}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal">L</span><span class="mopen">{</span><span class="mord mathnormal">d</span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mord mathnormal">n</span><span class="mclose">}</span></span></span></span> 可以嵌入到 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">L</mi><mo stretchy="false">{</mo><mtext>nat dyn </mtext><mo>⇀</mo><mo stretchy="false">}</mo></mrow><annotation encoding="application/x-tex">\mathcal L \{\text{nat dyn } \rightharpoonup\}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal">L</span><span class="mopen">{</span><span class="mord text"><span class="mord">nat dyn </span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⇀</span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mclose">}</span></span></span></span> 中，只需要一个简单的翻译</p>
+<p><img src="/images/dynamic_as_static_typing.png" alt="" loading="lazy"></p>
+<h3 id="Optimization-of-Dynamic-Typing">Optimization of Dynamic Typing<a class="header-anchor" href="#Optimization-of-Dynamic-Typing"> ¶</a></h3>
+<p>考虑之前提到的那个加法函数。</p>
+<p><img src="/images/optimization_of_dynamic_typing.png" alt="" loading="lazy"></p>
+<p>我们之前已经指出它具有大量可以在静态类型版本中消除的开销。消除这些开销需要静态类型</p>
+<blockquote>
+<p>由于动态语言只能表示一种类型的值，因此不可能在动态语言中表达优化后的形式。动态语言所声称的自由——即由于省略了类型而带来的灵活性——实际上对语言的表达能力施加了严重的限制，相比之下，具有动态值类型的静态语言则更具表现力。</p>
+</blockquote>
+<p>首先，关于前文所说 p 绑定递归的低效性。我们只需要简单地把 p 的类型改成 <code>dyn -&gt; dyn</code> 就能直接表达 p 是一个作用于动态值函数的不变量。</p>
+<pre><code class="hljs">fun ! λ (x : dyn) fun ! fix p : dyn -&gt; dyn is λ (y : dyn) e&#x27;(x,p,y&#x27;)
+</code></pre>
+<p>其中 <code>e'(x,p,y')</code> 是</p>
+<pre><code class="hljs">ifz (y ? num) &#123; zero ⇒ x | succ(y&#x27;) ⇒ num ! (s(p(num! y&#x27;) ? num)) &#125;.
+</code></pre>
+<p>这样，循环内部的 p 就无须 tag check 了。</p>
+<p>接下来，观察到类型为 <code>dyn</code> 的参数 <code>y</code> 在每次循环迭代时都会被转换为一个数字，然后才会被测试是否为零。由于此函数是递归的，参数 <code>y</code> 在两种情况下会绑定到值：</p>
+<ol>
+<li>在最初调用加法函数时。</li>
+<li>在每次递归调用时。</li>
+</ol>
+<p>但是，递归调用是在 <code>y</code> 的 predecessor 上进行的，而前驱一定是一个自然数。在调用点上，它被标记为 <code>num</code>，但在下一次迭代的条件检查中却会被移除。这表明，我们应该在循环外部就对 <code>y</code> 进行类型转换，避免在递归调用中对参数进行类型转换。</p>
+<p>这样做会改变函数的类型，从 <code>dyn -&gt; dyn</code> 变为 <code>nat -&gt; dyn</code>。因此，还需要进一步更改，以确保整个函数保持类型正确。</p>
+<p>继续观察。递归调用的结果会进行检查，以确保其类别是 <code>num</code>，然后对底层值进行递增，并将其标记为 <code>num</code>。如果递归调用的结果来自条件语句的这个分支，则显然类别检查是多余的，因为我们已经知道它必须具有 <code>num</code> 类别。但如果结果来自条件语句的另一个分支呢？在这种情况下，函数返回 <code>x</code>，但 <code>x</code> 不一定是 <code>num</code>，因为它是由函数的调用者提供的。然而，我们可以合理地认为，向加法函数传递非数值参数是一个错误。这可以通过将条件分支中的 <code>x</code> 替换为 <code>x ? num</code> 来强制执行。</p>
+<p>结合这些优化，我们得到内循环 <code>e''(x)</code> 的最终形式如下：</p>
+<pre><code class="hljs">fix p : nat -&gt; nat is λ (y : nat) ifz y &#123; zero ⇒ x ? num | succ(y&#x27;) ⇒ s(p(y&#x27;)) &#125;.
+</code></pre>
+<p>这个函数的类型是 nat -&gt; nat，并且在应用于自然数时会以全速运行——所有的检查都已经从内部循环中移除。</p>
+<p>最后，回顾一下我们的整体目标：我们希望定义一个加法函数，该函数作用于 <code>dyn</code> 类型的值。因此，我们需要一个 <code>dyn -&gt; dyn</code> 的值，而当前我们得到的是 <code>nat -&gt; nat</code>。可以通过在前面预加一个 num 类型转换，并在后面加一个 num 类型的强制转换来获得所需的形式：</p>
+<pre><code class="hljs">fun ! λ (x : dyn) fun ! λ (y : dyn) num ! (e&#x27;&#x27;(x) (y ? num)).
+</code></pre>
+<p>最内层的 λ-抽象 通过组合类检查将 e’'(x) 从 <code>nat -&gt; nat</code> 转换为 <code>dyn -&gt; dyn</code>，确保 <code>y</code> 在初始调用时是一个自然数，并将结果重新标记为 <code>dyn</code>。</p>
+<p>这些转换的结果是，计算的内部循环可以“全速”运行，不需要对函数或数字进行 tag check。而加法函数的最外层仍然保持为 <code>dyn</code> 类型的值，它封装了一个柯里化函数，接收两个 <code>dyn</code> 类型的参数。这种方式保留了所有对加法函数的调用的正确性，即传递和返回 <code>dyn</code> 类型的值，同时优化其执行过程。</p>
+<p>当然，我们还可以去除加法函数的类标签，将其类型从 <code>dyn</code> 更改为更具描述性的 <code>dyn -&gt; dyn -&gt; dyn</code>。但这要求调用者不能将加法视为 <code>dyn</code> 类型的值，而必须将其视为一个函数，该函数必须依次应用于两个 <code>dyn</code> 类型的值，并且它们的 class 必须是 num。如果程序员可以控制在哪里调用该函数，就可以进行这样的转换，并不会有什么问题。只有在可能存在程序员无法直接控制的外部 call 时，才有必要将加法函数封装为 <code>dyn</code> 类型的值。</p>
+<p>从这个原则出发，我们可以得出一个更广泛的结论：动态类型的作用仅限于系统的“边缘”，即那些涉及不受控制的调用的地方。在系统的内部，仅使用 dyn 类型没有任何好处，反而会带来相当大的弊端。</p>
+<h3 id="Static-Versus-Dynamic-Typing">Static Versus Dynamic Typing<a class="header-anchor" href="#Static-Versus-Dynamic-Typing"> ¶</a></h3>
+<p>动态类型的支持者曾试图通过各种方式区分动态语言和静态语言。我们可以从当前的视角来重新审视这些所谓的区别。</p>
+<ul>
+<li>
+<p><strong>“动态语言将类型与值关联，而静态语言将类型与变量关联。”</strong><br>
+但这种说法是错误的，源于将“类型”（types）与“类别”（classes）混淆的错误认识。动态语言实际上是通过标记（tagging）来将 class 与 value 关联，比如使用 <code>num</code> 和 <code>fun</code> 这样的标识符。这种分类方法本质上等同于在静态类型语言中使用递归和 sum types。因此，这并不是动态语言的一个独特特性。此外，静态语言不仅为变量分配类型，还为表达式分配类型。由于动态语言本质上是一种特殊的静态语言（仅包含单一类型），因此它们同样也为表达式分配类型。</p>
+<p>举一点现实语言的例子。比如 C 标准库的 qsort 为</p>
+<pre><code class="hljs language-c"><span class="hljs-type">void</span> <span class="hljs-title function_">qsort</span><span class="hljs-params">(
+    <span class="hljs-type">void</span>* ptr, <span class="hljs-type">size_t</span> count, <span class="hljs-type">size_t</span> size,
+    <span class="hljs-type">int</span> (*comp)(<span class="hljs-type">const</span> <span class="hljs-type">void</span>*, <span class="hljs-type">const</span> <span class="hljs-type">void</span>*)
+)</span>;
+</code></pre>
+<p>其实这里的 <code>void*</code> 就充当了某种 <code>dyn</code> 的作用。C++ 中也有更现代的 <code>std::any</code></p>
+<pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;any&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span>
+<span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;
+  std::any a = <span class="hljs-number">1</span>;
+  std::cout &lt;&lt; a.<span class="hljs-built_in">type</span>().<span class="hljs-built_in">name</span>() &lt;&lt; <span class="hljs-string">&quot;: &quot;</span> &lt;&lt; std::<span class="hljs-built_in">any_cast</span>&lt;<span class="hljs-type">int</span>&gt;(a) &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;
+  a = <span class="hljs-number">3.14</span>;
+  std::cout &lt;&lt; a.<span class="hljs-built_in">type</span>().<span class="hljs-built_in">name</span>() &lt;&lt; <span class="hljs-string">&quot;: &quot;</span> &lt;&lt; std::<span class="hljs-built_in">any_cast</span>&lt;<span class="hljs-type">double</span>&gt;(a) &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;
+  a = <span class="hljs-literal">true</span>;
+  std::cout &lt;&lt; a.<span class="hljs-built_in">type</span>().<span class="hljs-built_in">name</span>() &lt;&lt; <span class="hljs-string">&quot;: &quot;</span> &lt;&lt; std::<span class="hljs-built_in">any_cast</span>&lt;<span class="hljs-type">bool</span>&gt;(a) &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;
+
+  <span class="hljs-comment">// Outputs:</span>
+  <span class="hljs-comment">// double: 3.14</span>
+  <span class="hljs-comment">// bool: true</span>
+  <span class="hljs-comment">// bad any_cast</span>
+&#125;
+</code></pre>
+</li>
+<li>
+<p><strong>“动态语言在运行时检查类型，而静态语言在编译时检查类型。”</strong><br>
+这也是一个错误的说法。动态语言和静态语言在本质上都是静态类型的，只不过动态语言采用了一种退化的类型系统，即只有一个类型。如我们所见，动态语言确实会在运行时进行类别检查（class checks），但静态语言中如果允许 sum types，同样也需要执行类别检查。真正的区别仅在于类别检查的使用范围：在动态语言中，类别检查是始终必须的；而在静态语言中，类别检查只在必要时才会进行。</p>
+</li>
+<li>
+<p><strong>“动态语言支持异构集合，而静态语言只支持同构集合。”</strong></p>
+<p>（这句话说的是，你可以在动态语言中构造 <code>[1, true, &quot;foo&quot;, &#123; bar: null &#125;]</code> 这样元素类型不同的集合，而这些人认为静态语言中做不到这一点）</p>
+<p>这同样是一个错误的说法。静态语言中的 sum types 本来就是用于支持异构数据的，任何支持 sum type 的静态语言都可以表示异构数据结构。例如，考虑以下列表：</p>
+<pre><code class="hljs">cons(num(1); cons(fun(λ(x)x); nil))
+</code></pre>
+<p>有人认为在静态语言中无法表示这样的列表，因为它的元素类型不同。然而，无论是在静态语言还是动态语言中，这种列表实际上都是类型同构（<em>type</em> homogeneous）的，只不过它的元素类别可能是异构（<em>class</em> heterogeneous）的。在上述列表中，所有元素的类型都是 <code>dyn</code>，但第一个元素的类别是 <code>num</code>，第二个元素的类别是 <code>fun</code>。</p>
+<p>在这里我们甚至也能给出一个现实生活的例子： <a target="_blank" rel="noopener" href="https://crystal-lang.org/">Crystal 语言</a>。一个编译的、native 的静态语言。它支持以类型 itself 为 tag 的 sum type（或者被叫作 union type），所以你很容易写出</p>
+<pre><code class="hljs language-crystal">arr = [] <span class="hljs-keyword">of</span> (Int32 | String)
+arr.push(<span class="hljs-number">1</span>)
+arr.push(<span class="hljs-string">&quot;qwq&quot;</span>)
+puts arr <span class="hljs-comment"># 输出 [1, &quot;qwq&quot;]</span>
+</code></pre>
+<p>这很好的打破了这句话。</p>
+</li>
+</ul>
+<p>所以，我们该如何看待动态语言和静态语言之间的这种所谓的区别呢？</p>
+<p>与其说它们是对立的，不如说动态语言实际上是静态语言的一种使用方式。每一种动态语言本质上都是一种静态语言，只不过它的类型系统极为有限（只有一个类型！）。然而，正如我们之前所看到的，类型对于程序的正确性和效率至关重要，它们不仅用于表达程序的不变性（invariants），还用于强制执行这些不变性。因此，动态语言的“自由”实际上是一种受限的自由，牺牲了类型信息所能提供的优势。</p>
+<hr>
+<p>版权声明： CC BY-NC-SA 4.0</p>
+</section><section class="post-meta"><span class="info"><i class="fa fa-calendar"></i> <span class="date">2025-03-22</span>  </span><span class="info"><i class="fa fa-folder-o"></i> <a href="/categories/Practical-Foundations-for-Programming-Languages/" title="Practical Foundations for Programming Languages">Practical Foundations for Programming Languages</a>  </span></section></article><p class="pagination"><a href="/2025/03/27/learn-monads/" title="所以这个 Monads 到底是什么啊之让我学学">Previous</a><span>  </span><a href="/2025/03/21/pfpl-note-5/" title="PFPL 笔记 - V Infinite Data Types">Next</a></p><article class="comment-container"><div class="comment-container"><script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js" onload="(new Gitalk({&quot;clientID&quot;:&quot;12a250ac67f452906dd6&quot;,&quot;clientSecret&quot;:&quot;7422a9ecdc933d5e6facbc61d546bced40519f0b&quot;,&quot;repo&quot;:&quot;lhcfl.github.io&quot;,&quot;owner&quot;:&quot;lhcfl&quot;,&quot;admin&quot;:[&quot;lhcfl&quot;],&quot;id&quot;:&quot;PFPL 笔记 - VI Dynamic Types&quot;,&quot;distractionFreeMode&quot;:false})).render(&quot;gitalk-comment-slot&quot;)"></script><div id="gitalk-comment-slot">Loading...</div></div></article></main><footer class="footer"><br><p class="powered_by">Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> and <a target="_blank" rel="noopener" href="https://github.com/Lhcfl/hexo-theme-sosimple">SoSimple</a></p></footer></body></html>

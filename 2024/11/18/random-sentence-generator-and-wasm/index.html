@@ -1,0 +1,426 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Linca"><title>随机句子生成器与一场有趣的WASM尝试 · Zero Calorie Drink Shop</title><meta name="description" content="一时兴起想写一个随机句子生成器。正巧在学上下文无关语言 (Context-Free Language, CFL)，意识到句子的结构很大程度上是一个上下文无关语法。查阅 X-bar 理论得到也确实类似如此。
+同时正好在学 Rust，所以试了一下拿 Rust 编写这个生成器，并编译到 WebAssemb"><meta name="keywords" content="Code,Frontend,Rust"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="mobile-web-app-capable" content="yes"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta id="site_data_static" data-url="/"><meta name="renderer" content="webkit"><link rel="shortcut icon" type="image/x-icon" href="/images/logo.png"><link rel="stylesheet" href="/js_complied/bundle.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><style>:root { --normal-font-face: LXGW WenKai, LXGW WenKai TC, 'Times New Roman', Times, serif; }</style><script src="/js_complied/bundle.js"></script><script>Utils.loadCSS("https://testingcf.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css");
+Utils.loadCSS("https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&display=swap");
+Utils.loadCSS("https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css");
+Utils.loadCSS("/css/font-awesome.min.css");</script><meta name="generator" content="Hexo 7.3.0"></head><body class="post-page"><noscript><link rel="stylesheet" href="https://testingcf.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&amp;display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"></noscript><nav class="nav"><a href="/">Home</a>&nbsp;&nbsp;<a href="/archives">Archives</a>&nbsp;&nbsp;<a href="/tags">Tags</a>&nbsp;&nbsp;<a href="/about">About</a>&nbsp;&nbsp;<a href="/links">Links</a>&nbsp;&nbsp;<a href="/search">Search</a>&nbsp;&nbsp;<a href="javascript:SoSimple.darkLightToggle()">Dark/Light Mode</a></nav><main class="main"><article class="post-container post-full"><header class="post-title"><h1>随机句子生成器与一场有趣的WASM尝试</h1></header><section class="post-toc"><details open><summary>Menu</summary><div class="toc"><ol class="toclist"><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#Context-Free-Language"><span class="toclist-text">Context Free Language</span></a></li><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#CFG-of-natural-language-grammar"><span class="toclist-text">CFG of natural language grammar</span></a></li><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#Implement-by-Rust"><span class="toclist-text">Implement by Rust</span></a></li><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#WASM"><span class="toclist-text">WASM</span></a></li></ol></div></details></section><section class="post-body"><p>一时兴起想写一个随机句子生成器。正巧在学上下文无关语言 (Context-Free Language, <strong>CFL</strong>)，意识到句子的结构很大程度上是一个上下文无关语法。查阅<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/X-bar%E7%90%86%E8%AE%BA"> X-bar 理论</a>得到也确实类似如此。</p>
+<p>同时正好在学 Rust，所以试了一下拿 Rust 编写这个生成器，并<a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/WebAssembly/Rust_to_Wasm">编译到 WebAssembly (<strong>WASM</strong>)</a>。效果很成功！</p>
+<span id="more"></span>
+<h2 id="Context-Free-Language">Context Free Language<a class="header-anchor" href="#Context-Free-Language"> ¶</a></h2>
+<p>A context-free grammar is a notation for describing languages.<br>
+It is more powerful than finite automata or RE’s, but still cannot define all possible languages.<br>
+Useful for nested structures, e.g., parentheses in programming languages. But it also works for natural language.</p>
+<p>The basic idea of CFL to use “variables” to stand for sets of strings (i.e., languages). These variables are defined recursively, in terms of one another. The recursive rules (“productions”) involve only concatenation.</p>
+<p>Lets start with a example. Consider these productions:</p>
+<ul>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mo>→</mo><mn>01</mn></mrow><annotation encoding="application/x-tex">S \to 01</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">01</span></span></span></span></li>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mo>→</mo><mn>0</mn><mi>S</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">S \to 0S1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">0</span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mord">1</span></span></span></span></li>
+</ul>
+<p>It means <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>01</mn></mrow><annotation encoding="application/x-tex">01</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">01</span></span></span></span> is in the language. And recursively, if <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>w</mi></mrow><annotation encoding="application/x-tex">w</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span></span></span></span> is in the language, then so is <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0</mn><mi>w</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">0w1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mord">1</span></span></span></span>.</p>
+<p>Definations:</p>
+<ul>
+<li><strong>Terminals</strong>: symbols of the alphabet of the language being defined.</li>
+<li><strong>Variables</strong> (nonterminals): a finite set of other symbols, each of which represents a language.</li>
+<li><strong>Start symbol</strong>: the variable whose language is the one being defined.</li>
+</ul>
+<p>A <em>production</em> has the form <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext>variable (head)</mtext><mo>→</mo><mtext>string of variables and terminals (body)</mtext></mrow><annotation encoding="application/x-tex">\text{variable (head)} \to \text{string of variables and terminals (body)}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">variable (head)</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">string of variables and terminals (body)</span></span></span></span></span>. Then we <em>derive</em> strings in the language of a CFG by starting with the start symbol, and repeatedly replacing some variable <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi></mrow><annotation encoding="application/x-tex">A</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span></span></span></span> by the body of one of its productions.</p>
+<p>For example,</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>S</mi><mo>→</mo><mn>0</mn><mi>S</mi><mn>1</mn><mo>→</mo><mn>00</mn><mi>S</mi><mn>11</mn><mo>→</mo><mn>000</mn><mi>S</mi><mn>111</mn><mo>→</mo><mn>00001111</mn></mrow><annotation encoding="application/x-tex">S \to 0S1 \to 00S11 \to 000S111 \to 00001111
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">0</span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">00</span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mord">11</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">000</span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mord">111</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">00001111</span></span></span></span></span></p>
+<p>We are not going to introduce CFL in detail, so let’s talk about how does it related to natural language. Let us consider a classic subject-verb-object structure (SVO), where a sentence consists of a subject, a verb, and an object in that order.</p>
+<ul>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mtext>sentence</mtext></msub><mo>→</mo><mi>S</mi><mi>V</mi><mi>O</mi></mrow><annotation encoding="application/x-tex">S_\text{sentence} \to SVO</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord text mtight"><span class="mord mtight">sentence</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mord mathnormal" style="margin-right:0.22222em;">V</span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span></span></span></span></li>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mo>→</mo><mtext>我</mtext></mrow><annotation encoding="application/x-tex">S \to 我</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">我</span></span></span></span></li>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mo>→</mo><mtext>打</mtext></mrow><annotation encoding="application/x-tex">V \to 打</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.22222em;">V</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">打</span></span></span></span></li>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo>→</mo><mtext>宿傩</mtext></mrow><annotation encoding="application/x-tex">O \to 宿傩</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">宿傩</span></span></span></span></li>
+</ul>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>S</mi><mtext>sentence</mtext></msub><mo>→</mo><mi>S</mi><mi>V</mi><mi>O</mi><mo>→</mo><mtext>我</mtext><mi>V</mi><mi>O</mi><mo>→</mo><mtext>我打</mtext><mi>O</mi><mo>→</mo><mtext>我打宿傩</mtext></mrow><annotation encoding="application/x-tex">S_\text{sentence} \to SVO \to 我VO \to 我打O \to 我打宿傩
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord text mtight"><span class="mord mtight">sentence</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mord mathnormal" style="margin-right:0.22222em;">V</span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">我</span><span class="mord mathnormal" style="margin-right:0.22222em;">V</span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">我打</span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">我打宿傩</span></span></span></span></span></p>
+<h2 id="CFG-of-natural-language-grammar">CFG of natural language grammar<a class="header-anchor" href="#CFG-of-natural-language-grammar"> ¶</a></h2>
+<p>现在继续考虑自然语言。我们只考虑最简单的句子结构，不考虑时态、时体的话，可以构造这样一个 CFG</p>
+<ul>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mo>→</mo><msub><mi>N</mi><mi>P</mi></msub><msub><mi>V</mi><mi>P</mi></msub><mspace width="2em"/></mrow><annotation encoding="application/x-tex">S \to N_PV_P \qquad</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">P</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.22222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">P</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:2em;"></span></span></span></span> (句子 → 名词短语 + 动词短语)</li>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mi>P</mi></msub><mo>→</mo><mi>N</mi><mspace width="2em"/></mrow><annotation encoding="application/x-tex">N_P \to N \qquad</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">P</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mspace" style="margin-right:2em;"></span></span></span></span> (纯名词)</li>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mi>P</mi></msub><mo>→</mo><msub><mi>A</mi><mrow><mi>a</mi><mi>d</mi><mi>j</mi></mrow></msub><mi>N</mi><mspace width="2em"/></mrow><annotation encoding="application/x-tex">N_P \to A_{adj}N \qquad</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">P</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight">d</span><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mspace" style="margin-right:2em;"></span></span></span></span> (形容词 + 名词)</li>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>V</mi><mi>P</mi></msub><mo>→</mo><mi>V</mi><mspace width="2em"/></mrow><annotation encoding="application/x-tex">V_P \to V \qquad</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.22222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">P</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.22222em;">V</span><span class="mspace" style="margin-right:2em;"></span></span></span></span></li>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>V</mi><mi>P</mi></msub><mo>→</mo><msub><mi>A</mi><mrow><mi>a</mi><mi>d</mi><mi>v</mi></mrow></msub><mi>V</mi><mspace width="2em"/></mrow><annotation encoding="application/x-tex">V_P \to A_{adv}V \qquad</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.22222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">P</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight">d</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">v</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.22222em;">V</span><span class="mspace" style="margin-right:2em;"></span></span></span></span></li>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mo>→</mo><msub><mi>V</mi><mrow><mi>i</mi><mi>n</mi><mi>t</mi></mrow></msub><mspace width="2em"/></mrow><annotation encoding="application/x-tex">V \to V_{int} \qquad</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.22222em;">V</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.22222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">in</span><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:2em;"></span></span></span></span> (不及物动词 e.g. 上班)</li>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mo>→</mo><msub><mi>V</mi><mrow><mi>t</mi><mi>r</mi><mi>a</mi></mrow></msub><msub><mi>N</mi><mi>P</mi></msub><mspace width="2em"/></mrow><annotation encoding="application/x-tex">V \to V_{tra}N_P \qquad</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.22222em;">V</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.22222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span><span class="mord mathnormal mtight">a</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">P</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:2em;"></span></span></span></span> (及物动词 e.g. 打宿傩)</li>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mo>→</mo><msub><mi>V</mi><mrow><mi>d</mi><mi>i</mi><mi>t</mi></mrow></msub><msub><mi>N</mi><mi>P</mi></msub><msub><mi>N</mi><mi>P</mi></msub><mspace width="2em"/></mrow><annotation encoding="application/x-tex">V \to V_{dit}N_PN_P \qquad</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.22222em;">V</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.22222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">d</span><span class="mord mathnormal mtight">i</span><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">P</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">P</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:2em;"></span></span></span></span> (双宾语及物动词 e.g. 给它一本书)</li>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>A</mi><mrow><mi>a</mi><mi>d</mi><mi>j</mi></mrow></msub><mo>→</mo><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">A_{adj} \to ...</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight">d</span><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.1056em;"></span><span class="mord">...</span></span></span></span></li>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo>→</mo><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">N \to ...</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.1056em;"></span><span class="mord">...</span></span></span></span></li>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>V</mi><mrow><mi>i</mi><mi>n</mi><mi>t</mi></mrow></msub><mo>→</mo><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">V_{int} \to ...</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.22222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">in</span><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.1056em;"></span><span class="mord">...</span></span></span></span></li>
+</ul>
+<p>现在考虑一个从句也可以修饰一个名词，例如 “<u>打宿傩</u>的我”，因此又可以构造回环</p>
+<ul>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mi>p</mi></msub><mo>→</mo><msub><mi>V</mi><mi>P</mi></msub><mtext>的</mtext><mi>N</mi></mrow><annotation encoding="application/x-tex">N_p \to V_P\text{的}N</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">p</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.22222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">P</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord text"><span class="mord cjk_fallback">的</span></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span></span></span></span></li>
+</ul>
+<h2 id="Implement-by-Rust">Implement by Rust<a class="header-anchor" href="#Implement-by-Rust"> ¶</a></h2>
+<p>现在已经有了 CFG，需要考虑的是如何实现它。显而易见的，我们可以用一个 <code>enum</code> 存放可能出现的 Variables，并用 <code>match</code> 匹配 terminals. 因此我们能写出类似这样的代码：</p>
+<pre><code class="hljs language-rust"><span class="hljs-keyword">enum</span> <span class="hljs-title class_">CFGSymbol</span> &#123;
+    Sentence,
+    NP,
+    VP,
+    N,
+    VInt,
+    VTra,
+    VDit,
+    ADJ,
+    ADV,
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">expand_str</span>(symbol: &amp;CFGSymbol) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">Option</span>&lt;&amp;<span class="hljs-symbol">&#x27;static</span> [&amp;<span class="hljs-symbol">&#x27;static</span> <span class="hljs-type">str</span>]&gt; &#123;
+    <span class="hljs-title function_ invoke__">Some</span>(<span class="hljs-keyword">match</span> symbol &#123;
+        N =&gt; &amp;[<span class="hljs-string">&quot;小豆泥&quot;</span>, <span class="hljs-string">&quot;薯条&quot;</span>, <span class="hljs-string">&quot;葡萄&quot;</span>, <span class="hljs-string">&quot;咖啡&quot;</span>],
+        VInt =&gt; &amp;[<span class="hljs-string">&quot;上班&quot;</span>, <span class="hljs-string">&quot;发疯&quot;</span>],
+        VTra =&gt; &amp;[<span class="hljs-string">&quot;吃&quot;</span>, <span class="hljs-string">&quot;摸&quot;</span>],
+        VDit =&gt; &amp;[<span class="hljs-string">&quot;给&quot;</span>, <span class="hljs-string">&quot;送给&quot;</span>],
+        ADJ =&gt; &amp;[<span class="hljs-string">&quot;可爱的&quot;</span>, <span class="hljs-string">&quot;好吃的&quot;</span>],
+        ADV =&gt; &amp;[<span class="hljs-string">&quot;超大声地&quot;</span>, <span class="hljs-string">&quot;超小声地&quot;</span>],
+        _ =&gt; <span class="hljs-keyword">return</span> <span class="hljs-literal">None</span>,
+    &#125;)
+&#125;
+</code></pre>
+<p>关于 Rules，如果打算用常量存储，就不能用 <code>Vec</code>。但没关系，我们可以用固定的数组配合元组描述一个规则。可以让</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>S</mi><mo>→</mo><msub><mi>A</mi><mn>1</mn></msub><msub><mi>A</mi><mn>2</mn></msub><msub><mi>A</mi><mn>3</mn></msub><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><msub><mi>A</mi><mi>n</mi></msub></mrow><annotation encoding="application/x-tex">S \to A_1A_2A_3...A_n
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">...</span><span class="mord"><span class="mord mathnormal">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></p>
+<p>写作</p>
+<pre><code class="hljs language-rust">(S, &amp;[A1, A2, <span class="hljs-comment">/* ... */</span>, An])
+</code></pre>
+<p>于是我们可以写出 CFG 规则</p>
+<pre><code class="hljs language-rust"><span class="hljs-keyword">const</span> CFG_RULES: &amp;[(CFGSymbol, &amp;[CFGSymbol])] = &amp;[
+    (Sentence, &amp;[NP, VP]),
+    (NP, &amp;[Ns]),
+    (Ns, &amp;[N]),
+    (Ns, &amp;[ADJ, N]),
+    (Ns, &amp;[VP, CharDe, N]),
+    (Ns, &amp;[ADJ, N]),
+    (VP, &amp;[Vs]),
+    (VP, &amp;[ADV, Vs]),
+    (Vs, &amp;[VInts]),
+    (Vs, &amp;[VTras]),
+    (Vs, &amp;[VDits]),
+    (VInts, &amp;[VInt]),
+    (VTras, &amp;[VTra, NP]),
+    (VDits, &amp;[VDitts, NP, NP]),
+];
+</code></pre>
+<p>剩下的工作就简单了：从规则一条条推导，随机选择一条推导规则继续，直到所有 Symbol 都是 terminal 就生成了一条随机的句子。</p>
+<details>
+<summary>完整代码（没必要看的）</summary>
+<pre><code class="hljs language-rust"><span class="hljs-keyword">extern</span> <span class="hljs-keyword">crate</span> rand;
+<span class="hljs-keyword">extern</span> <span class="hljs-keyword">crate</span> wasm_bindgen;
+<span class="hljs-keyword">use</span> rand::seq::SliceRandom;
+<span class="hljs-keyword">use</span> wasm_bindgen::prelude::*;
+
+<span class="hljs-meta">#[derive(std::fmt::Debug, PartialEq, Eq)]</span>
+<span class="hljs-keyword">enum</span> <span class="hljs-title class_">CFGSymbol</span> &#123;
+    <span class="hljs-comment">/// 句子</span>
+    Sentence,
+    <span class="hljs-comment">/// 名词短语</span>
+    NP,
+    Ns,
+    <span class="hljs-comment">/// noun. 名词</span>
+    N,
+    <span class="hljs-comment">/// 动词短语</span>
+    VP,
+    Vs,
+    <span class="hljs-comment">/// adj. 形容词</span>
+    ADJ,
+    <span class="hljs-comment">/// Transitive （单宾语）及物动词</span>
+    VTra,
+    <span class="hljs-comment">/// 单宾语及物动词，后置</span>
+    VTra2,
+    VTras,
+    <span class="hljs-comment">/// Intransitive 不及物动词</span>
+    VInt,
+    VInts,
+    <span class="hljs-comment">/// Ditransitive 双宾语及物</span>
+    VDit,
+    VDitts,
+    VDits,
+    <span class="hljs-comment">/// adv. 副词</span>
+    ADV,
+    <span class="hljs-comment">// 把/被</span>
+    CharBaBei,
+    <span class="hljs-comment">// 的</span>
+    CharDe,
+&#125;
+<span class="hljs-keyword">use</span> crate::CFGSymbol::*;
+
+<span class="hljs-comment">// S -&gt; SS, + 概率权重</span>
+<span class="hljs-keyword">const</span> CFG_RULES: &amp;[(CFGSymbol, &amp;[CFGSymbol], <span class="hljs-type">i32</span>)] = &amp;[
+    (Sentence, &amp;[NP, VP], <span class="hljs-number">5</span>),                      <span class="hljs-comment">// S V O 结构</span>
+    (Sentence, &amp;[NP, CharBaBei, NP, VTra2], <span class="hljs-number">1</span>),    <span class="hljs-comment">// noun. 把/被 noun. verb-tra.</span>
+    (Sentence, &amp;[NP, CharBaBei, NP, VDit, NP], <span class="hljs-number">1</span>), <span class="hljs-comment">// noun. 把/被 noun. verb-tra.</span>
+    (NP, &amp;[Ns], <span class="hljs-number">3</span>),
+    (Ns, &amp;[N], <span class="hljs-number">6</span>),
+    (Ns, &amp;[ADJ, N], <span class="hljs-number">3</span>),
+    (Ns, &amp;[VP, CharDe, N], <span class="hljs-number">1</span>),
+    (Ns, &amp;[ADJ, N], <span class="hljs-number">1</span>),
+    (VP, &amp;[ADV, Vs], <span class="hljs-number">1</span>),
+    (VP, &amp;[Vs], <span class="hljs-number">3</span>),
+    (Vs, &amp;[VInts], <span class="hljs-number">1</span>),
+    (Vs, &amp;[VTras], <span class="hljs-number">1</span>),
+    (Vs, &amp;[VDits], <span class="hljs-number">1</span>),
+    (VInts, &amp;[VInt], <span class="hljs-number">1</span>),
+    (VTras, &amp;[VTra, NP], <span class="hljs-number">1</span>),
+    (VDits, &amp;[VDitts, NP], <span class="hljs-number">1</span>),
+    (VDitts, &amp;[VDit, NP], <span class="hljs-number">1</span>),
+];
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">expand_str</span>(symbol: &amp;CFGSymbol) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">Option</span>&lt;&amp;<span class="hljs-symbol">&#x27;static</span> [&amp;<span class="hljs-symbol">&#x27;static</span> <span class="hljs-type">str</span>]&gt; &#123;
+    <span class="hljs-title function_ invoke__">Some</span>(<span class="hljs-keyword">match</span> symbol &#123;
+        <span class="hljs-comment">// nouns</span>
+        N =&gt; &amp;[
+            <span class="hljs-string">&quot;小豆泥&quot;</span>,
+            <span class="hljs-string">&quot;猫&quot;</span>,
+            <span class="hljs-string">&quot;纸&quot;</span>,
+            <span class="hljs-string">&quot;鬼&quot;</span>,
+            <span class="hljs-string">&quot;薯条&quot;</span>,
+            <span class="hljs-string">&quot;KFC&quot;</span>,
+            <span class="hljs-string">&quot;麦当劳&quot;</span>,
+            <span class="hljs-string">&quot;霸王龙&quot;</span>,
+            <span class="hljs-string">&quot;饮料&quot;</span>,
+            <span class="hljs-string">&quot;皇上&quot;</span>,
+            <span class="hljs-string">&quot;甜点&quot;</span>,
+            <span class="hljs-string">&quot;毛球&quot;</span>,
+            <span class="hljs-string">&quot;狸花&quot;</span>,
+            <span class="hljs-string">&quot;葡萄&quot;</span>,
+            <span class="hljs-string">&quot;咖啡&quot;</span>,
+            <span class="hljs-string">&quot;茶&quot;</span>,
+            <span class="hljs-string">&quot;兔子&quot;</span>,
+            <span class="hljs-string">&quot;鳄鱼&quot;</span>,
+            <span class="hljs-string">&quot;小黑猫&quot;</span>,
+            <span class="hljs-string">&quot;undefined&quot;</span>,
+            <span class="hljs-string">&quot;错误&quot;</span>,
+            <span class="hljs-string">&quot;芝士&quot;</span>,
+            <span class="hljs-string">&quot;自助餐&quot;</span>,
+            <span class="hljs-string">&quot;蛋挞&quot;</span>,
+            <span class="hljs-string">&quot;Windows11&quot;</span>,
+        ],
+        VTra =&gt; &amp;[
+            <span class="hljs-string">&quot;打&quot;</span>,
+            <span class="hljs-string">&quot;吃&quot;</span>,
+            <span class="hljs-string">&quot;啃&quot;</span>,
+            <span class="hljs-string">&quot;摸&quot;</span>,
+            <span class="hljs-string">&quot;揉&quot;</span>,
+            <span class="hljs-string">&quot;喝&quot;</span>,
+            <span class="hljs-string">&quot;买&quot;</span>,
+            <span class="hljs-string">&quot;是&quot;</span>,
+            <span class="hljs-string">&quot;吃掉了&quot;</span>,
+            <span class="hljs-string">&quot;拿走了&quot;</span>,
+        ],
+        VTra2 =&gt; &amp;[<span class="hljs-string">&quot;吃掉了&quot;</span>, <span class="hljs-string">&quot;拿走了&quot;</span>],
+        VInt =&gt; &amp;[
+            <span class="hljs-string">&quot;喵喵叫&quot;</span>,
+            <span class="hljs-string">&quot;睡觉&quot;</span>,
+            <span class="hljs-string">&quot;做深蹲&quot;</span>,
+            <span class="hljs-string">&quot;写作业&quot;</span>,
+            <span class="hljs-string">&quot;学习&quot;</span>,
+            <span class="hljs-string">&quot;画画&quot;</span>,
+            <span class="hljs-string">&quot;emo&quot;</span>,
+            <span class="hljs-string">&quot;吃饭&quot;</span>,
+            <span class="hljs-string">&quot;蹦蹦跳跳&quot;</span>,
+            <span class="hljs-string">&quot;摸鱼&quot;</span>,
+            <span class="hljs-string">&quot;看电视&quot;</span>,
+            <span class="hljs-string">&quot;ypt启动&quot;</span>,
+            <span class="hljs-string">&quot;关闭ypt&quot;</span>,
+            <span class="hljs-string">&quot;打maimai&quot;</span>,
+            <span class="hljs-string">&quot;写代码&quot;</span>,
+            <span class="hljs-string">&quot;不知道在干什么&quot;</span>,
+            <span class="hljs-string">&quot;思考中&quot;</span>,
+            <span class="hljs-string">&quot;呜呜呜&quot;</span>,
+            <span class="hljs-string">&quot;刷TL&quot;</span>,
+            <span class="hljs-string">&quot;上班&quot;</span>,
+            <span class="hljs-string">&quot;工作&quot;</span>,
+            <span class="hljs-string">&quot;发疯&quot;</span>,
+            <span class="hljs-string">&quot;正在更新&quot;</span>,
+            <span class="hljs-string">&quot;看同人&quot;</span>,
+        ],
+        VDit =&gt; &amp;[<span class="hljs-string">&quot;给&quot;</span>, <span class="hljs-string">&quot;送给&quot;</span>],
+        ADJ =&gt; &amp;[
+            <span class="hljs-string">&quot;可爱的&quot;</span>,
+            <span class="hljs-string">&quot;好吃的&quot;</span>,
+            <span class="hljs-string">&quot;无聊的&quot;</span>,
+            <span class="hljs-string">&quot;开心的&quot;</span>,
+            <span class="hljs-string">&quot;美味的&quot;</span>,
+            <span class="hljs-string">&quot;刚重生的&quot;</span>,
+            <span class="hljs-string">&quot;你主页上的&quot;</span>,
+            <span class="hljs-string">&quot;谁的&quot;</span>,
+            <span class="hljs-string">&quot;终末时的&quot;</span>,
+            <span class="hljs-string">&quot;无限的&quot;</span>,
+            <span class="hljs-string">&quot;超厉害的&quot;</span>,
+        ],
+        ADV =&gt; &amp;[
+            <span class="hljs-string">&quot;悄悄&quot;</span>,
+            <span class="hljs-string">&quot;静静&quot;</span>,
+            <span class="hljs-string">&quot;想&quot;</span>,
+            <span class="hljs-string">&quot;轻轻地&quot;</span>,
+            <span class="hljs-string">&quot;不想&quot;</span>,
+            <span class="hljs-string">&quot;正在&quot;</span>,
+            <span class="hljs-string">&quot;在&quot;</span>,
+            <span class="hljs-string">&quot;在你身后&quot;</span>,
+            <span class="hljs-string">&quot;几乎处处&quot;</span>,
+            <span class="hljs-string">&quot;随时&quot;</span>,
+            <span class="hljs-string">&quot;超大声地&quot;</span>,
+            <span class="hljs-string">&quot;超小声地&quot;</span>,
+            <span class="hljs-string">&quot;又开始&quot;</span>,
+            <span class="hljs-string">&quot;重新&quot;</span>,
+        ],
+        CharBaBei =&gt; &amp;[<span class="hljs-string">&quot;把&quot;</span>, <span class="hljs-string">&quot;被&quot;</span>],
+        CharDe =&gt; &amp;[<span class="hljs-string">&quot;的&quot;</span>],
+        _ =&gt; <span class="hljs-keyword">return</span> <span class="hljs-literal">None</span>,
+    &#125;)
+&#125;
+
+<span class="hljs-keyword">const</span> TO_STR_POSSIBILITY: <span class="hljs-type">f64</span> = <span class="hljs-number">0.5</span>;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">generate</span>(ctx: &amp;<span class="hljs-keyword">mut</span> <span class="hljs-type">String</span>, symbol: &amp;CFGSymbol) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">String</span> &#123;
+    ctx.<span class="hljs-title function_ invoke__">push_str</span>(&amp;<span class="hljs-built_in">format!</span>(<span class="hljs-string">&quot;[&#123;:?&#125; &quot;</span>, symbol));
+
+    <span class="hljs-keyword">let</span> <span class="hljs-keyword">mut </span><span class="hljs-variable">symbol_rules</span> = <span class="hljs-type">Vec</span>::&lt;&amp;[CFGSymbol]&gt;::<span class="hljs-title function_ invoke__">new</span>();
+
+    <span class="hljs-keyword">for</span> (sym, rule, weight) <span class="hljs-keyword">in</span> CFG_RULES.<span class="hljs-title function_ invoke__">iter</span>() &#123;
+        <span class="hljs-keyword">for</span> <span class="hljs-variable">_</span> <span class="hljs-keyword">in</span> <span class="hljs-number">0</span>..<span class="hljs-keyword">if</span> sym == symbol &#123; *weight &#125; <span class="hljs-keyword">else</span> &#123; <span class="hljs-number">0</span> &#125; &#123;
+            symbol_rules.<span class="hljs-title function_ invoke__">push</span>(rule);
+        &#125;
+    &#125;
+
+    <span class="hljs-keyword">let</span> <span class="hljs-variable">force_expand</span> = symbol_rules.<span class="hljs-title function_ invoke__">len</span>() == <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">let</span> <span class="hljs-variable">res</span> = <span class="hljs-keyword">match</span> <span class="hljs-title function_ invoke__">expand_str</span>(symbol) &#123;
+        <span class="hljs-title function_ invoke__">Some</span>(strs) <span class="hljs-keyword">if</span> force_expand || rand::random::&lt;<span class="hljs-type">f64</span>&gt;() &lt; TO_STR_POSSIBILITY =&gt; &#123;
+            <span class="hljs-keyword">let</span> <span class="hljs-variable">res</span> = strs
+                .<span class="hljs-title function_ invoke__">choose</span>(&amp;<span class="hljs-keyword">mut</span> rand::<span class="hljs-title function_ invoke__">thread_rng</span>())
+                .<span class="hljs-title function_ invoke__">unwrap_or_else</span>(|| &amp;<span class="hljs-string">&quot;&quot;</span>)
+                .<span class="hljs-title function_ invoke__">to_string</span>();
+            ctx.<span class="hljs-title function_ invoke__">push_str</span>(&amp;<span class="hljs-built_in">format!</span>(<span class="hljs-string">&quot;&#123;&#125;&quot;</span>, res));
+            res
+        &#125;
+        <span class="hljs-title function_ invoke__">Some</span>(_) | <span class="hljs-literal">None</span> =&gt; &#123;
+            <span class="hljs-keyword">if</span> <span class="hljs-keyword">let</span> <span class="hljs-variable">Some</span>(chosen) = symbol_rules.<span class="hljs-title function_ invoke__">choose</span>(&amp;<span class="hljs-keyword">mut</span> rand::<span class="hljs-title function_ invoke__">thread_rng</span>()) &#123;
+                chosen
+                    .<span class="hljs-title function_ invoke__">iter</span>()
+                    .<span class="hljs-title function_ invoke__">map</span>(|sym| <span class="hljs-title function_ invoke__">generate</span>(ctx, sym))
+                    .collect::&lt;<span class="hljs-type">Vec</span>&lt;<span class="hljs-type">String</span>&gt;&gt;()
+                    .<span class="hljs-title function_ invoke__">join</span>(<span class="hljs-string">&quot;&quot;</span>)
+            &#125; <span class="hljs-keyword">else</span> &#123;
+                <span class="hljs-string">&quot;&quot;</span>.<span class="hljs-title function_ invoke__">to_string</span>()
+            &#125;
+        &#125;
+    &#125;;
+    ctx.<span class="hljs-title function_ invoke__">push_str</span>(&amp;<span class="hljs-built_in">format!</span>(<span class="hljs-string">&quot;] &quot;</span>));
+    res
+&#125;
+
+<span class="hljs-meta">#[wasm_bindgen]</span>
+<span class="hljs-keyword">pub</span> <span class="hljs-keyword">struct</span> <span class="hljs-title class_">SentenceRes</span> &#123;
+    ctx: <span class="hljs-type">String</span>,
+    res: <span class="hljs-type">String</span>,
+&#125;
+
+<span class="hljs-meta">#[wasm_bindgen]</span>
+<span class="hljs-keyword">impl</span> <span class="hljs-title class_">SentenceRes</span> &#123;
+    <span class="hljs-meta">#[wasm_bindgen(getter)]</span>
+    <span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">ctx</span>(&amp;<span class="hljs-keyword">self</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">String</span> &#123;
+        <span class="hljs-keyword">self</span>.ctx.<span class="hljs-title function_ invoke__">clone</span>()
+    &#125;
+    <span class="hljs-meta">#[wasm_bindgen(getter)]</span>
+    <span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">res</span>(&amp;<span class="hljs-keyword">self</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">String</span> &#123;
+        <span class="hljs-keyword">self</span>.res.<span class="hljs-title function_ invoke__">clone</span>()
+    &#125;
+&#125;
+
+<span class="hljs-meta">#[wasm_bindgen]</span>
+<span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">generate_sentence</span>() <span class="hljs-punctuation">-&gt;</span> SentenceRes &#123;
+    <span class="hljs-keyword">let</span> <span class="hljs-keyword">mut </span><span class="hljs-variable">ctx</span> = <span class="hljs-type">String</span>::<span class="hljs-title function_ invoke__">new</span>();
+    <span class="hljs-keyword">let</span> <span class="hljs-variable">res</span> = <span class="hljs-title function_ invoke__">generate</span>(&amp;<span class="hljs-keyword">mut</span> ctx, &amp;Sentence);
+    SentenceRes &#123; ctx, res &#125;
+&#125;
+</code></pre>
+</details>
+<h2 id="WASM">WASM<a class="header-anchor" href="#WASM"> ¶</a></h2>
+<p>上述的 Rust 代码依照 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/WebAssembly/Rust_to_Wasm">MDN web docs</a> 的教程编译成了 WASM，可以在下面按按钮体验一下随机句子生成器。</p>
+<div>
+  <button type="button" id="svo-regen">重新生成</button>
+  <pre><code id="svo-ctx">
+    [Sentence [NP [Ns [N 芝士] ] ] [VP [Vs [VInts [VInt 喵喵叫] ] ] ] ]
+  </code></pre>
+  <p id="svo-res">芝士喵喵叫</p>
+  <p id="svo-img"></p>
+</div>
+<small>
+<p><strong>Copyright</strong><br>
+上图的 <a target="_blank" rel="noopener" href="https://mshang.ca/syntree/">Syntax Generator</a> 代码来自 <a target="_blank" rel="noopener" href="https://github.com/mshang/syntree">https://github.com/mshang/syntree</a> ，许可证如下</p>
+<pre><code class="hljs">Copyright (C) 2011 by Miles Shang &lt;mail@mshang.ca&gt;
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the &quot;Software&quot;), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+This software uses the following libraries:
+
+base64.js
+	Copyright (C) 1999 Masanao Izumo &lt;iz@onicos.co.jp&gt;
+	Version: 1.0
+	LastModified: Dec 25 1999
+	This library is free.  You can redistribute it and/or modify it.
+
+canvas2image.js
+	Canvas2Image v0.1
+	Copyright (c) 2008 Jacob Seidelin, jseidelin@nihilogic.dk
+	MIT License [http://www.opensource.org/licenses/mit-license.php]
+
+jQuery v1.7.1
+	Copyright (c) 2011 John Resig, http://jquery.com/
+	MIT license [jquery.org/license]
+
+jQuery UI v1.8.18
+	Copyright (c) 2011 Paul Bakaus, http://jqueryui.com/
+	MIT license [jquery.org/license]
+</code></pre>
+</small>
+<script src="/files/svo-generator/svo_generator.js" defer></script>
+<script>
+  function regenerate_svo() {
+    const gg = wasm_bindgen.generate_sentence();
+    document.getElementById("svo-ctx").innerText = gg.ctx;
+    document.getElementById("svo-res").innerText = gg.res;
+    console.log(gg.ctx);
+    const img = go(gg.ctx, 12, "12pt sans-serif", "12pt sans-serif", 35, 10, true, true);
+    document.getElementById("svo-img").innerHTML = "";
+    document.getElementById("svo-img").append(img);
+  }
+  document.getElementById("svo-regen").addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    regenerate_svo()
+  });
+</script>
+<script>
+  // TREE NODE
+  // By Miles Shang <mail@mshang.ca>
+  // MIT license
+  var vert_space = 35;
+  var debug=!0,margin=15,padding_above_text=6,padding_below_text=6;function Node(){this.value=null,this.step=null,this.draw_triangle=null,this.label=null,this.tail=null,this.max_y=null,this.children=new Array,this.has_children,this.first=null,this.last=null,this.parent=null,this.next=null,this.previous=null,this.x=null,this.y=null,this.head_chain=null,this.tail_chain=null,this.starred=null}function MovementLine(){this.head=null,this.tail=null,this.lca=null,this.dest_x=null,this.dest_y=null,this.bottom_y=null,this.max_y=null,this.should_draw=null,this.leftwards=null}function go(t,i,e,h,n,s,a,l){t=t.replace(/^\s+/,"");for(var r=0,d=0;d<t.length;d++)"["==t[d]&&r++,"]"==t[d]&&r--;for(;r<0;)t="["+t,r++;for(;0<r;)t+="]",r--;var o,_,c=parse(t);c.set_siblings(null),c.check_triangle();try{_=(o=document.createElement("canvas")).getContext("2d")}catch(t){throw"canvas"}c.set_width(_,n,s,e,h),c.assign_location(0,0,i,l),c.find_height();var f=new Array;c.find_movement(f,c);for(d=0;d<f.length;d++)c.reset_chains(),f[d].set_up();for(var s=c.left_width+c.right_width+2*margin,u=c.max_y+i+2*margin,d=0;d<f.length;d++)if(f[d].max_y==c.max_y){u+=n;break}o.id="canvas",o.width=s,o.height=u,_.fillStyle="rgb(255, 255, 255)",_.fillRect(0,0,s,u),_.fillStyle="rgb(0, 0, 0)",_.textAlign="center";var s=Math.floor(c.left_width+margin),p=Math.floor(i+margin);_.translate(s,p),c.draw(_,i,e,h,a,l);for(d=0;d<f.length;d++)f[d].should_draw&&f[d].draw(_);return Canvas2Image.saveAsPNG(o,!0)}function subscriptify(t){for(var i="",e=0;e<t.length;++e)switch(t[e]){case"0":i+="₀";break;case"1":i+="₁";break;case"2":i+="₂";break;case"3":i+="₃";break;case"4":i+="₄";break;case"5":i+="₅";break;case"6":i+="₆";break;case"7":i+="₇";break;case"8":i+="₈";break;case"9":i+="₉"}return i}function parse(t){var e=new Node;if("["!=t[0])t=(t=(t=t.replace(/\s*<(\w+)>\s*/,function(t,i){return e.tail=i," "})).replace(/^\s+/,"")).replace(/\s+$/,""),e.value=t;else{for(var i=1;" "!=t[i]&&"["!=t[i]&&"]"!=t[i];)i++;for(e.value=t.substr(1,i-1),e.value=e.value.replace(/\^/,function(){return e.starred=!0,""}),e.value=e.value.replace(/_(\w+)$/,function(t,i){return e.label=i,-1!=e.label.search(/^\d+$/)?subscriptify(e.label):""});" "==t[i];)i++;if("]"!=t[i])for(var h=1,n=i;i<t.length;i++){var s=h;"["==t[i]&&h++,"]"==t[i]&&h--,(1==s&&2==h||1==s&&0==h)&&(-1<t.substring(n,i).search(/[^\s]/)&&e.children.push(parse(t.substring(n,i))),n=i),2==s&&1==h&&(e.children.push(parse(t.substring(n,i+1))),n=i+1)}}return e}Node.prototype.set_siblings=function(t){for(var i=0;i<this.children.length;i++)this.children[i].set_siblings(this);this.has_children=0<this.children.length,this.parent=t,this.has_children&&(this.first=this.children[0],this.last=this.children[this.children.length-1]);for(i=0;i<this.children.length-1;i++)this.children[i].next=this.children[i+1];for(i=1;i<this.children.length;i++)this.children[i].previous=this.children[i-1]},Node.prototype.check_triangle=function(){this.draw_triangle=0,!this.has_children&&this.parent.starred&&(this.draw_triangle=1);for(var t=this.first;null!=t;t=t.next)t.check_triangle()},Node.prototype.set_width=function(t,i,e,h,n){t.font=h,this.has_children&&(t.font=n);for(var s=t.measureText(this.value).width,a=this.first;null!=a;a=a.next)a.set_width(t,i,e,h,n);if(this.has_children){this.step=0;for(var l,a=this.first;null!=a&&null!=a.next;a=a.next){var r=a.right_width+e+a.next.left_width;this.step=Math.max(this.step,r)}this.left_width=0,this.right_width=0,this.has_children&&(l=(this.children.length-1)/2*this.step,this.left_width=l+this.first.left_width,this.right_width=l+this.last.right_width),this.left_width=Math.max(this.left_width,s/2),this.right_width=Math.max(this.right_width,s/2)}else this.left_width=s/2,this.right_width=s/2},Node.prototype.find_height=function(){this.max_y=this.y;for(var t=this.first;null!=t;t=t.next)this.max_y=Math.max(this.max_y,t.find_height());return this.max_y},Node.prototype.assign_location=function(t,i,e,h){if(this.x=Math.floor(t)+.5,this.y=Math.floor(i)+.5,this.has_children)for(var n=t-this.step*((this.children.length-1)/2),s=0;s<this.children.length;s++)this.children[s].assign_location(n+s*this.step,i+vert_space,e,h);else!this.parent||h||1!=this.parent.children.length||this.draw_triangle||(this.y=this.parent.y+padding_above_text+padding_below_text+e)},Node.prototype.draw=function(t,i,e,h,n,s){t.font=e,this.has_children&&(t.font=h),t.fillStyle="black",n&&(t.fillStyle="green",this.has_children)&&(t.fillStyle="blue"),t.fillText(this.value,this.x,this.y);for(var a=this.first;null!=a;a=a.next)a.draw(t,i,e,h,n,s);this.parent&&(this.draw_triangle?(t.moveTo(this.parent.x,this.parent.y+padding_below_text),t.lineTo(this.x-this.left_width,this.y-i-padding_above_text),t.lineTo(this.x+this.right_width,this.y-i-padding_above_text),t.lineTo(this.parent.x,this.parent.y+padding_below_text),t.stroke()):(this.has_children||s||1!=this.parent.children.length)&&(t.moveTo(this.parent.x,this.parent.y+padding_below_text),t.lineTo(this.x,this.y-i-padding_above_text),t.stroke()))},Node.prototype.find_head=function(t){for(var i=this.first;null!=i;i=i.next){var e=i.find_head(t);if(null!=e)return e}return this.label==t?this:null},Node.prototype.find_movement=function(t,i){for(var e,h=this.first;null!=h;h=h.next)h.find_movement(t,i);null!=this.tail&&((e=new MovementLine).tail=this,e.head=i.find_head(this.tail),t.push(e))},Node.prototype.reset_chains=function(){this.head_chain=null,this.tail_chain=null;for(var t=this.first;null!=t;t=t.next)t.reset_chains()},Node.prototype.find_intervening_height=function(t){for(var i=this.y,e=this;e=t?e.previous:e.next;){if(e.head_chain||e.tail_chain)return i;i=Math.max(i,e.max_y)}return i=Math.max(i,this.parent.find_intervening_height(t))},MovementLine.prototype.set_up=function(){this.should_draw=0,null!=this.tail&&null!=this.head&&this.check_head()&&(this.find_lca(),null!=this.lca)&&(this.find_intervening_height(),this.dest_x=this.head.x,this.dest_y=this.head.max_y,this.bottom_y=this.max_y+vert_space,this.should_draw=1)},MovementLine.prototype.check_head=function(){var t=this.tail;for(t.tail_chain=1;null!=t.parent;){if((t=t.parent)==this.head)return 0;t.tail_chain=1}return 1},MovementLine.prototype.find_lca=function(){var t=this.head;for(t.head_chain=1,this.lca=null;null!=t.parent;)if((t=t.parent).head_chain=1,t.tail_chain){this.lca=t;break}},MovementLine.prototype.find_intervening_height=function(){for(var t=this.lca.first;null!=t;t=t.next)if(t.head_chain||t.tail_chain){this.leftwards=!1,t.head_chain&&(this.leftwards=!0);break}this.max_y=Math.max(this.tail.find_intervening_height(this.leftwards),this.head.find_intervening_height(!this.leftwards),this.head.max_y)},MovementLine.prototype.draw=function(t){var i=this.tail.x+3;this.dest_x-=3,this.leftwards&&(i-=6,this.dest_x+=6),t.moveTo(i,this.tail.y+padding_below_text),t.quadraticCurveTo(i,this.bottom_y,(i+this.dest_x)/2,this.bottom_y),t.quadraticCurveTo(this.dest_x,this.bottom_y,this.dest_x,this.dest_y+padding_below_text),t.stroke(),t.beginPath(),t.lineTo(this.dest_x+3,this.dest_y+padding_below_text+10),t.lineTo(this.dest_x-3,this.dest_y+padding_below_text+10),t.lineTo(this.dest_x,this.dest_y+padding_below_text),t.closePath(),t.fillStyle="#000000",t.fill()};
+  /*
+  * Canvas2Image v0.1
+  * Copyright (c) 2008 Jacob Seidelin, jseidelin@nihilogic.dk
+  * MIT License [http://www.opensource.org/licenses/mit-license.php]
+  */
+  var Canvas2Image=function(){var h,o,u,n,l,s,p,i,f,t=!1,e=document.createElement("canvas");return(t=!!e.getContext("2d")||t)?(h=!!e.getContext("2d").getImageData,o=!!e.toDataURL,u=!!window.btoa,n="image/octet-stream",l=function(t){var e="";if("string"==typeof t)e=t;else for(var a=t,r=0;r<a.length;r++)e+=String.fromCharCode(a[r]);return btoa(e)},s=function(t){document.location.href=t},p=function(t,e){return"data:"+e+";base64,"+t},i=function(t){var e=document.createElement("img");return e.src=t,e},f=function(t,e,a){var r;return e&&a?((r=document.createElement("canvas")).width=e,r.height=a,r.style.width=e+"px",r.style.height=a+"px",r.getContext("2d").drawImage(t,0,0,t.width,t.height,0,0,e,a),r):t},{saveAsPNG:function(t,e,a,r){return o&&(t=f(t,a,r).toDataURL("image/png"),e?i(t):(s(t.replace("image/png",n)),!0))},saveAsJPEG:function(t,e,a,r){var h;return o&&(h="image/jpeg",5==(t=f(t,a,r).toDataURL(h)).indexOf(h))&&(e?i(t):(s(t.replace(h,n)),!0))},saveAsBMP:function(t,e,a,r){if(!h||!u)return!1;t=f(t,a,r);a=t,r=parseInt(a.width),t=parseInt(a.height);a=function(t){var e=[],a=t.width,r=t.height,h=(e.push(66),e.push(77),a*r*3+54),o=(e.push(h%256),h=Math.floor(h/256),e.push(h%256),h=Math.floor(h/256),e.push(h%256),h=Math.floor(h/256),e.push(h%256),e.push(0),e.push(0),e.push(0),e.push(0),e.push(54),e.push(0),e.push(0),e.push(0),[]),h=(o.push(40),o.push(0),o.push(0),o.push(0),a),h=(o.push(h%256),h=Math.floor(h/256),o.push(h%256),h=Math.floor(h/256),o.push(h%256),h=Math.floor(h/256),o.push(h%256),r),h=(o.push(h%256),h=Math.floor(h/256),o.push(h%256),h=Math.floor(h/256),o.push(h%256),h=Math.floor(h/256),o.push(h%256),o.push(1),o.push(0),o.push(24),o.push(0),o.push(0),o.push(0),o.push(0),o.push(0),a*r*3);o.push(h%256),h=Math.floor(h/256),o.push(h%256),h=Math.floor(h/256),o.push(h%256),h=Math.floor(h/256),o.push(h%256);for(var u=0;u<16;u++)o.push(0);var n=(4-3*a%4)%4,s=t.data,p="",i=r;do{for(var f=a*(i-1)*4,g="",c=0;c<a;c++)var d=4*c,g=(g=(g+=String.fromCharCode(s[f+d+2]))+String.fromCharCode(s[f+d+1]))+String.fromCharCode(s[f+d]);for(var m=0;m<n;m++)g+=String.fromCharCode(0)}while(p+=g,--i);return l(e.concat(o))+l(p)}(a.getContext("2d").getImageData(0,0,r,t));return e?i(p(a,"image/bmp")):(s(p(a,n)),!0)}}):{saveAsBMP:function(){},saveAsPNG:function(){},saveAsJPEG:function(){}}}();
+</script>
+</section><section class="post-meta"><span class="info"><i class="fa fa-calendar"></i> <span class="date">2024-11-18</span>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Code/" title="Code">Code</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Frontend/" title="Frontend">Frontend</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Rust/" title="Rust">Rust</a>  </span></section></article><p class="pagination"><a href="/2024/11/25/Package%20Manager%20The%20History/" title="Package Manager: The History">Previous</a><span>  </span><a href="/2024/11/13/so-simple/" title="一晚上搓出的 So Simple 博客主题">Next</a></p><article class="comment-container"><div class="comment-container"><script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js" onload="(new Gitalk({&quot;clientID&quot;:&quot;12a250ac67f452906dd6&quot;,&quot;clientSecret&quot;:&quot;7422a9ecdc933d5e6facbc61d546bced40519f0b&quot;,&quot;repo&quot;:&quot;lhcfl.github.io&quot;,&quot;owner&quot;:&quot;lhcfl&quot;,&quot;admin&quot;:[&quot;lhcfl&quot;],&quot;id&quot;:&quot;随机句子生成器与一场有趣的WASM尝试&quot;,&quot;distractionFreeMode&quot;:false})).render(&quot;gitalk-comment-slot&quot;)"></script><div id="gitalk-comment-slot">Loading...</div></div></article></main><footer class="footer"><br><p class="powered_by">Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> and <a target="_blank" rel="noopener" href="https://github.com/Lhcfl/hexo-theme-sosimple">SoSimple</a></p></footer></body></html>

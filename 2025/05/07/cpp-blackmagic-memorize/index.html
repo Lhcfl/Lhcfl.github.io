@@ -1,0 +1,132 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Linca"><title>C++ 黑魔法习题：memorize · Zero Calorie Drink Shop</title><meta name="description" content="习题来自 https://bartoszmilewski.com/2014/11/24/types-and-functions/
+
+
+Define a higher-order function (or a function object) memoize in your favorite lang"><meta name="keywords" content="Code,C++"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="mobile-web-app-capable" content="yes"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta id="site_data_static" data-url="/"><meta name="renderer" content="webkit"><link rel="shortcut icon" type="image/x-icon" href="/images/logo.png"><link rel="stylesheet" href="/js_complied/bundle.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><style>:root { --normal-font-face: LXGW WenKai, LXGW WenKai TC, 'Times New Roman', Times, serif; }</style><script src="/js_complied/bundle.js"></script><script>Utils.loadCSS("https://testingcf.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css");
+Utils.loadCSS("https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&display=swap");
+Utils.loadCSS("https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css");
+Utils.loadCSS("/css/font-awesome.min.css");</script><meta name="generator" content="Hexo 7.3.0"></head><body class="post-page"><noscript><link rel="stylesheet" href="https://testingcf.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&amp;display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"></noscript><nav class="nav"><a href="/">Home</a>&nbsp;&nbsp;<a href="/archives">Archives</a>&nbsp;&nbsp;<a href="/tags">Tags</a>&nbsp;&nbsp;<a href="/about">About</a>&nbsp;&nbsp;<a href="/links">Links</a>&nbsp;&nbsp;<a href="/search">Search</a>&nbsp;&nbsp;<a href="javascript:SoSimple.darkLightToggle()">Dark/Light Mode</a></nav><main class="main"><article class="post-container post-full"><header class="post-title"><h1>C++ 黑魔法习题：memorize</h1></header><section class="post-body"><p>习题来自 <a target="_blank" rel="noopener" href="https://bartoszmilewski.com/2014/11/24/types-and-functions/">https://bartoszmilewski.com/2014/11/24/types-and-functions/</a></p>
+<span id="more"></span>
+<blockquote>
+<p>Define a higher-order function (or a function object) memoize in your favorite language. This function takes a pure function f as an argument and returns a function that behaves almost exactly like f, except that it only calls the original function once for every argument, stores the result internally, and subsequently returns this stored result every time it’s called with the same argument. You can tell the memoized function from the original by watching its performance. For instance, try to memoize a function that takes a long time to evaluate. You’ll have to wait for the result the first time you call it, but on subsequent calls, with the same argument, you should get the result immediately.</p>
+</blockquote>
+<p>（当然 C++ 不是我最喜欢的语言，但是确实是很有挑战性的一个，所以这样写了）</p>
+<pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;chrono&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;concepts&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;functional&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;tuple&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;type_traits&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;unordered_map&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;utility&gt;</span></span>
+
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">typename</span> = std::<span class="hljs-type">void_t</span>&lt;&gt;&gt;
+<span class="hljs-keyword">struct</span> is_std_hashable : std::false_type &#123;&#125;;
+
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">is_std_hashable</span>&lt;
+    T, std::<span class="hljs-type">void_t</span>&lt;<span class="hljs-keyword">decltype</span>(std::declval&lt;std::hash&lt;T&gt;&gt;()(std::<span class="hljs-built_in">declval</span>&lt;T&gt;()))&gt;&gt;
+    : std::true_type &#123;&#125;;
+
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;
+<span class="hljs-keyword">constexpr</span> <span class="hljs-type">bool</span> is_std_hashable_v = is_std_hashable&lt;T&gt;::value;
+
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span>... Args&gt;
+  <span class="hljs-keyword">requires</span> std::equality_comparable&lt;std::tuple&lt;Args...&gt;&gt;
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">Arguments</span> &#123;
+  std::tuple&lt;Args...&gt; data;
+  <span class="hljs-type">bool</span> <span class="hljs-keyword">operator</span>==(<span class="hljs-type">const</span> Arguments &amp;other) <span class="hljs-type">const</span> = <span class="hljs-keyword">default</span>;
+&#125;;
+
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> R, <span class="hljs-keyword">typename</span>... Args&gt; <span class="hljs-keyword">using</span> fn_type = <span class="hljs-built_in">R</span>(Args...);
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> R, <span class="hljs-keyword">typename</span>... Args&gt; <span class="hljs-function"><span class="hljs-keyword">auto</span> <span class="hljs-title">memorize</span><span class="hljs-params">(fn_type&lt;R, Args...&gt; f)</span> </span>&#123;
+  <span class="hljs-keyword">auto</span> cache = std::unordered_map&lt;Arguments&lt;Args...&gt;, R&gt;();
+
+  <span class="hljs-keyword">return</span> [=](Args... args) <span class="hljs-keyword">mutable</span> -&gt; R &#123;
+    <span class="hljs-keyword">auto</span> key = Arguments&#123;std::<span class="hljs-built_in">make_tuple</span>(args...)&#125;;
+    <span class="hljs-keyword">if</span> (cache.<span class="hljs-built_in">find</span>(key) == cache.<span class="hljs-built_in">end</span>()) &#123;
+      <span class="hljs-keyword">auto</span> result = <span class="hljs-built_in">f</span>(args...);
+      cache[key] = result;
+      <span class="hljs-keyword">return</span> result;
+    &#125;
+    <span class="hljs-keyword">return</span> cache[key];
+  &#125;;
+&#125;
+
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> R, <span class="hljs-keyword">typename</span>... Args&gt;
+<span class="hljs-function"><span class="hljs-keyword">auto</span> <span class="hljs-title">memorize</span><span class="hljs-params">(std::function&lt;R(Args...)&gt; &amp;&amp;f)</span> </span>&#123;
+  <span class="hljs-keyword">auto</span> cache = std::unordered_map&lt;Arguments&lt;Args...&gt;, R&gt;();
+
+  <span class="hljs-keyword">return</span> [=](Args... args) <span class="hljs-keyword">mutable</span> -&gt; R &#123;
+    <span class="hljs-keyword">auto</span> key = Arguments&#123;std::<span class="hljs-built_in">make_tuple</span>(args...)&#125;;
+    <span class="hljs-keyword">if</span> (cache.<span class="hljs-built_in">find</span>(key) == cache.<span class="hljs-built_in">end</span>()) &#123;
+      <span class="hljs-keyword">auto</span> result = <span class="hljs-built_in">f</span>(args...);
+      cache[key] = result;
+      <span class="hljs-keyword">return</span> result;
+    &#125;
+    <span class="hljs-keyword">return</span> cache[key];
+  &#125;;
+&#125;
+
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span>... Args&gt; <span class="hljs-keyword">class</span> <span class="hljs-title class_">std</span>::hash&lt;Arguments&lt;Args...&gt;&gt; &#123;
+  <span class="hljs-keyword">template</span> &lt;<span class="hljs-type">size_t</span> I&gt;
+    <span class="hljs-built_in">requires</span>(I == std::tuple_size_v&lt;std::tuple&lt;Args...&gt;&gt;)
+  <span class="hljs-function"><span class="hljs-type">size_t</span> <span class="hljs-title">hasher_recusive</span><span class="hljs-params">(<span class="hljs-type">const</span> std::tuple&lt;Args...&gt; &amp;)</span> <span class="hljs-type">const</span> </span>&#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+  &#125;
+
+  <span class="hljs-keyword">template</span> &lt;<span class="hljs-type">size_t</span> I&gt;
+    <span class="hljs-built_in">requires</span>(I &lt; std::tuple_size_v&lt;std::tuple&lt;Args...&gt;&gt;)
+  <span class="hljs-function"><span class="hljs-type">size_t</span> <span class="hljs-title">hasher_recusive</span><span class="hljs-params">(<span class="hljs-type">const</span> std::tuple&lt;Args...&gt; &amp;t)</span> <span class="hljs-type">const</span> </span>&#123;
+    <span class="hljs-keyword">using</span> the_tuple = std::tuple&lt;Args...&gt;;
+    <span class="hljs-keyword">using</span> the_element = std::<span class="hljs-type">tuple_element_t</span>&lt;I, the_tuple&gt;;
+    <span class="hljs-built_in">static_assert</span>(is_std_hashable_v&lt;the_element&gt;,
+                  <span class="hljs-string">&quot;the element is not std::hash-able&quot;</span>);
+    <span class="hljs-keyword">return</span> std::hash&lt;the_element&gt;&#123;&#125;(std::<span class="hljs-built_in">get</span>&lt;I&gt;(t)) ^ <span class="hljs-built_in">hasher_recusive</span>&lt;I + <span class="hljs-number">1</span>&gt;(t);
+  &#125;
+
+<span class="hljs-keyword">public</span>:
+  <span class="hljs-function"><span class="hljs-type">size_t</span> <span class="hljs-title">operator</span><span class="hljs-params">()</span><span class="hljs-params">(<span class="hljs-type">const</span> Arguments&lt;Args...&gt; &amp;t)</span> <span class="hljs-type">const</span> </span>&#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-built_in">hasher_recusive</span>&lt;<span class="hljs-number">0</span>&gt;(t.data);
+  &#125;
+&#125;;
+
+<span class="hljs-function"><span class="hljs-type">long</span> <span class="hljs-type">long</span> <span class="hljs-title">fib</span><span class="hljs-params">(<span class="hljs-type">long</span> <span class="hljs-type">long</span> n)</span> </span>&#123;
+  <span class="hljs-keyword">if</span> (n &lt;= <span class="hljs-number">1</span>)
+    <span class="hljs-keyword">return</span> n;
+  <span class="hljs-keyword">return</span> <span class="hljs-built_in">fib</span>(n - <span class="hljs-number">1</span>) + <span class="hljs-built_in">fib</span>(n - <span class="hljs-number">2</span>);
+&#125;
+
+<span class="hljs-comment">// struct NotHashable &#123;</span>
+<span class="hljs-comment">//   constexpr bool operator==(const NotHashable &amp;) const &#123; return true; &#125;</span>
+<span class="hljs-comment">// &#125;;</span>
+<span class="hljs-comment">// int foo(int x, NotHashable bar) &#123; return 1; &#125;</span>
+
+<span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;
+  <span class="hljs-keyword">auto</span> memoized_fib = <span class="hljs-built_in">memorize</span>(fib);
+  <span class="hljs-comment">// auto memoized_foo = memorize(foo);</span>
+  <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">100</span>; ++i) &#123;
+    <span class="hljs-keyword">auto</span> t0 = std::chrono::system_clock::<span class="hljs-built_in">now</span>();
+    std::cout &lt;&lt; <span class="hljs-string">&quot;calculating fib(&quot;</span> &lt;&lt; <span class="hljs-number">30</span> &lt;&lt; <span class="hljs-string">&quot;) = &quot;</span>;
+    std::cout &lt;&lt; <span class="hljs-built_in">memoized_fib</span>(<span class="hljs-number">30</span>) &lt;&lt; <span class="hljs-string">&quot; &quot;</span>;
+    <span class="hljs-keyword">auto</span> t1 = std::chrono::system_clock::<span class="hljs-built_in">now</span>();
+    <span class="hljs-keyword">auto</span> duration =
+        std::chrono::<span class="hljs-built_in">duration_cast</span>&lt;std::chrono::microseconds&gt;(t1 - t0);
+    std::cout &lt;&lt; <span class="hljs-string">&quot; took &quot;</span> &lt;&lt; duration.<span class="hljs-built_in">count</span>() &lt;&lt; <span class="hljs-string">&quot; microseconds&quot;</span> &lt;&lt; std::endl;
+  &#125;
+
+  <span class="hljs-type">int</span> n = <span class="hljs-number">30</span>;
+  <span class="hljs-keyword">auto</span> memoized_lamfib = <span class="hljs-built_in">memorize</span>(std::<span class="hljs-built_in">function</span>([=]() &#123; <span class="hljs-keyword">return</span> <span class="hljs-built_in">fib</span>(n); &#125;));
+  <span class="hljs-comment">// auto memoized_foo = memorize(foo);</span>
+  <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">100</span>; ++i) &#123;
+    <span class="hljs-keyword">auto</span> t0 = std::chrono::system_clock::<span class="hljs-built_in">now</span>();
+    std::cout &lt;&lt; <span class="hljs-string">&quot;calculating fib2(&quot;</span> &lt;&lt; <span class="hljs-number">30</span> &lt;&lt; <span class="hljs-string">&quot;) = &quot;</span>;
+    std::cout &lt;&lt; <span class="hljs-built_in">memoized_lamfib</span>() &lt;&lt; <span class="hljs-string">&quot; &quot;</span>;
+    <span class="hljs-keyword">auto</span> t1 = std::chrono::system_clock::<span class="hljs-built_in">now</span>();
+    <span class="hljs-keyword">auto</span> duration =
+        std::chrono::<span class="hljs-built_in">duration_cast</span>&lt;std::chrono::microseconds&gt;(t1 - t0);
+    std::cout &lt;&lt; <span class="hljs-string">&quot; took &quot;</span> &lt;&lt; duration.<span class="hljs-built_in">count</span>() &lt;&lt; <span class="hljs-string">&quot; microseconds&quot;</span> &lt;&lt; std::endl;
+  &#125;
+  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+&#125;
+</code></pre>
+</section><section class="post-meta"><span class="info"><i class="fa fa-calendar"></i> <span class="date">2025-05-07</span>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Code/" title="Code">Code</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/C/" title="C++">C++</a>  </span></section></article><p class="pagination"><a href="/2025/05/05/idris2-test/" title="试试 idris2">Next</a></p><article class="comment-container"><div class="comment-container"><script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js" onload="(new Gitalk({&quot;clientID&quot;:&quot;12a250ac67f452906dd6&quot;,&quot;clientSecret&quot;:&quot;7422a9ecdc933d5e6facbc61d546bced40519f0b&quot;,&quot;repo&quot;:&quot;lhcfl.github.io&quot;,&quot;owner&quot;:&quot;lhcfl&quot;,&quot;admin&quot;:[&quot;lhcfl&quot;],&quot;id&quot;:&quot;C++ 黑魔法习题：memorize&quot;,&quot;distractionFreeMode&quot;:false})).render(&quot;gitalk-comment-slot&quot;)"></script><div id="gitalk-comment-slot">Loading...</div></div></article></main><footer class="footer"><br><p class="powered_by">Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> and <a target="_blank" rel="noopener" href="https://github.com/Lhcfl/hexo-theme-sosimple">SoSimple</a></p></footer></body></html>
