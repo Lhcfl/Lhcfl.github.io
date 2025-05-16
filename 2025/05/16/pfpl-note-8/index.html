@@ -1,0 +1,69 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Linca"><title>PFPL 笔记 - VII Subtyping · Zero Calorie Drink Shop</title><meta name="description" content="Subtyping ¶
+子类型是大家用的很多的东西，简单来说，里氏替换原则 如果 τ₁ &amp;lt;: τ 则 任何需要 τ 类型的地方都可能在任何时候被 provide 一个 τ₁ 的值
+子类型是一个 pre-order. 显然不是一个 total order. 但是为什么不是一个 partial o"><meta name="keywords" content="Blog"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="mobile-web-app-capable" content="yes"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta id="site_data_static" data-url="/"><meta name="renderer" content="webkit"><link rel="shortcut icon" type="image/x-icon" href="/images/logo.png"><link rel="stylesheet" href="/js_complied/bundle.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><style>:root { --normal-font-face: LXGW WenKai, LXGW WenKai TC, 'Times New Roman', Times, serif; }</style><script src="/js_complied/bundle.js"></script><script>Utils.loadCSS("https://testingcf.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css");
+Utils.loadCSS("https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&display=swap");
+Utils.loadCSS("https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css");
+Utils.loadCSS("/css/font-awesome.min.css");</script><meta name="generator" content="Hexo 7.3.0"></head><body class="post-page"><noscript><link rel="stylesheet" href="https://testingcf.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&amp;display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"></noscript><nav class="nav"><a href="/">Home</a>&nbsp;&nbsp;<a href="/archives">Archives</a>&nbsp;&nbsp;<a href="/tags">Tags</a>&nbsp;&nbsp;<a href="/about">About</a>&nbsp;&nbsp;<a href="/links">Links</a>&nbsp;&nbsp;<a href="/search">Search</a>&nbsp;&nbsp;<a href="javascript:SoSimple.darkLightToggle()">Dark/Light Mode</a></nav><main class="main"><article class="post-container post-full"><header class="post-title"><h1>PFPL 笔记 - VII Subtyping</h1></header><section class="post-body"><span id="more"></span>
+<h3 id="Subtyping">Subtyping<a class="header-anchor" href="#Subtyping"> ¶</a></h3>
+<p>子类型是大家用的很多的东西，简单来说，<s>里氏替换原则</s> 如果 τ₁ &lt;: τ 则 任何需要 τ 类型的地方都可能在任何时候被 provide 一个 τ₁ 的值</p>
+<p>子类型是一个 pre-order. 显然不是一个 total order. 但是为什么不是一个 partial order?</p>
+<p>（可能是因为存在 <code>class T1 &lt; T &#123;&#125;</code> 这种东西，在 norminal type 的情况下二者不等但是理论上可以互相替换吧，我们这章节似乎没有对 eq 做一个很好的定义）</p>
+<p>比如 int &lt;: rat &lt;: real</p>
+<h4 id="Prod-and-Sum-type">Prod and Sum type<a class="header-anchor" href="#Prod-and-Sum-type"> ¶</a></h4>
+<p><img src="/images/sum_prod_type_variance.png" alt="" loading="lazy"></p>
+<p>这里看上去 prod type 是“逆变”的而 sum type 是“协变” 的，为什么？（虽然我不觉得在这里下标集合算逆变/协变性）</p>
+<p>因为 sum type 是只有其中的某一个，那么大的下标集合会包含小的那个下标集合的所有可能取值，所以小的 I 产生的是大的 J 产生的子类型</p>
+<p>prod type 是包含所有的，那么大的集合会包含小的那个集合的所有信息，所以大的集合是小集合的子类型</p>
+<p>（很难不吐槽一下子类型是十分复杂的东西）</p>
+<p><img src="/images/prod_and_sum_type_variance_2.png" alt="" loading="lazy"></p>
+<p>这是当类型的分量是子类型的时候的子类型关系，可以看出这显然是协变的，很符合直觉</p>
+<h4 id="Function-Type">Function Type<a class="header-anchor" href="#Function-Type"> ¶</a></h4>
+<p>函数类型的子类型的两条基本规则比较显然，我们以 Nat 和 Int 为例子</p>
+<p>假如有 <code>f : Int -&gt; Int</code> ，考虑将定义域缩小， <code>f': Nat -&gt; Int</code> ，注意到 <code>f'(-1)</code> 没有定义，所以 <code>f'</code> 并不 &lt;: <code>f</code></p>
+<p>考虑将定义域扩大， <code>f': Real -&gt; Int</code> ，注意到 <code>f'</code> 对所有 <code>f</code> 可接受的输入产生合适的输出，所以 <code>f' &lt;: f</code></p>
+<p>同理，将值域扩大和缩小也能推出类似的规则，</p>
+<p><img src="/images/function_types_variance.png" alt="" loading="lazy"></p>
+<h4 id="Quantified-Type">Quantified Type<a class="header-anchor" href="#Quantified-Type"> ¶</a></h4>
+<p><img src="/images/quantified_type_variance.png" alt="" loading="lazy"></p>
+<p>这两条规则都比较直白，很好看懂</p>
+<p><img src="/images/quantified_type_variance_2.png" alt="" loading="lazy"></p>
+<p>这两条关系要抽象很多，而且 23.11 作者还写错了呃呃，第二个 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>τ</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow><annotation encoding="application/x-tex">\tau&#x27;</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7519em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span> 应该是 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>τ</mi></mrow><annotation encoding="application/x-tex">\tau</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span></p>
+<p>总而言之，首先让我们看看 universal type 的 contravariant 性质，让我们写一坨 ts 代码方便理解：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">type</span> A = &#123; <span class="hljs-attr">a</span>: <span class="hljs-built_in">number</span> &#125;;
+<span class="hljs-keyword">type</span> B = &#123; <span class="hljs-attr">b</span>: <span class="hljs-built_in">string</span> &#125;;
+
+<span class="hljs-comment">// 注意 typescript 是 structural type，可以认为这里自带一个 forall</span>
+<span class="hljs-comment">// ∀ t : A, t -&gt; A | undefined</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">id_a</span>(<span class="hljs-params"><span class="hljs-attr">a</span>: A</span>): A | <span class="hljs-literal">undefined</span> &#123;
+  <span class="hljs-keyword">return</span> a;
+&#125;
+
+<span class="hljs-comment">// ∀ t : A | B, t -&gt; A | undefined</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">id_a_or_b</span>(<span class="hljs-params"><span class="hljs-attr">a</span>: A | B</span>): A | <span class="hljs-literal">undefined</span> &#123;
+  <span class="hljs-keyword">return</span> <span class="hljs-literal">undefined</span>;
+&#125;
+
+<span class="hljs-comment">// ∀ t : A &amp; B, t -&gt; A | undefined</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">id_a_and_b</span>(<span class="hljs-params"><span class="hljs-attr">a</span>: A &amp; B</span>): A | <span class="hljs-literal">undefined</span> &#123;
+  <span class="hljs-keyword">return</span> a;
+&#125;
+
+<span class="hljs-comment">// A is a subtype of A | B</span>
+<span class="hljs-comment">// A &amp; B is a subtype of A</span>
+<span class="hljs-comment">// so id_a_or_b is a subtype of id_a</span>
+<span class="hljs-comment">// and id_a is a subtype of id_a_and_b</span>
+
+<span class="hljs-comment">// universal quantification is contravariant</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">test</span>(<span class="hljs-params"><span class="hljs-attr">fn</span>: <span class="hljs-keyword">typeof</span> id_a</span>) &#123;&#125;
+
+<span class="hljs-title function_">test</span>(id_a); <span class="hljs-comment">// ok</span>
+<span class="hljs-title function_">test</span>(id_a_or_b); <span class="hljs-comment">// ok</span>
+<span class="hljs-title function_">test</span>(id_a_and_b); <span class="hljs-comment">// error</span>
+<span class="hljs-comment">// 类型“(a: A &amp; B) =&gt; A | undefined”的参数不能赋给类型“(a: A) =&gt; A | undefined”的参数。</span>
+<span class="hljs-comment">//   参数“a”和“a” 的类型不兼容。</span>
+<span class="hljs-comment">//     不能将类型“A”分配给类型“A &amp; B”。</span>
+<span class="hljs-comment">//       类型 &quot;A&quot; 中缺少属性 &quot;b&quot;，但类型 &quot;B&quot; 中需要该属性。ts(2345)</span>
+</code></pre>
+<p>又，因为 ∃ t . τ == ∀ u . (∀ t. τ → u ) → u</p>
+<p>所以两次逆变，我们可以知道 extensial type 是协变的</p>
+</section><section class="post-meta"><span class="info"><i class="fa fa-calendar"></i> <span class="date">2025-05-16</span>  </span></section></article><p class="pagination"><a href="/2025/05/12/algebraic-effect/" title="简单接触 Algebraic Effects">Next</a></p><article class="comment-container"><div class="comment-container"><script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js" onload="(new Gitalk({&quot;clientID&quot;:&quot;12a250ac67f452906dd6&quot;,&quot;clientSecret&quot;:&quot;7422a9ecdc933d5e6facbc61d546bced40519f0b&quot;,&quot;repo&quot;:&quot;lhcfl.github.io&quot;,&quot;owner&quot;:&quot;lhcfl&quot;,&quot;admin&quot;:[&quot;lhcfl&quot;],&quot;id&quot;:&quot;PFPL 笔记 - VII Subtyping&quot;,&quot;distractionFreeMode&quot;:false})).render(&quot;gitalk-comment-slot&quot;)"></script><div id="gitalk-comment-slot">Loading...</div></div></article></main><footer class="footer"><br><p class="powered_by">Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> and <a target="_blank" rel="noopener" href="https://github.com/Lhcfl/hexo-theme-sosimple">SoSimple</a></p></footer></body></html>

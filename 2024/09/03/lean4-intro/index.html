@@ -1,0 +1,69 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Linca"><title>Lean 初见笔记 · Zero Calorie Drink Shop</title><meta name="description" content="Lean 4 是一个功能强大的交互式定理证明器和编程语言，结合了逻辑推理与编程，主要用于形式化验证、数学证明以及高可靠性软件开发。Lean 4 提供了一个灵活的类型系统和高性能的编译器，使其在理论研究和实际应用中都有出色表现。 —— GPT 说的。
+F*ck 我为什么要去看这种东西啊（悲） —— 我"><meta name="keywords" content="Code,Programing Language,Functional,Math,Lean"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="mobile-web-app-capable" content="yes"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta id="site_data_static" data-url="/"><meta name="renderer" content="webkit"><link rel="shortcut icon" type="image/x-icon" href="/images/logo.png"><link rel="stylesheet" href="/js_complied/bundle.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><style>:root { --normal-font-face: LXGW WenKai, LXGW WenKai TC, 'Times New Roman', Times, serif; }</style><script src="/js_complied/bundle.js"></script><script>Utils.loadCSS("https://testingcf.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css");
+Utils.loadCSS("https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&display=swap");
+Utils.loadCSS("https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css");
+Utils.loadCSS("/css/font-awesome.min.css");</script><meta name="generator" content="Hexo 7.3.0"></head><body class="post-page"><noscript><link rel="stylesheet" href="https://testingcf.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&amp;display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"></noscript><nav class="nav"><a href="/">Home</a>&nbsp;&nbsp;<a href="/archives">Archives</a>&nbsp;&nbsp;<a href="/tags">Tags</a>&nbsp;&nbsp;<a href="/about">About</a>&nbsp;&nbsp;<a href="/links">Links</a>&nbsp;&nbsp;<a href="/search">Search</a>&nbsp;&nbsp;<a href="javascript:SoSimple.darkLightToggle()">Dark/Light Mode</a></nav><main class="main"><article class="post-container post-full"><header class="post-title"><h1>Lean 初见笔记</h1></header><section class="post-toc"><details open><summary>Menu</summary><div class="toc"><ol class="toclist"><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#%E5%81%87%E8%A3%85%E8%BF%99%E6%98%AF%E5%89%8D%E8%A8%80"><span class="toclist-text">假装这是前言</span></a></li><li class="toclist-item toclist-level-2"><a class="toclist-link" href="#Preparation"><span class="toclist-text">Preparation</span></a><ol class="toclist-child"><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#Install"><span class="toclist-text">Install</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#The-book"><span class="toclist-text">The book</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#Basics"><span class="toclist-text">Basics</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#Tactic"><span class="toclist-text">Tactic</span></a></li></ol></li></ol></div></details></section><section class="post-body"><p>Lean 4 是一个功能强大的交互式定理证明器和编程语言，结合了逻辑推理与编程，主要用于形式化验证、数学证明以及高可靠性软件开发。Lean 4 提供了一个灵活的类型系统和高性能的编译器，使其在理论研究和实际应用中都有出色表现。 —— GPT 说的。</p>
+<p>F*ck 我为什么要去看这种东西啊（悲） —— 我说的</p>
+<span id="more"></span>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+.post-content { 
+  font-family: "Open sans", Arial;
+}
+</style>
+<h2 id="假装这是前言">假装这是前言<a class="header-anchor" href="#假装这是前言"> ¶</a></h2>
+<p>\senioria/</p>
+<p>这篇博客我会尝试用英语写。</p>
+<h2 id="Preparation">Preparation<a class="header-anchor" href="#Preparation"> ¶</a></h2>
+<h3 id="Install">Install<a class="header-anchor" href="#Install"> ¶</a></h3>
+<p>Follow the guide at <a target="_blank" rel="noopener" href="https://leanprover-community.github.io/get_started.html">https://leanprover-community.github.io/get_started.html</a></p>
+<h3 id="The-book">The book<a class="header-anchor" href="#The-book"> ¶</a></h3>
+<p>I’m firstly reading <a target="_blank" rel="noopener" href="https://leanprover-community.github.io/mathematics_in_lean/C01_Introduction.html">Mathematics in Lean</a> to start. It is the standard mathematics-oriented reference is Mathematics in Lean, recommended by Lean Community. Unlike other popular languages, you may need a high perspective of math to learn Lean.</p>
+<ul>
+<li>Senioria: linca 这种动态语言迷居然觉得 lean 爽 x（超小声（</li>
+<li>Me: no 我是在用它作为定理证明 （看上去就好坐牢</li>
+</ul>
+<p>（……真的有人会用 Lean 这种语言去写代码吗……学术代码例外）</p>
+<p>Unlike other languages, in general, if you just open a single <code>.lean</code> file in your text editor and try to compile it, you’ll get a bunch of confusing errors.</p>
+<p>Thus, you should <strong><em>strictly</em></strong> follow <a target="_blank" rel="noopener" href="https://leanprover-community.github.io/install/project.html#working-on-an-existing-project">the guide</a>, if you’re a starter. I suggest this because I messed up my environment just by swapping a step (oh…), that’s my personal experience.</p>
+<p>如果你是初学者，你应该严格的遵守安装指南。这是我的亲身体会，你只需要交换一个看上去微不足道的步骤就能搞坏你的环境。（毕竟初学者）</p>
+<p>Every non-trivial piece of Lean code needs to live inside a Lean project (sometimes also called a Lean package). A “Lean project” is more than just a folder that you’ve named “My Lean stuff”. Rather, it’s a folder containing some very specific things: in particular, a git repository and a file lakefile.lean that gathers information about dependencies of the project, including for instance the version of Lean that should be used.</p>
+<h3 id="Basics">Basics<a class="header-anchor" href="#Basics"> ¶</a></h3>
+<p>Learn requires us to justify <strong>each</strong> step in a calculation. For example:</p>
+<pre><code class="hljs language-lean"><span class="hljs-keyword">example</span> (a b c : ℝ) : a * b * c = b * (a * c) <span class="hljs-symbol">:=</span> <span class="hljs-keyword">by</span>
+  <span class="hljs-built_in">rw</span> [mul_comm a b]
+  <span class="hljs-built_in">rw</span> [mul_assoc b a c]
+</code></pre>
+<p>The <code>rw</code> means “rewrite”. And the <code>mul_comm</code> here means Commutative property of multiplication（乘法交换律）. So, <code>rw [mul_comm a b]</code> means “rewrite patterns match <code>(a * b)</code> to <code>(b * a)</code>”.</p>
+<p>You can see the replaced formula in VSCode here:</p>
+<p><img src="/images/mul_comm_20240903184037.png" alt="mul_comm_20240903184037.png" loading="lazy"></p>
+<p>And <code>\l</code> (<code>←</code>) stands for right-to-left equation replacement. For example:</p>
+<pre><code class="hljs language-lean"><span class="hljs-keyword">example</span> (a b c : ℝ) : b * (a * c) = a * b * c <span class="hljs-symbol">:=</span> <span class="hljs-keyword">by</span>
+  <span class="hljs-built_in">rw</span> [← mul_assoc b a c]
+  <span class="hljs-built_in">rw</span> [← mul_comm a b]
+</code></pre>
+<p>It is the reverse of the previous proof.</p>
+<h3 id="Tactic">Tactic<a class="header-anchor" href="#Tactic"> ¶</a></h3>
+<p>It will be annoying to write duplicated basic formulas, for example if we are proving this:</p>
+<pre><code class="hljs language-lean"><span class="hljs-keyword">example</span> : g + a + d + e + b + h + f + c = a + b + c + d + e + f + g + h <span class="hljs-symbol">:=</span> <span class="hljs-keyword">by</span>
+  <span class="hljs-built_in">rw</span> [add_comm g]
+  <span class="hljs-built_in">rw</span> [add_assoc a, add_comm g, ← add_assoc]
+  <span class="hljs-built_in">rw</span> [add_assoc (a + d), add_comm g, ← add_assoc]
+  <span class="hljs-built_in">rw</span> [add_assoc (a + d + e), add_comm g, ← add_assoc]
+  <span class="hljs-built_in">rw</span> [add_assoc (a + d + e + b), add_assoc (a)]
+  <span class="hljs-built_in">rw</span> [add_assoc a, add_comm (d + e), ← add_assoc a]
+  <span class="hljs-built_in">rw</span> [add_assoc (a + b + (d + e)), add_comm (g + h)]
+  <span class="hljs-built_in">rw</span> [add_assoc (a + b + (d + e)), add_comm (f + (g + h)), ← add_assoc]
+  <span class="hljs-built_in">rw</span> [add_assoc (a + b), add_comm (d + e)]
+  <span class="hljs-built_in">rw</span> [← add_assoc, ← add_assoc, ← add_assoc, ← add_assoc]
+</code></pre>
+<p>We reordered the items tediously, but this is something that a human would know is correct at first glance. In fact, Lean requires a rigorous proof, so this is essential, but we can let the computer do this boring work for us. We need to introduce a magic: <em>Tactic</em></p>
+<blockquote>
+<p>The <code>ring</code> tactic is imported indirectly when we import <code>Mathlib.Data.Real.Basic</code>, but we will see in the next section that it can be used for calculations on structures other than the real numbers. It can be imported explicitly with the command <code>import Mathlib.Tactic</code>. We will see there are similar tactics for other common kind of algebraic structures.</p>
+</blockquote>
+<p>The <code>ring</code> tactic is designed to prove identities in any commutative ring as long as they follow purely from the ring axioms, without using any local assumption. So we can rewrite the tedious proof above, with only one line:</p>
+<pre><code class="hljs language-lean"><span class="hljs-keyword">example</span> : g + a + d + e + b + h + f + c = a + b + c + d + e + f + g + h <span class="hljs-symbol">:=</span> <span class="hljs-keyword">by</span>
+  <span class="hljs-built_in">ring</span>
+</code></pre>
+<p>到这里 2.1. Calculating 的内容就结束了，今天就先写到这里。</p>
+</section><section class="post-meta"><span class="info"><i class="fa fa-calendar"></i> <span class="date">2024-09-03</span>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Code/" title="Code">Code</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Programing-Language/" title="Programing Language">Programing Language</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Functional/" title="Functional">Functional</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Math/" title="Math">Math</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Lean/" title="Lean">Lean</a>  </span></section></article><p class="pagination"><a href="/2024/09/03/make-blog-support-lean/" title="使 Hexo 支持高亮 Lean">Previous</a><span>  </span><a href="/2024/07/08/%E6%A8%A1%E6%8B%9F%E4%B8%80%E4%B8%AAvue%E7%9A%84%E5%93%8D%E5%BA%94%E5%BC%8F%E6%93%8D%E4%BD%9C/" title="试着复刻一个vue的计算属性">Next</a></p><article class="comment-container"><div class="comment-container"><script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js" onload="(new Gitalk({&quot;clientID&quot;:&quot;12a250ac67f452906dd6&quot;,&quot;clientSecret&quot;:&quot;7422a9ecdc933d5e6facbc61d546bced40519f0b&quot;,&quot;repo&quot;:&quot;lhcfl.github.io&quot;,&quot;owner&quot;:&quot;lhcfl&quot;,&quot;admin&quot;:[&quot;lhcfl&quot;],&quot;id&quot;:&quot;Lean 初见笔记&quot;,&quot;distractionFreeMode&quot;:false})).render(&quot;gitalk-comment-slot&quot;)"></script><div id="gitalk-comment-slot">Loading...</div></div></article></main><footer class="footer"><br><p class="powered_by">Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> and <a target="_blank" rel="noopener" href="https://github.com/Lhcfl/hexo-theme-sosimple">SoSimple</a></p></footer></body></html>
