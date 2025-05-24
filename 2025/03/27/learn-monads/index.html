@@ -1,0 +1,256 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Linca"><title>所以这个 Monads 到底是什么啊之让我学学 · Zero Calorie Drink Shop</title><meta name="description" content="简单的说单子(Monad)就是自函子范畴上的一个幺半群 👀 你说这个谁懂啊
+
+
+从很久以前就听说了 Monads 这个概念，但是一直都不懂，今天终于花了几个小时去理解（然后还是似懂非懂）
+Option, one of the most simple Monad ¶
+
+monad 可以理解成包了一些"><meta name="keywords" content="Programing Language,Functional"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="mobile-web-app-capable" content="yes"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta id="site_data_static" data-url="/"><meta name="renderer" content="webkit"><link rel="shortcut icon" type="image/x-icon" href="/images/logo.png"><link rel="stylesheet" href="/js_complied/bundle.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><style>:root { --normal-font-face: LXGW WenKai, LXGW WenKai TC, 'Times New Roman', Times, serif; }</style><script src="/js_complied/bundle.js"></script><script>Utils.loadCSS("https://testingcf.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css");
+Utils.loadCSS("https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&display=swap");
+Utils.loadCSS("https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css");
+Utils.loadCSS("/css/font-awesome.min.css");</script><meta name="generator" content="Hexo 7.3.0"></head><body class="post-page"><noscript><link rel="stylesheet" href="https://testingcf.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&amp;display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"></noscript><nav class="nav"><a href="/">Home</a>&nbsp;&nbsp;<a href="/archives">Archives</a>&nbsp;&nbsp;<a href="/tags">Tags</a>&nbsp;&nbsp;<a href="/about">About</a>&nbsp;&nbsp;<a href="/links">Links</a>&nbsp;&nbsp;<a href="/search">Search</a>&nbsp;&nbsp;<a href="javascript:SoSimple.darkLightToggle()">Dark/Light Mode</a></nav><main class="main"><article class="post-container post-full"><header class="post-title"><h1>所以这个 Monads 到底是什么啊之让我学学</h1></header><section class="post-body"><p><s>简单的说单子(Monad)就是自函子范畴上的一个幺半群</s> 👀 你说这个谁懂啊</p>
+<p><img src="/images/nishuozhexiewoyebudong.png" alt="" loading="lazy"></p>
+<span id="more"></span>
+<p>从很久以前就听说了 Monads 这个概念，但是一直都不懂，今天终于花了几个小时去理解（然后还是似懂非懂）</p>
+<h3 id="Option-one-of-the-most-simple-Monad">Option, one of the most simple Monad<a class="header-anchor" href="#Option-one-of-the-most-simple-Monad"> ¶</a></h3>
+<blockquote>
+<p>monad 可以理解成包了一些其他控制结构/副作用, 用来提供数据的管线</p>
+</blockquote>
+<p>让我们看看 Haskell 和 Lean 4 里分别对 Monad 的定义</p>
+<pre><code class="hljs language-haskell"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-type">Monad</span> m <span class="hljs-keyword">where</span></span>
+  return :: a -&gt; m a           <span class="hljs-comment">-- 也可以叫 pure</span>
+  (&gt;&gt;=)  :: m a -&gt; (a -&gt; m b) -&gt; m b
+</code></pre>
+<pre><code class="hljs language-lean"><span class="hljs-theorem"><span class="hljs-keyword">class</span> <span class="hljs-title">Monad</span> <span class="hljs-params">(m : <span class="hljs-built_in">Type</span> u → <span class="hljs-built_in">Type</span> v)</span> <span class="hljs-title">where</span>
+  <span class="hljs-title">pure</span> <span class="hljs-symbol">:</span></span> &#123;α : <span class="hljs-built_in">Type</span> u&#125; → α → m α
+  bind : &#123;α β : <span class="hljs-built_in">Type</span> u&#125; → m α → (α → m β) → m β
+</code></pre>
+<p>之后我们 focus on 最经典的 Monads 之一 也就是 <code>Option</code> 或者说 <code>Maybe</code></p>
+<pre><code class="hljs language-haskell"><span class="hljs-class"><span class="hljs-keyword">instance</span> <span class="hljs-type">Monad</span> <span class="hljs-type">Maybe</span> <span class="hljs-keyword">where</span></span>
+  return x = <span class="hljs-type">Just</span> x
+  <span class="hljs-type">Just</span> x &gt;&gt;= f = f x
+  <span class="hljs-type">Nothing</span> &gt;&gt;= _ = <span class="hljs-type">Nothing</span>
+</code></pre>
+<pre><code class="hljs language-lean"><span class="hljs-comment">-- 真实代码不长这样</span>
+
+<span class="hljs-keyword">inductive</span> Option (α : <span class="hljs-built_in">Type</span> u) where
+  <span class="hljs-doctag">/-- No value. -/</span>
+  | none : Option α
+  <span class="hljs-doctag">/-- Some value of type `α`. -/</span>
+  | some (val : α) : Option α
+
+<span class="hljs-theorem"><span class="hljs-keyword">instance</span> <span class="hljs-symbol">:</span></span> Monad Option where
+  pure x <span class="hljs-symbol">:=</span> some x
+  bind opt next <span class="hljs-symbol">:=</span>
+    <span class="hljs-keyword">match</span> opt <span class="hljs-built_in">with</span>
+    | none =&gt; none
+    | some x =&gt; next x
+</code></pre>
+<p>可以大概地看出一件事：一个 Monad （在这里）是一个<strong>类型类</strong>，得到一种将它们串起来的方法</p>
+<p>什么事类型类呢？类型类可以理解为一个接口 / trait 之类的东西，实现了这个接口以后就有这个接口的特征</p>
+<p>也就是说，我们给 Option 实现了 Monad 以后，就能用 Monad 来串联 Option 了</p>
+<pre><code class="hljs language-lean">#eval bind (some <span class="hljs-number">2</span>) <span class="hljs-keyword">λ</span> x =&gt; pure $ x + <span class="hljs-number">3</span>
+#eval (some <span class="hljs-number">2</span>) &gt;&gt;= <span class="hljs-keyword">λ</span> x =&gt; pure $ x + <span class="hljs-number">3</span>
+<span class="hljs-comment">-- some 5</span>
+</code></pre>
+<p>也就是说，我们可以这样直观地去理解一个 Monad：它是一个管子，<code>pure</code> 用来往管子里放东西，<code>bind</code> 用来定义管子里的东西怎么流动。</p>
+<p>为了方便非函数式背景的人<s>比如我</s>进一步理解 Monad，我们可以用 C++ 模拟一个半残的 Monad Option：</p>
+<pre><code class="hljs language-c++"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;functional&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;optional&gt;</span></span>
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">T</span>, <span class="hljs-keyword">class</span> <span class="hljs-title class_">M</span>&gt; <span class="hljs-keyword">class</span> <span class="hljs-title class_">Monads</span> &#123;
+<span class="hljs-keyword">public</span>:
+  <span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-keyword">auto</span> <span class="hljs-title">pure</span><span class="hljs-params">(T)</span> -&gt; M</span>;
+  <span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-keyword">auto</span> <span class="hljs-title">bind</span><span class="hljs-params">(M, std::function&lt;M(T)&gt;)</span> -&gt; M</span>;
+  <span class="hljs-keyword">auto</span> <span class="hljs-keyword">operator</span>&gt;&gt;(std::function&lt;<span class="hljs-built_in">M</span>(T)&gt; fun) -&gt; M &#123; <span class="hljs-keyword">return</span> <span class="hljs-built_in">bind</span>(*<span class="hljs-keyword">this</span>, fun); &#125;
+&#125;;
+
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">class</span> <span class="hljs-title class_">T</span>&gt; <span class="hljs-keyword">class</span> <span class="hljs-title class_">Option</span> : <span class="hljs-keyword">public</span> Monads&lt;T, Option&lt;T&gt;&gt; &#123;
+  std::optional&lt;T&gt; v;
+  <span class="hljs-built_in">Option</span>(std::optional&lt;T&gt; v) : <span class="hljs-built_in">v</span>(std::<span class="hljs-built_in">move</span>(v)) &#123;&#125;
+
+<span class="hljs-keyword">public</span>:
+  <span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-keyword">auto</span> <span class="hljs-title">pure</span><span class="hljs-params">(T val)</span> -&gt; Option&lt;T&gt; </span>&#123; <span class="hljs-keyword">return</span> <span class="hljs-built_in">Option</span>(std::<span class="hljs-built_in">optional</span>&lt;T&gt;(val)); &#125;
+  <span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-keyword">auto</span> <span class="hljs-title">bind</span><span class="hljs-params">(Option opt, std::function&lt;Option(T)&gt; fun)</span> -&gt; Option </span>&#123;
+    <span class="hljs-keyword">if</span> (opt.v.<span class="hljs-built_in">has_value</span>()) &#123;
+      <span class="hljs-keyword">return</span> <span class="hljs-built_in">fun</span>(opt.v.<span class="hljs-built_in">value</span>());
+    &#125; <span class="hljs-keyword">else</span> &#123;
+      <span class="hljs-keyword">return</span> <span class="hljs-built_in">Option</span>(std::<span class="hljs-literal">nullopt</span>);
+    &#125;
+  &#125;
+  <span class="hljs-keyword">auto</span> <span class="hljs-keyword">operator</span>&gt;&gt;(std::function&lt;<span class="hljs-built_in">Option</span>(T)&gt; fun) -&gt; Option &#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-built_in">bind</span>(*<span class="hljs-keyword">this</span>, fun);
+  &#125;
+  <span class="hljs-function"><span class="hljs-keyword">auto</span> <span class="hljs-title">get_v</span><span class="hljs-params">()</span> -&gt; std::optional&lt;T&gt; </span>&#123; <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>-&gt;v; &#125;
+&#125;;
+
+<span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;
+  <span class="hljs-keyword">auto</span> opt = Option&lt;<span class="hljs-type">int</span>&gt;::<span class="hljs-built_in">pure</span>(<span class="hljs-number">3</span>);
+  <span class="hljs-keyword">auto</span> p2 = opt &gt;&gt; [](<span class="hljs-type">int</span> v) &#123; <span class="hljs-keyword">return</span> Option&lt;<span class="hljs-type">int</span>&gt;::<span class="hljs-built_in">pure</span>(v + <span class="hljs-number">2</span>); &#125;;
+  std::cout &lt;&lt; p<span class="hljs-number">2.</span><span class="hljs-built_in">get_v</span>().<span class="hljs-built_in">value</span>(); <span class="hljs-comment">// 5</span>
+&#125;
+</code></pre>
+<p>有了 <code>Monad</code> 定义的这根管子，任何继承了 <code>Monad</code> （或者说实现了 Monad 接口）的类都将会有一个 <code>&gt;&gt;</code> 符号，把自己“流”到一个函数里面，流出来一个新的 Monad。这就是 Monad 的作用。</p>
+<h3 id="Why-Monads">Why Monads<a class="header-anchor" href="#Why-Monads"> ¶</a></h3>
+<p>如果没有 monads，我们可能不得不写出这样的代码</p>
+<pre><code class="hljs language-lean"><span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">get1357</span> <span class="hljs-params">(xs : List α)</span> <span class="hljs-symbol">:</span></span> Option (α × α × α × α) <span class="hljs-symbol">:=</span>
+  <span class="hljs-keyword">match</span> xs[<span class="hljs-number">0</span>]? <span class="hljs-built_in">with</span>
+  | none =&gt; none
+  | some first =&gt;
+    <span class="hljs-keyword">match</span> xs[<span class="hljs-number">2</span>]? <span class="hljs-built_in">with</span>
+    | none =&gt; none
+    | some third =&gt;
+      <span class="hljs-keyword">match</span> xs[<span class="hljs-number">4</span>]? <span class="hljs-built_in">with</span>
+      | none =&gt; none
+      | some fifth =&gt;
+        <span class="hljs-keyword">match</span> xs[<span class="hljs-number">6</span>]? <span class="hljs-built_in">with</span>
+        | none =&gt; none
+        | some seventh =&gt;
+          some (first, third, fifth, seventh)
+</code></pre>
+<p>比如说许多的非函数式语言，就不得不这样写</p>
+<pre><code class="hljs language-go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">foo</span><span class="hljs-params">()</span></span> &#123;
+  _, err = task1();
+  <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, err
+  &#125;
+  _, err = task2();
+  <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, err
+  &#125;
+  _, err = task3();
+  <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, err
+  &#125;
+  _, err = task4();
+  <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, err
+  &#125;
+  _, err = task5();
+  <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, err
+  &#125;
+&#125;
+</code></pre>
+<p>人们已经注意到这样的链式行为非常多，以至于在 C#, Kotlin, Javascript 等语言中，有一个 <code>?.</code> 运算符，专门用于链式地在可能为 <code>null</code> 的值上查找属性或调用方法的。如果 <code>?.</code> 前的值为 <code>null</code>，则整个表达式为 <code>null</code>。否则，该非 <code>null</code> 值会被用于使用。像这样链接 <code>null</code> 检查比编写和维护深层嵌套的 if 方便得多。</p>
+<h3 id="State-Monad">State Monad<a class="header-anchor" href="#State-Monad"> ¶</a></h3>
+<p>在接触纯函数式语言的时候，我们最先知道的也是最先<s>深受其害</s>大为震撼的，应该是它的不可变。我们不再能方便地使用状态。但是有时候，必须要用到一些状态。</p>
+<p>比如，让我们用函数式语言写一个斐波那契数列的计算。</p>
+<pre><code class="hljs language-haskell"><span class="hljs-title">fib</span> :: <span class="hljs-type">Int</span> -&gt; <span class="hljs-type">Int</span>
+<span class="hljs-title">fib</span> <span class="hljs-number">1</span> = <span class="hljs-number">1</span>
+<span class="hljs-title">fib</span> <span class="hljs-number">2</span> = <span class="hljs-number">1</span>
+<span class="hljs-title">fib</span> n = fib (n - <span class="hljs-number">1</span>) + fib (n - <span class="hljs-number">2</span>)
+
+<span class="hljs-title">main</span> :: <span class="hljs-type">IO</span> ()
+<span class="hljs-title">main</span> = print $ fib <span class="hljs-number">10</span>
+<span class="hljs-comment">-- 55</span>
+</code></pre>
+<p>它很好，但是效率致命的低下，具有指数级的时间复杂度。有很多更加函数式风格的改善，不过让我们考虑 C/C++ 的代码</p>
+<pre><code class="hljs language-c++"><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">fib</span><span class="hljs-params">(<span class="hljs-type">int</span> n)</span> </span>&#123;
+    <span class="hljs-type">int</span> a = <span class="hljs-number">1</span>, b = <span class="hljs-number">1</span>;
+    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; i++) &#123;
+        <span class="hljs-type">int</span> c = a;
+        a = b;
+        b = a + c;
+    &#125;
+    <span class="hljs-keyword">return</span> a;
+&#125;
+</code></pre>
+<p><code>a</code> 和 <code>b</code> 是状态，维护了 <code>fib (n - 1)</code> 和 <code>fib (n - 2)</code></p>
+<p>如果是函数式语言的话，容易想出一种解决方案：把状态当成参数传入（和传出）。给定状态 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi></mrow><annotation encoding="application/x-tex">S</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span></span></span>, 返回 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mi>R</mi><mo separator="true">,</mo><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(R, S&#x27;)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0019em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.00773em;">R</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> 其中 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi></mrow><annotation encoding="application/x-tex">R</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.00773em;">R</span></span></span></span> 是本来的返回值，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>S</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow><annotation encoding="application/x-tex">S&#x27;</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7519em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span> 是修改后的新状态。</p>
+<pre><code class="hljs language-haskell"><span class="hljs-title">fibHelper</span> :: <span class="hljs-type">Int</span> -&gt; (<span class="hljs-type">Int</span>, <span class="hljs-type">Int</span>) -&gt; <span class="hljs-type">Int</span>
+<span class="hljs-title">fibHelper</span> <span class="hljs-number">0</span> (a, b) = a
+<span class="hljs-title">fibHelper</span> n (a, b) = fibHelper (n - <span class="hljs-number">1</span>) (b, a + b)
+
+<span class="hljs-title">fib</span> :: <span class="hljs-type">Int</span> -&gt; <span class="hljs-type">Int</span>
+<span class="hljs-title">fib</span> n = fibHelper n (<span class="hljs-number">0</span>, <span class="hljs-number">1</span>)
+
+<span class="hljs-title">main</span> :: <span class="hljs-type">IO</span> ()
+<span class="hljs-title">main</span> = print $ fib <span class="hljs-number">10</span>
+<span class="hljs-comment">-- 55</span>
+</code></pre>
+<p>这样很好地解决了这个问题。</p>
+<p>注意到，因为有了状态，之前理论上可能可以交换的执行顺序变得固定了。在之前，<code>fib (n - 1)</code> 和 <code>fib (n - 2)</code> 完全是独立的，理论上先算哪个都没关系。现在后面的状态总是依赖于前面的状态被计算出。这种关系形成了一个链条，于是有了我们 Monads 的用武之地。</p>
+<p>State Monads 通常被实现为一个</p>
+<pre><code class="hljs language-lean"><span class="hljs-theorem"><span class="hljs-keyword">structure</span> <span class="hljs-title">State</span> <span class="hljs-params">(σ α : <span class="hljs-built_in">Type</span>)</span> <span class="hljs-title">where</span>
+  <span class="hljs-title">run</span> <span class="hljs-symbol">:</span></span> σ → (α × σ)
+</code></pre>
+<p>容易看出这就是一个对 <code>state -&gt; (val, state)</code> 的包装，</p>
+<pre><code class="hljs language-lean"><span class="hljs-theorem"><span class="hljs-keyword">instance</span> <span class="hljs-symbol">:</span></span> Monad (State σ) where
+  pure x <span class="hljs-symbol">:=</span> ⟨<span class="hljs-keyword">fun</span> s =&gt; (x, s)⟩  <span class="hljs-comment">-- 直接返回 x，不改变状态</span>
+  bind sa f <span class="hljs-symbol">:=</span> ⟨<span class="hljs-keyword">fun</span> s =&gt;
+    <span class="hljs-keyword">let</span> (a, s<span class="hljs-string">&#x27;) := sa.run s  -- 取出当前状态，计算 a
+    (f a).run s&#x27;</span>⟩  <span class="hljs-comment">-- 用新状态执行 f</span>
+</code></pre>
+<p>然后在上面经常会实现有 get 和 put 两个很方便的函数</p>
+<pre><code class="hljs language-lean"><span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">get</span> <span class="hljs-symbol">:</span></span> State σ σ <span class="hljs-symbol">:=</span>
+  ⟨<span class="hljs-keyword">fun</span> s =&gt; (s, s)⟩  <span class="hljs-comment">-- 直接返回当前状态 s</span>
+
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">put</span> <span class="hljs-params">(s&#x27; : σ)</span> <span class="hljs-symbol">:</span></span> State σ Unit <span class="hljs-symbol">:=</span>
+  ⟨<span class="hljs-keyword">fun</span> _ =&gt; ((), s<span class="hljs-string">&#x27;)⟩  -- 不关心旧状态，直接设置新状态
+</span></code></pre>
+<p>比如之前那个斐波那契数列，可以这样写：</p>
+<pre><code class="hljs language-lean"><span class="hljs-keyword">import</span> Std
+
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">fibStep</span> <span class="hljs-symbol">:</span></span> StateM (Nat × Nat) Nat <span class="hljs-symbol">:=</span> <span class="hljs-keyword">do</span>
+  <span class="hljs-keyword">let</span> (a, b) ← get    <span class="hljs-comment">-- 读取 (a, b)</span>
+  set (b, a + b)     <span class="hljs-comment">-- 更新状态为 (b, a+b)</span>
+  <span class="hljs-keyword">return</span> b
+
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">fib</span> <span class="hljs-params">(n: Nat)</span> <span class="hljs-symbol">:=</span></span> (<span class="hljs-keyword">do</span>
+  for _ <span class="hljs-keyword">in</span> [<span class="hljs-number">0</span>:n] <span class="hljs-keyword">do</span>
+    _ &lt;- fibStep
+  <span class="hljs-keyword">return</span> &lt;- fibStep).run<span class="hljs-string">&#x27; (0, 1)
+
+#eval [1,2,3,4,5,6].map fib
+-- [1, 2, 3, 5, 8, 13]
+</span></code></pre>
+<p>我们把它 desugar，基本上相当于</p>
+<pre><code class="hljs language-lean"><span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">fibStep&#x27;</span> <span class="hljs-symbol">:</span></span> StateM (Nat × Nat) Nat <span class="hljs-symbol">:=</span>
+  get &gt;&gt;= <span class="hljs-keyword">fun</span> (a, b) =&gt;           <span class="hljs-comment">-- 读取 (a, b)</span>
+  set (b, a + b) &gt;&gt;= <span class="hljs-keyword">fun</span> _ =&gt;     <span class="hljs-comment">-- 更新状态为 (b, a+b)</span>
+  pure b                          <span class="hljs-comment">-- 返回 b</span>
+
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">fibrecu</span> <span class="hljs-params">(step : Nat)</span> <span class="hljs-symbol">:</span></span> StateM (Nat × Nat) Nat <span class="hljs-symbol">:=</span>
+  fibStep &gt;&gt;= <span class="hljs-keyword">fun</span> r =&gt; <span class="hljs-keyword">match</span> step <span class="hljs-built_in">with</span>
+  | .zero =&gt; pure r
+  | .succ step<span class="hljs-string">&#x27; =&gt; fibrecu step&#x27;</span>
+
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">fib&#x27;</span> <span class="hljs-params">(n : Nat)</span> <span class="hljs-symbol">:</span></span> Nat <span class="hljs-symbol">:=</span> (fibrecu n).run<span class="hljs-string">&#x27; (0, 1)
+
+#eval [1,2,3,4,5,6].map fib&#x27;</span>
+<span class="hljs-comment">-- [1, 2, 3, 5, 8, 13]</span>
+</code></pre>
+<p>也就是说，在 State Monad 这个神奇的管道下，只需要传入初始状态，则 <code>get</code> 和 <code>set</code> 就能一路把状态在管道内传递，而无需我们手动维护。有了 State Monads 我们就在 “不可变” 的语言里产生了 “可变”</p>
+<p>当然，我们这样费力 Desugar 反而有点适得其反了，其实我们本身就是为了能写 <code>do</code> 记号而引入的 Monads。</p>
+<h3 id="Promise-Monad"><s>Promise Monad</s><a class="header-anchor" href="#Promise-Monad"> ¶</a></h3>
+<blockquote>
+<p>什么？这不是 <code>Promise</code>，这是一个异步 Monad 。我们这个异步 Monad 体积小方便携带，拆开一包，放 then 里就变出值，怎么 then 都有值，用来解决回调地狱，做异步都是很好用的。你看打开以后像 Monads 一样的结构，放在事件循环里，你看它遇 resolved 变大变高，可用性很强的。打开以后，是一条加大加厚的 value，你看它怎么玩都玩不坏，不掉毛不掉絮，then 个七八次都没问题，异步函数带上它非常方便，你用它跑个 XMLHTTPRequest，跑个 fs.readFile，干净又卫生。什么？在哪里用？点击键盘 F12，开 Console，敲一行，看一行，还有结果。</p>
+</blockquote>
+<p>当我们写 JavaScript 的时候，应该感谢 Monads 的伟力。显然 Promise （删掉 catch）本质上是一个 Monad：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> monad_promise = &#123;
+  <span class="hljs-attr">pure</span>: <span class="hljs-title class_">Promise</span>.<span class="hljs-property">resolve</span> <span class="hljs-keyword">as</span> &lt;T&gt;<span class="hljs-function">(<span class="hljs-params"><span class="hljs-attr">t</span>: T</span>) =&gt;</span> <span class="hljs-title class_">Promise</span>&lt;T&gt;,
+  <span class="hljs-attr">bind</span>: <span class="hljs-title class_">Promise</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">then</span> <span class="hljs-keyword">as</span> &lt;T, U&gt;<span class="hljs-function">(<span class="hljs-params">
+    <span class="hljs-attr">this</span>: <span class="hljs-title class_">Promise</span>&lt;T&gt;,
+    <span class="hljs-attr">fn</span>: (t: T) =&gt; <span class="hljs-title class_">Promise</span>&lt;U&gt;
+  </span>) =&gt;</span> <span class="hljs-title class_">Promise</span>&lt;U&gt;,
+&#125;;
+</code></pre>
+<p>有了 Promise Monad，之前的回调地狱就这样变成了</p>
+<pre><code class="hljs language-javascript"><span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">resolve</span>(<span class="hljs-number">3</span>)
+  .<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">x</span>) =&gt;</span> x + <span class="hljs-number">4</span>)
+  .<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">x</span>) =&gt;</span> x * <span class="hljs-number">2</span>)
+  .<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">x</span>) =&gt;</span> <span class="hljs-title function_">some_api</span>(x));
+</code></pre>
+<p>同样的，Javascript 也提供了像 do notation 那样消除显式的 then 的工具，也就是 <code>async</code></p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;
+  <span class="hljs-keyword">let</span> x = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">resolve</span>(<span class="hljs-number">3</span>);
+  x = <span class="hljs-keyword">await</span> <span class="hljs-title function_">add4</span>(x);
+  x = <span class="hljs-keyword">await</span> <span class="hljs-title function_">somefunc</span>(x);
+  x = <span class="hljs-keyword">await</span> <span class="hljs-title function_">some_api</span>(x);
+  <span class="hljs-keyword">return</span> x
+&#125;
+</code></pre>
+<p>起到了将异步函数打成看上去像同步一样的效果。</p>
+<h3 id="总结">总结<a class="header-anchor" href="#总结"> ¶</a></h3>
+<p>所以并非只有函数式语言，我们其实已经应用了许多的 Monads 到实践中。Monads 将链式的控制流封装起来，提供统一的表达方式，从而提高代码的可读性。</p>
+</section><section class="post-meta"><span class="info"><i class="fa fa-calendar"></i> <span class="date">2025-03-27</span>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Programing-Language/" title="Programing Language">Programing Language</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Functional/" title="Functional">Functional</a>  </span></section></article><p class="pagination"><a href="/2025/03/30/pop-front-list-compare-vec/" title="小数据的时候 `std::vector&lt;int&gt;` 删除首元素比 deque 和 list 还快">Previous</a><span>  </span><a href="/2025/03/22/pfpl-note-6/" title="PFPL 笔记 - VI Dynamic Types">Next</a></p><article class="comment-container"><div class="comment-container"><script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js" onload="(new Gitalk({&quot;clientID&quot;:&quot;12a250ac67f452906dd6&quot;,&quot;clientSecret&quot;:&quot;7422a9ecdc933d5e6facbc61d546bced40519f0b&quot;,&quot;repo&quot;:&quot;lhcfl.github.io&quot;,&quot;owner&quot;:&quot;lhcfl&quot;,&quot;admin&quot;:[&quot;lhcfl&quot;],&quot;id&quot;:&quot;所以这个 Monads 到底是什么啊之让我学学&quot;,&quot;distractionFreeMode&quot;:false})).render(&quot;gitalk-comment-slot&quot;)"></script><div id="gitalk-comment-slot">Loading...</div></div></article></main><footer class="footer"><br><p class="powered_by">Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> and <a target="_blank" rel="noopener" href="https://github.com/Lhcfl/hexo-theme-sosimple">SoSimple</a></p></footer></body></html>
