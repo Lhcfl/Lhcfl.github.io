@@ -1,0 +1,7 @@
+User-agent: BaiDuSpider
+Disallow: *
+
+User-agent: 操你爹所有未经我同意的“博客聚合站点”
+Disallow: *
+
+# “川流”和“Saveweb”项目的作者您好：您全家暴毙。
