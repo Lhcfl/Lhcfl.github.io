@@ -1,0 +1,343 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Linca"><title>简单接触 Algebraic Effects · Zero Calorie Drink Shop</title><meta name="description" content="TL;DR：简而言之，代数效应是一种机制，允许在不破坏函数式编程纯度的前提下，更加结构化和组合化地处理副作用。
+
+引入 ¶
+本学期的 Rust 课程项目大作业是写一个 git。总而言之，Git 有一个对象存储系统，允许将 Tree 和 Blob 和 Commit 作为三种不同的 Object 存储在"><meta name="keywords" content="Code,Programing Language"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="mobile-web-app-capable" content="yes"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta id="site_data_static" data-url="/"><meta name="renderer" content="webkit"><link rel="shortcut icon" type="image/x-icon" href="/images/logo.png"><link rel="stylesheet" href="/js_complied/bundle.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><style>:root { --normal-font-face: LXGW WenKai, LXGW WenKai TC, 'Times New Roman', Times, serif; }</style><script src="/js_complied/bundle.js"></script><script>Utils.loadCSS("https://testingcf.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css");
+Utils.loadCSS("https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&display=swap");
+Utils.loadCSS("https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css");
+Utils.loadCSS("/css/font-awesome.min.css");</script><meta name="generator" content="Hexo 7.3.0"></head><body class="post-page"><noscript><link rel="stylesheet" href="https://testingcf.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&amp;display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"></noscript><nav class="nav"><a href="/">Home</a>&nbsp;&nbsp;<a href="/archives">Archives</a>&nbsp;&nbsp;<a href="/tags">Tags</a>&nbsp;&nbsp;<a href="/about">About</a>&nbsp;&nbsp;<a href="/links">Links</a>&nbsp;&nbsp;<a href="/search">Search</a>&nbsp;&nbsp;<a href="javascript:SoSimple.darkLightToggle()">Dark/Light Mode</a></nav><main class="main"><article class="post-container post-full"><header class="post-title"><h1>简单接触 Algebraic Effects</h1></header><section class="post-toc"><details open><summary>Menu</summary><div class="toc"><ol class="toclist"><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#%E5%BC%95%E5%85%A5"><span class="toclist-text">引入</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#Effect%EF%BC%8CSide-Effect"><span class="toclist-text">Effect，Side Effect</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#Algebraic-Effect"><span class="toclist-text">Algebraic Effect</span></a></li></ol></div></details></section><section class="post-body"><p>TL;DR：简而言之，代数效应是一种机制，允许在不破坏函数式编程纯度的前提下，更加结构化和组合化地处理副作用。</p>
+<span id="more"></span>
+<h3 id="引入">引入<a class="header-anchor" href="#引入"> ¶</a></h3>
+<p>本学期的 Rust 课程项目大作业是写一个 git。总而言之，Git 有一个对象存储系统，允许将 <code>Tree</code> 和 <code>Blob</code> 和 <code>Commit</code> 作为三种不同的 <code>Object</code> 存储在 <code>.git/objects/[object hash]</code> 这个文件中。</p>
+<p>作为一个浸淫于实践需求中的人，你很容易看出来，git 项目的几乎所有东西都依赖实现计算好的 <code>.git</code> 文件夹的位置，所以我们可以抽象一个数据类型</p>
+<pre><code class="hljs language-rust"><span class="hljs-keyword">pub</span> <span class="hljs-keyword">struct</span> <span class="hljs-title class_">Repository</span> &#123;
+    <span class="hljs-comment">/// .git dir for the repository</span>
+    <span class="hljs-keyword">pub</span> root: PathBuf,
+&#125;
+</code></pre>
+<p>这很好。然后你发现，我们需要带着这个 <code>Repository</code> 的引用（指针）到处跑，所有需要从磁盘中读取和保存的场景我们全都需要 <code>Repository</code> 提供的 <code>root</code> 路径。一个不太熟练（ <s>不太被腌入味了</s> ）的人可能会写出</p>
+<pre><code class="hljs language-rust"><span class="hljs-keyword">impl</span> <span class="hljs-title class_">Object</span> &#123;
+    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">save</span>(<span class="hljs-keyword">self</span>, repo: Repository) <span class="hljs-punctuation">-&gt;</span> io::<span class="hljs-type">Result</span>&lt;()&gt; &#123; ... &#125;
+    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">load</span>(repo: Repository) <span class="hljs-punctuation">-&gt;</span> io::<span class="hljs-type">Result</span>&lt;<span class="hljs-keyword">Self</span>&gt; &#123; ... &#125;
+&#125;
+</code></pre>
+<p>这当然好！……但是有没有可能，到处都要显式传递 repo 这件事显得很繁琐很增加键盘输入量呢？</p>
+<p>所以你脑袋一拍，我们构造一个数据结构吧，</p>
+<pre><code class="hljs language-rust"><span class="hljs-keyword">pub</span> <span class="hljs-keyword">struct</span> <span class="hljs-title class_">WithRepo</span>&lt;<span class="hljs-symbol">&#x27;r</span>, T&gt; &#123;
+    <span class="hljs-keyword">pub</span> repo: &amp;<span class="hljs-symbol">&#x27;r</span> Repository,
+    inner: T,
+&#125;
+
+<span class="hljs-keyword">impl</span>&lt;<span class="hljs-symbol">&#x27;r</span>, T&gt; WithRepo&lt;<span class="hljs-symbol">&#x27;r</span>, T&gt; &#123;
+    <span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">new</span>(repo: &amp;<span class="hljs-symbol">&#x27;r</span> Repository, inner: T) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-keyword">Self</span> &#123;
+        WithRepo &#123; repo, inner &#125;
+    &#125;
+
+    <span class="hljs-comment">/// Wrap the storeable object with the repository path</span>
+    <span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">wrap</span>&lt;To&gt;(&amp;<span class="hljs-keyword">self</span>, inner: To) <span class="hljs-punctuation">-&gt;</span> WithRepo&lt;<span class="hljs-symbol">&#x27;r</span>, To&gt; &#123;
+        WithRepo &#123;
+            repo: <span class="hljs-keyword">self</span>.repo,
+            inner,
+        &#125;
+    &#125;
+
+    <span class="hljs-comment">/// unpack self, and get the inner object</span>
+    <span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">unwrap</span>(<span class="hljs-keyword">self</span>) <span class="hljs-punctuation">-&gt;</span> T &#123;
+        <span class="hljs-keyword">self</span>.inner
+    &#125;
+
+    <span class="hljs-comment">/// A `WithRepo&lt;T&gt;` is actually a functor, you can apply a T -&gt; U function to `WithRepo&lt;T&gt;` to get` WithRepo&lt;U&gt;` by mapping it.</span>
+    <span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">map</span>&lt;F, U&gt;(<span class="hljs-keyword">self</span>, f: F) <span class="hljs-punctuation">-&gt;</span> WithRepo&lt;<span class="hljs-symbol">&#x27;r</span>, U&gt;
+    <span class="hljs-keyword">where</span>
+        F: <span class="hljs-title function_ invoke__">FnOnce</span>(T) <span class="hljs-punctuation">-&gt;</span> U,
+    &#123;
+        WithRepo &#123;
+            repo: <span class="hljs-keyword">self</span>.repo,
+            inner: <span class="hljs-title function_ invoke__">f</span>(<span class="hljs-keyword">self</span>.inner),
+        &#125;
+    &#125;
+&#125;
+</code></pre>
+<p><code>WithRepo</code> 是一个 <a target="_blank" rel="noopener" href="https://www.adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html">Functor</a>，它有一个 map 方法，在 Haskell 里是 <code>fmap</code> ，用来把一个 <code>a -&gt; b</code> 的函数 apply 到 <code>WithRepo&lt;a&gt;</code> 上得到一个 <code>WithRepo&lt;b&gt;</code></p>
+<p>现在好多了，我们可以直接在 <code>WithRepo&lt;Object&gt;</code> 之类的东西上做文章，<code>Repository</code> 的指针在被创建的时候被包了进去作为<strong>依赖</strong>。我们可以写出这样优雅的代码：</p>
+<pre><code class="hljs language-rust"><span class="hljs-keyword">let</span> <span class="hljs-variable">repo</span> = Repository::<span class="hljs-title function_ invoke__">load</span>()?;
+
+<span class="hljs-comment">// stage: WithRepo&lt;&#x27;_, MutableTree&gt;</span>
+<span class="hljs-keyword">let</span> <span class="hljs-keyword">mut </span><span class="hljs-variable">stage</span> = repo.<span class="hljs-title function_ invoke__">stage</span>()?.<span class="hljs-title function_ invoke__">into_muter</span>();
+
+<span class="hljs-keyword">for</span> <span class="hljs-variable">path</span> <span class="hljs-keyword">in</span> &amp;<span class="hljs-keyword">self</span>.paths &#123;
+    <span class="hljs-keyword">let</span> <span class="hljs-variable">path</span> = env::<span class="hljs-title function_ invoke__">current_dir</span>()?.<span class="hljs-title function_ invoke__">join</span>(path);
+    stage.<span class="hljs-title function_ invoke__">add_path</span>(&amp;path)?;
+&#125;
+
+<span class="hljs-comment">/// impl&lt;&#x27;a&gt; WithRepo&lt;&#x27;a, MutableTree&gt; pub fn freeze(self) -&gt; WithRepo&lt;&#x27;a, Tree&gt;</span>
+stage.<span class="hljs-title function_ invoke__">freeze</span>().<span class="hljs-title function_ invoke__">map</span>(Stage).<span class="hljs-title function_ invoke__">save</span>()?;
+</code></pre>
+<p><code>repo</code> 这个参数只在最开始被使用，之后的 stage 以及 <code>WithRepo&lt;'a, MutableTree&gt;</code> 这个东西的所有内部用到的东西都很自然地被提供了 <code>repo</code> 这个上下文，因此 <code>save</code> 不需要额外的参数指明 <code>.git</code> 所在文件夹的路径，直观而优雅。</p>
+<p>问题出在 <code>add_path</code> 里面。<code>add_path</code> 在文件系统中找到路径，测试它是文件还是文件夹，如果是文件把它读取并存储为 <code>Blob</code>，如果是文件夹把它 dump 成一个 <code>Tree</code> 并存储。</p>
+<p>这是我们的代码。</p>
+<pre><code class="hljs language-rust"><span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">add_file</span>(&amp;<span class="hljs-keyword">mut</span> <span class="hljs-keyword">self</span>, path: &amp;Path) <span class="hljs-punctuation">-&gt;</span> io::<span class="hljs-type">Result</span>&lt;&amp;<span class="hljs-keyword">mut</span> <span class="hljs-keyword">Self</span>&gt; &#123;
+    <span class="hljs-keyword">let</span> <span class="hljs-variable">filename</span> = path
+        .<span class="hljs-title function_ invoke__">file_name</span>()
+        .<span class="hljs-title function_ invoke__">ok_or</span>(io::Error::<span class="hljs-title function_ invoke__">new</span>(
+            io::ErrorKind::InvalidInput,
+            <span class="hljs-built_in">format!</span>(<span class="hljs-string">&quot;file name is invalid: &#123;&#125;&quot;</span>, path.<span class="hljs-title function_ invoke__">display</span>()),
+        ))?
+        .<span class="hljs-title function_ invoke__">to_string_lossy</span>();
+
+    <span class="hljs-keyword">self</span>.<span class="hljs-title function_ invoke__">debug_util</span>(path, <span class="hljs-string">&quot;Adding file&quot;</span>)?;
+    <span class="hljs-keyword">let</span> <span class="hljs-variable">ctnt</span> = fs::<span class="hljs-title function_ invoke__">read</span>(path)?;
+    <span class="hljs-keyword">let</span> <span class="hljs-variable">blob</span> = Object::<span class="hljs-title function_ invoke__">Blob</span>(
+        <span class="hljs-type">String</span>::<span class="hljs-title function_ invoke__">from_utf8</span>(ctnt)
+            .<span class="hljs-title function_ invoke__">map</span>(|<span class="hljs-type">str</span>| <span class="hljs-type">str</span>.<span class="hljs-title function_ invoke__">into</span>())
+            .<span class="hljs-title function_ invoke__">unwrap_or_else</span>(|e| e.<span class="hljs-title function_ invoke__">into_bytes</span>().<span class="hljs-title function_ invoke__">into</span>()),
+    );
+
+    <span class="hljs-keyword">let</span> <span class="hljs-variable">blob</span> = <span class="hljs-keyword">self</span>.<span class="hljs-title function_ invoke__">wrap</span>(blob);
+
+    <span class="hljs-keyword">if</span> <span class="hljs-keyword">self</span>.save_object &#123;
+        blob.<span class="hljs-title function_ invoke__">save</span>()?;
+    &#125;
+
+    <span class="hljs-keyword">let</span> <span class="hljs-variable">line</span> = TreeLine &#123;
+        kind: TreeLineKind::File,
+        name: filename.<span class="hljs-title function_ invoke__">to_string</span>(),
+        sha1: blob.<span class="hljs-title function_ invoke__">sha1</span>().<span class="hljs-title function_ invoke__">into</span>(),
+    &#125;;
+
+    <span class="hljs-keyword">self</span>.data.<span class="hljs-title function_ invoke__">insert</span>(filename.<span class="hljs-title function_ invoke__">to_string</span>(), line);
+
+    <span class="hljs-title function_ invoke__">Ok</span>(<span class="hljs-keyword">self</span>)
+&#125;
+</code></pre>
+<p>问题所在是什么呢？它很难测试。当然你可以直接 <code>fs::tmp_dir()</code> 直接在系统里创一个临时文件夹，然后灌一些临时文件进去，但是这当然不够优雅。更何况，<strong>副作用</strong> 不止有 文件 IO 一种。还有控制台 IO。如果你要测试 <code>git commit</code> 这个命令，希望它产生一个正确的屏幕输出，怎么做到？只能将 <code>println!</code> 又换成自己的宏，也做参数传进去，为了保持完美的可测试性和可组合性，久而久之你的函数可能会变成这样：</p>
+<pre><code class="hljs language-rust"><span class="hljs-keyword">impl</span> <span class="hljs-title class_">GitAdd</span> <span class="hljs-keyword">for</span> <span class="hljs-title class_">WithRepo</span>&lt;WithFs&lt;WithConsole&lt;WithService1&lt;WithService2&lt;.....&gt;&gt;&gt;&gt;&gt;
+</code></pre>
+<p>这完全就是地狱……于是人们发明了 DI ： 依赖注入</p>
+<p><s>但我们这里不是讲依赖注入，所以请看代数效应</s></p>
+<h3 id="Effect，Side-Effect">Effect，Side Effect<a class="header-anchor" href="#Effect，Side-Effect"> ¶</a></h3>
+<p>要讲 Algebraic Effect 让我们先讲讲 Haskell 的 IO Monad。写过 Haskell 的人都知道，Haskell 里面的 putStrLn 是</p>
+<pre><code class="hljs language-haskell"><span class="hljs-title">putStrLn</span> :: <span class="hljs-type">String</span> -&gt; <span class="hljs-type">IO</span> ()
+</code></pre>
+<p>你会注意到一个看上去很像 Rust 的 <code>io::Result</code> 的 Monad，也就是 <code>IO</code>。但 Haskell 与 Rust 不一样的一个地方是，IO Monad 并不是“保存”了执行结果，而是“说明”了执行顺序。在 Rust 中，如果你写一个 <code>fs::write(...)</code> 得到了一个 <code>io::Result&lt;T&gt;</code>，这个副作用真的已经被执行了，返回的只是成功与否；而 Haskell 中返回的是这个副作用本身。它可能在未来的某一个被某个 <code>IO a -&gt; a</code> 的东西执行，这时候才真正执行了副作用；但在此之前它只是一个顺序。</p>
+<p>对于一个完全没有什么函数式经验的人来说这句话可能很难理解。让我们引用一下 <a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/1892390136857228808">https://zhuanlan.zhihu.com/p/1892390136857228808</a> <a target="_blank" rel="noopener" href="https://entropicthoughts.com/haskell-procedural-programming">Haskell：优秀的过程式语言</a></p>
+<blockquote>
+<p><strong>副作用作为一等公民 (first class values)</strong></p>
+<p>在 Haskell 中，有副作用的计算被当作一等值。这意味着我们可以将它们存储在变量或数据结构中以备后用。有一个 Haskell 函数：</p>
+<pre><code class="hljs language-haskell"><span class="hljs-title">randomRIO</span> :: (<span class="hljs-type">Int</span>, <span class="hljs-type">Int</span>) -&gt; <span class="hljs-type">IO</span> <span class="hljs-type">Int</span>
+</code></pre>
+<p>当传入两个整数作为参数时，它会在这两个数之间随机选出一个整数。我们可以将对这个函数的调用放入一个列表中，像这样：</p>
+<pre><code class="hljs language-haskell"><span class="hljs-title">some_dice</span> = [ randomRIO(<span class="hljs-number">1</span>, <span class="hljs-number">6</span>), randomRIO(<span class="hljs-number">1</span>, <span class="hljs-number">6</span>) ]
+</code></pre>
+<p>这是一个包含两次对 <code>randomRIO</code> 调用的列表。令非 Haskell 程序员感到惊讶的是，当这个列表被创建时，并不会生成任何随机数。来自其他编程语言的我们习惯于副作用（如随机生成）在调用带有副作用的函数时立即执行。[6]</p>
+<p>我们可以在列表中加入更多的随机生成操作：</p>
+<pre><code class="hljs language-haskell"><span class="hljs-title">more_dice</span> = some_dice &lt;&gt; [ randomRIO(<span class="hljs-number">1</span>, <span class="hljs-number">6</span>) ]
+</code></pre>
+<p>依然不会生成随机数。我们可以任意操作这个列表，依旧不会生成随机数。</p>
+<p>需要明确的是，<code>randomRIO</code> 函数确实可能会被调用[7]。而当它被调用时，它返回的值类型是 <code>IO Int</code>。只不过这个值并不是一个整数。如果要说的话，我们可以把它看作是一组最终能获得整数的指令。它并非实际的整数，而是一个封装了副作用的对象。当这个副作用对象执行时，会产生一个随机整数，但这个对象本身仅仅描述了计算过程，并不是一个整数。</p>
+<p>换句话说，在 Haskell 中，仅仅调用一个带有副作用的函数是不足以执行其副作用的。当我们调用一个带副作用的函数时，它产生了一个封装了副作用的对象，这个对象可以在未来某个时刻被执行，从而产生副作用的结果[8]。</p>
+</blockquote>
+<p>如果它难以理解，不妨想象一下你在写一个前端项目。—— 是的，<code>Promise</code> 也（几乎）是一个 Monad。关于 Monad 是什么，可以看看我的 <a href="/2025/03/27/learn-monads/">这篇文章</a></p>
+<p>Promise 和 IO 的共同点是，它们都封装了一个<strong>执行顺序</strong>。有经验的前端开发者一眼就看得出来</p>
+<pre><code class="hljs language-javascript"><span class="hljs-title function_">fetch</span>(<span class="hljs-string">&quot;https://example.com/example-api&quot;</span>)
+  .<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">res</span>) =&gt;</span> res.<span class="hljs-title function_">json</span>())
+  .<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">res</span>) =&gt;</span> &#123;
+    <span class="hljs-title function_">balabala</span>(res);
+    <span class="hljs-title function_">dosomething</span>(res);
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-title function_">foo</span>(res));
+  &#125;)
+  .<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">res</span>) =&gt;</span> &#123;
+    <span class="hljs-title function_">bar</span>(res);
+  &#125;);
+</code></pre>
+<p>Promise 提供了一套很好的接口，允许我们顺序地写出一些先后发生的事情，而无需关心回调的细节。在这里，所有的 <code>.then</code> 函数都不是马上执行的：它们只有在前一个 Promise fulfilled 的时候才会被自动地回调。因此，你可能会看到这样的代码：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">runDecorateResult</span>(<span class="hljs-params">promise</span>) &#123;
+  <span class="hljs-keyword">return</span> promise.<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">res</span>) =&gt;</span> <span class="hljs-title function_">foo</span>(res)).<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">res</span>) =&gt;</span> <span class="hljs-title function_">bar</span>(res));
+&#125;
+
+<span class="hljs-keyword">const</span> decorated = <span class="hljs-keyword">await</span> <span class="hljs-title function_">runDecorateResult</span>(
+  <span class="hljs-title function_">sendSomeApi</span>().<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">res</span>) =&gt;</span> <span class="hljs-title function_">baz</span>(res))
+);
+</code></pre>
+<p>这里，<code>sendSomeApi().then((res) =&gt; baz(res))</code> 创建了一个<strong>顺序</strong>，先 <code>sendSomeApi</code>，再基于结果 <code>baz</code>。然后 <code>runDecorateResult</code> 又进一步的<strong>在顺序上</strong>而非结果上添加了新的顺序，先 <code>foo</code> 再 <code>bar</code>。这些与值无关，JS 引擎和 Promise 内部跑的循环将会<strong>执行这个顺序</strong>。</p>
+<p>或者我们这样说：<strong><code>then</code> 允许我们把顺序组合起来，交给某个特定的无关的执行者。</strong></p>
+<h3 id="Algebraic-Effect">Algebraic Effect<a class="header-anchor" href="#Algebraic-Effect"> ¶</a></h3>
+<p>理解了 Monad 如何组合副作用之后，我们就可以理解 Algebraic Effect 了。</p>
+<p>代数效应的核心思想是：<strong>我们可以把副作用进行传递和组合</strong>。让我们考察几种最常见的效应：</p>
+<ul>
+<li><code>total</code>: 没有任何效应对应数学意义上的全函数，总是能给定相同输入返回一个相同输出。</li>
+<li><code>exception</code>: （后面在 Koka 中叫 <code>exn</code>） 可能抛出异常</li>
+<li><code>div</code>: 可能不停机，也就是发散 （divergence）</li>
+<li><code>ndet</code>: 非决定性的函数，比如 <code>random</code>，对于相同输入可能返回多个不同的值</li>
+<li><code>io</code>: 这是最差的效应，这意味着程序可以引发异常、不终止、非确定性、读取和写入堆以及执行任何输入/输出作用。</li>
+</ul>
+<p><code>exn</code> 和 <code>div</code> 的组合是 pure，直接对应于 Haskell 的纯度概念。一个函数可能具有多个效应。比如如下 Koka 代码：</p>
+<pre><code class="hljs language-koka"><span class="hljs-comment">// combine-effects: forall&lt;a&gt; () -&gt; &lt;pure,ndet&gt; a</span>
+<span class="hljs-function"><span class="hljs-keyword">fun</span> combine-<span class="hljs-title">effects</span><span class="hljs-params">()</span></span>
+  <span class="hljs-keyword">val</span> i = srandom-int() <span class="hljs-comment">// non-deterministic</span>
+  <span class="hljs-keyword">throw</span>(<span class="hljs-string">&quot;oops&quot;</span>)         <span class="hljs-comment">// exception raising</span>
+  combine-effects()     <span class="hljs-comment">// and non-terminating</span>
+</code></pre>
+<p>分配给 <code>combine-effects</code> 的效应是 <code>ndet</code>、<code>div</code> 和 <code>exn</code>。</p>
+<p>algebraic effects 的做法是，我们把副作用抽象为 <strong>操作符（operations）</strong> 和 <strong>处理器（handlers）</strong> 两部分。以最经典的一种 effect 也就是异常为例：</p>
+<pre><code class="hljs language-koka">effect raise
+  ctl raise( msg : string ) : a
+</code></pre>
+<p>这定义了一个 effect 类型 raise 和一个 <code>(msg : string) -&gt; raise a</code> 类型的 operation <code>raise</code>。声明 effect 的签名后，我们已经可以使用这些 operations 了：</p>
+<pre><code class="hljs language-koka"><span class="hljs-function"><span class="hljs-keyword">fun</span> safe-<span class="hljs-title">divide</span><span class="hljs-params">( x : <span class="hljs-type">int</span>, y : <span class="hljs-type">int</span> )</span></span> : raise int
+  <span class="hljs-keyword">if</span> y==<span class="hljs-number">0</span> then raise(<span class="hljs-string">&quot;div-by-zero&quot;</span>) <span class="hljs-keyword">else</span> x / y
+</code></pre>
+<p>其中我们看到 safe-divide 函数获得了 raise 效应（因为我们在函数体内使用了 raise 操作符）。这样的效应类型意味着我们只能在处理 raise 的上下文中 evaluate 这个函数（换句话说，它是 “动态绑定”的，或者我们 “具有 raise 能力”） 的上下文。</p>
+<p>我们可以通过为 raise 给出具体定义来处理这种效果。例如，我们可能总是返回一个默认值：</p>
+<pre><code class="hljs language-koka"><span class="hljs-function"><span class="hljs-keyword">fun</span> raise-<span class="hljs-title">const</span><span class="hljs-params">()</span></span> : int
+  with handler
+    ctl raise(msg) <span class="hljs-number">42</span> <span class="hljs-comment">// 哦，宇宙的终极答案是 42</span>
+  <span class="hljs-number">8</span> + safe-divide(<span class="hljs-number">1</span>,<span class="hljs-number">0</span>)
+
+<span class="hljs-comment">// 返回 42 而不是 50</span>
+</code></pre>
+<p>调用 <code>raise-const()</code> 的计算结果为 42，不是 50。当调用 <code>raise</code> 时（在 <code>safe-divide</code> 中），它将 <code>yield</code> 于其最内层的 handler，展开堆栈，然后才 evaluate 操作符的定义 – 这个例子中，只是从定义 handler 的点直接返回 42。现在我们可以看到为什么它被称为 <code>ctl operator</code> （控制操作符），因为 raise 改变了常规的线性控制流，并从原始调用点直接 yield 到其最内层的处理程序。还要注意 <code>raise-const</code> 现在又是一个 <code>total</code> function 了，handler 抵消了 raise 的效果。</p>
+<p>看到 effect 的写法后，我觉得你应该大体就能理解代数效应解决了什么了。</p>
+<blockquote>
+<p>作者：Malcolm Yu<br>
+链接：<a target="_blank" rel="noopener" href="https://www.zhihu.com/question/300095154/answer/1744221759">https://www.zhihu.com/question/300095154/answer/1744221759</a><br>
+来源：知乎</p>
+<p>假如我们有这样一段代码，其主要目的是进行一大段精妙的运算：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">biz</span>(<span class="hljs-params">id</span>) &#123;
+  <span class="hljs-keyword">const</span> infoId = <span class="hljs-comment">/* do some calc */</span> id; <span class="hljs-comment">// 这里可以理解为是一大段计算逻辑</span>
+  <span class="hljs-keyword">const</span> info = <span class="hljs-keyword">await</span> <span class="hljs-title function_">getInfo</span>(infoId); <span class="hljs-comment">// 副作用，与 server 通信</span>
+  <span class="hljs-keyword">const</span> dataId = <span class="hljs-comment">/* do some calc */</span> info.<span class="hljs-property">dataId</span>; <span class="hljs-comment">// 这里可以理解为是一大段计算逻辑</span>
+  <span class="hljs-keyword">const</span> data = <span class="hljs-title function_">getData</span>(dataId); <span class="hljs-comment">// 副作用，非幂等操作</span>
+  <span class="hljs-keyword">return</span> <span class="hljs-comment">/* do some calc */</span> data.<span class="hljs-property">finalCalcData</span>; <span class="hljs-comment">// 这里可以理解为是一大段计算逻辑</span>
+&#125;
+</code></pre>
+<p>尽管运算逻辑很优美，但美中不足的是有两段副作用，导致它不能成为一个干净的纯函数被单元测试。而且这里会导致严重的逻辑耦合：『做什么』与『怎么做』没有拆的很干净：</p>
+<ul>
+<li>你的一大段计算逻辑是在处理「做什么」；</li>
+<li>两个副作用更关心「怎么做」：比如线上是接口调用，单测里是 mock 数据直接怼；</li>
+<li>但是由于这两块副作用代码，导致整个糅杂的逻辑都无法复用。</li>
+</ul>
+<p>看到这里你可能会一拍大腿：函数在 JS 里不是一等公民嘛，我直接把两个副作用传进来不就行了？</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">biz</span>(<span class="hljs-params">id, getInfo, getData</span>) &#123;
+  <span class="hljs-keyword">const</span> infoId = <span class="hljs-comment">/* do some calc */</span> id; <span class="hljs-comment">// 这里可以理解为是一大段计算逻辑</span>
+  <span class="hljs-keyword">const</span> info = <span class="hljs-keyword">await</span> <span class="hljs-title function_">getInfo</span>(infoId); <span class="hljs-comment">// 副作用，与 server 通信</span>
+  <span class="hljs-keyword">const</span> dataId = <span class="hljs-comment">/* do some calc */</span> info.<span class="hljs-property">dataId</span>; <span class="hljs-comment">// 这里可以理解为是一大段计算逻辑</span>
+  <span class="hljs-keyword">const</span> data = <span class="hljs-title function_">getData</span>(dataId); <span class="hljs-comment">// 副作用，非幂等操作</span>
+  <span class="hljs-keyword">return</span> <span class="hljs-comment">/* do some calc */</span> data.<span class="hljs-property">finalCalcData</span>; <span class="hljs-comment">// 这里可以理解为是一大段计算逻辑</span>
+&#125;
+</code></pre>
+<p>是的，这样确实可以复用，但还有一个叫函数染色的问题没有解决：明明是一大段干净的同步运算逻辑，因为 <code>getInfo</code> 是异步的，导致整个函数都得加个 <code>async</code>。而且很有可能在我单元测试里，这个 <code>getInfo</code> 是直接同步取内存数据，还得因此弄个 <code>Promise</code>……</p>
+</blockquote>
+<p>没错，代数效应就能非常简单的解决这个问题。比如这个 biz，我们把它在 Koka 中写成</p>
+<pre><code class="hljs language-koka">effect useInfoData
+  <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">getInfo</span><span class="hljs-params">(id : <span class="hljs-type">int</span>)</span></span> : info
+  <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">getData</span><span class="hljs-params">(id : <span class="hljs-type">int</span>)</span></span> : <span class="hljs-keyword">data</span>
+</code></pre>
+<p>然后我们就可以在 <code>biz</code> 里面使用 <code>getInfo</code> 和 <code>getData</code> 了：</p>
+<pre><code class="hljs language-koka"><span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">biz</span><span class="hljs-params">(id : <span class="hljs-type">int</span>)</span></span> : useInfoData <span class="hljs-keyword">data</span>
+  <span class="hljs-keyword">val</span> infoId = <span class="hljs-comment">/* do some calc */</span> id; <span class="hljs-comment">// 这里可以理解为是一大段计算逻辑</span>
+  <span class="hljs-keyword">val</span> info = getInfo(infoId); <span class="hljs-comment">// 副作用，与 server 通信</span>
+  <span class="hljs-keyword">val</span> dataId = <span class="hljs-comment">/* do some calc */</span> info.dataId; <span class="hljs-comment">// 这里可以理解为是一大段计算逻辑</span>
+  <span class="hljs-keyword">val</span> <span class="hljs-keyword">data</span> = getData(dataId); <span class="hljs-comment">// 副作用，非幂等操作</span>
+  <span class="hljs-comment">/* do some calc */</span>
+  <span class="hljs-keyword">data</span>.finalCalcData <span class="hljs-comment">// 这里可以理解为是一大段计算逻辑</span>
+</code></pre>
+<p>你说 getInfo 是 <code>async</code> 的，那咋了？在代数效应里，这种函数染色可以直接被削去：</p>
+<pre><code class="hljs language-koka"><span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">production_run_biz</span><span class="hljs-params">(id: <span class="hljs-type">int</span>)</span></span> : <span class="hljs-keyword">data</span>
+  with handler
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">getInfo</span><span class="hljs-params">(id)</span></span>
+      some_async_task(id) fn (res) &#123; resume (res); &#125;
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">getData</span><span class="hljs-params">(id)</span></span>
+      some_sync_task(id)
+  biz(id)
+
+<span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">test_run_biz</span><span class="hljs-params">(id: <span class="hljs-type">int</span>)</span></span> : <span class="hljs-keyword">data</span>
+  with handler
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">getInfo</span><span class="hljs-params">(id)</span></span>
+      some_sync_test_task(id)
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">getData</span><span class="hljs-params">(id)</span></span>
+      some_sync_test_task(id)
+  biz(id)
+</code></pre>
+<p>这样，我们复用了一大段精妙的逻辑 <code>biz</code>，而且没有函数染色的问题。我们可以在 <code>production_run_biz</code> 里面使用异步的 <code>getInfo</code> 和 <code>getData</code>，而在 <code>test_run_biz</code> 里面使用同步的 <code>getInfo</code> 和 <code>getData</code>。这就是代数效应的魅力所在。</p>
+<p>代数效应允许我们把副作用抽象成操作符和处理器，允许我们在不改变函数签名的情况下，使用不同的副作用实现。这样，我们就可以在测试中使用不同的副作用实现，而不需要修改函数本身。</p>
+<p>现在回到最初的场景：代数作用如何解决我们之前提到的 <code>WithRepo</code>, <code>fs</code>, <code>console</code> 的问题呢？</p>
+<p>我们可以把 <code>fs</code> 和 <code>console</code> 抽象成代数效应：（下面的代码是伪代码，不是 Koka 真的能运行的程序）</p>
+<pre><code class="hljs language-koka">effect fs
+  <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">read</span><span class="hljs-params">(path : <span class="hljs-type">string</span>)</span></span> : bytes
+  <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">write</span><span class="hljs-params">(path : <span class="hljs-type">string</span>, <span class="hljs-keyword">data</span> : <span class="hljs-type">bytes</span>)</span></span> : unit
+  <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">remove</span><span class="hljs-params">(path : <span class="hljs-type">string</span>)</span></span> : unit
+  <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">exists</span><span class="hljs-params">(path : <span class="hljs-type">string</span>)</span></span> : bool
+  ....
+
+effect console
+  <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">log</span><span class="hljs-params">(msg : <span class="hljs-type">string</span>)</span></span> : unit
+  <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">error</span><span class="hljs-params">(msg : <span class="hljs-type">string</span>)</span></span> : unit
+  <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">warn</span><span class="hljs-params">(msg : <span class="hljs-type">string</span>)</span></span> : unit
+  <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">info</span><span class="hljs-params">(msg : <span class="hljs-type">string</span>)</span></span> : unit
+  ....
+
+effect repo
+  <span class="hljs-keyword">val</span> path : string
+  ...
+
+<span class="hljs-function"><span class="hljs-keyword">fun</span> production-<span class="hljs-title">fs</span><span class="hljs-params">(action: () -&gt; &lt;<span class="hljs-type">fs</span>|<span class="hljs-type">e</span>&gt; <span class="hljs-type">a</span>)</span></span> : e a
+  with handler
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">read</span><span class="hljs-params">(path)</span></span> = std.fs.read(path)
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">write</span><span class="hljs-params">(path, <span class="hljs-keyword">data</span>)</span></span> = std.fs.write(path, <span class="hljs-keyword">data</span>)
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">remove</span><span class="hljs-params">(path)</span></span> = std.fs.remove(path)
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">exists</span><span class="hljs-params">(path)</span></span> = std.fs.exists(path)
+    ...
+  action()
+
+<span class="hljs-function"><span class="hljs-keyword">fun</span> test-<span class="hljs-title">fs</span><span class="hljs-params">(action: () -&gt; &lt;<span class="hljs-type">fs</span>|<span class="hljs-type">e</span>&gt; <span class="hljs-type">a</span>)</span></span> : e a
+  with handler
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">read</span><span class="hljs-params">(path)</span></span> = test.fs.read(path)
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">write</span><span class="hljs-params">(path, <span class="hljs-keyword">data</span>)</span></span> = test.fs.write(path, <span class="hljs-keyword">data</span>)
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">remove</span><span class="hljs-params">(path)</span></span> = test.fs.remove(path)
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">exists</span><span class="hljs-params">(path)</span></span> = test.fs.exists(path)
+    ...
+  action()
+
+<span class="hljs-function"><span class="hljs-keyword">fun</span> production-<span class="hljs-title">console</span><span class="hljs-params">(action: () -&gt; &lt;<span class="hljs-type">console</span>|<span class="hljs-type">e</span>&gt; <span class="hljs-type">a</span>)</span></span> : e a
+  with handler
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">log</span><span class="hljs-params">(msg)</span></span> = std.console.log(msg)
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">error</span><span class="hljs-params">(msg)</span></span> = std.console.error(msg)
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">warn</span><span class="hljs-params">(msg)</span></span> = std.console.warn(msg)
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">info</span><span class="hljs-params">(msg)</span></span> = std.console.info(msg)
+    ...
+  action()
+
+<span class="hljs-function"><span class="hljs-keyword">fun</span> test-<span class="hljs-title">console</span><span class="hljs-params">(action: () -&gt; &lt;<span class="hljs-type">console</span>|<span class="hljs-type">e</span>&gt; <span class="hljs-type">a</span>)</span></span> : e a
+  with handler
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">log</span><span class="hljs-params">(msg)</span></span> = test.console.log(msg)
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">error</span><span class="hljs-params">(msg)</span></span> = test.console.error(msg)
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">warn</span><span class="hljs-params">(msg)</span></span> = test.console.warn(msg)
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">info</span><span class="hljs-params">(msg)</span></span> = test
+    ...
+  action()
+
+
+...
+
+</code></pre>
+<p>最终我们可以非常自然地组合出我们真正需要的 git_add 函数：</p>
+<pre><code class="hljs language-koka">
+<span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">some_perfect_git_add_logic</span><span class="hljs-params">(files: <span class="hljs-type">List</span>&lt;<span class="hljs-type">string</span>&gt;)</span></span> -&gt; fs (console (repo unit))
+  <span class="hljs-keyword">var</span> stage := repo.stage()
+  ....
+  stage.save()
+
+<span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">git_add</span><span class="hljs-params">()</span></span>
+  with production-fs
+  with production-console
+  with production-repo
+  some_perfect_git_add_logic()
+
+<span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">test_git_add</span><span class="hljs-params">()</span></span>
+  with test-fs
+  with test-console
+  with test-repo
+  some_perfect_git_add_logic()
+</code></pre>
+<p>同时方便了 production 和 test，也让 git add 的 logic 变得可以充分的复用了起来。</p>
+</section><section class="post-meta"><span class="info"><i class="fa fa-calendar"></i> <span class="date">2025-05-12</span>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Code/" title="Code">Code</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Programing-Language/" title="Programing Language">Programing Language</a>  </span></section></article><p class="pagination"><a href="/2025/05/16/pfpl-note-8/" title="PFPL 笔记 - VII Subtyping">Previous</a><span>  </span><a href="/2025/05/07/cpp-blackmagic-memorize/" title="C++ 黑魔法习题：memorize">Next</a></p><article class="comment-container"><div class="comment-container"><script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js" onload="(new Gitalk({&quot;clientID&quot;:&quot;12a250ac67f452906dd6&quot;,&quot;clientSecret&quot;:&quot;7422a9ecdc933d5e6facbc61d546bced40519f0b&quot;,&quot;repo&quot;:&quot;lhcfl.github.io&quot;,&quot;owner&quot;:&quot;lhcfl&quot;,&quot;admin&quot;:[&quot;lhcfl&quot;],&quot;id&quot;:&quot;简单接触 Algebraic Effects&quot;,&quot;distractionFreeMode&quot;:false})).render(&quot;gitalk-comment-slot&quot;)"></script><div id="gitalk-comment-slot">Loading...</div></div></article></main><footer class="footer"><br><p class="powered_by">Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> and <a target="_blank" rel="noopener" href="https://github.com/Lhcfl/hexo-theme-sosimple">SoSimple</a></p></footer></body></html>

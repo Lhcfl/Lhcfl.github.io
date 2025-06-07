@@ -1,0 +1,613 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Linca"><title>学习在 Lean4 中使用 Parser Combinator · Zero Calorie Drink Shop</title><meta name="description" content="此时对于我那幽默的《编译原理》课程还在用 C 语言写编译器的不满达到了顶峰。
+
+你说得对，但是《编译原理》是由 Alfred V. Aho, Monica S. Lam, Ravi Sethi 和 Jeffrey D. Ullman 等人自主研发的一款全旧计算机世界编程游戏。游戏发生在一个被称作「C"><meta name="keywords" content="Code,Functional,Lean"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="mobile-web-app-capable" content="yes"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta id="site_data_static" data-url="/"><meta name="renderer" content="webkit"><link rel="shortcut icon" type="image/x-icon" href="/images/logo.png"><link rel="stylesheet" href="/js_complied/bundle.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><style>:root { --normal-font-face: LXGW WenKai, LXGW WenKai TC, 'Times New Roman', Times, serif; }</style><script src="/js_complied/bundle.js"></script><script>Utils.loadCSS("https://testingcf.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css");
+Utils.loadCSS("https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&display=swap");
+Utils.loadCSS("https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css");
+Utils.loadCSS("/css/font-awesome.min.css");</script><meta name="generator" content="Hexo 7.3.0"></head><body class="post-page"><noscript><link rel="stylesheet" href="https://testingcf.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&amp;display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"></noscript><nav class="nav"><a href="/">Home</a>&nbsp;&nbsp;<a href="/archives">Archives</a>&nbsp;&nbsp;<a href="/tags">Tags</a>&nbsp;&nbsp;<a href="/about">About</a>&nbsp;&nbsp;<a href="/links">Links</a>&nbsp;&nbsp;<a href="/search">Search</a>&nbsp;&nbsp;<a href="javascript:SoSimple.darkLightToggle()">Dark/Light Mode</a></nav><main class="main"><article class="post-container post-full"><header class="post-title"><h1>学习在 Lean4 中使用 Parser Combinator</h1></header><section class="post-toc"><details open><summary>Menu</summary><div class="toc"><ol class="toclist"><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#0-%E4%BB%8B%E7%BB%8D"><span class="toclist-text">0. 介绍</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#1-%E6%8A%BD%E8%B1%A1"><span class="toclist-text">1. 抽象</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#2-%E5%AE%9E%E8%B7%B5%EF%BC%9AJSON-%E8%A7%A3%E6%9E%90%E5%99%A8"><span class="toclist-text">2. 实践：JSON 解析器</span></a></li><li class="toclist-item toclist-level-3"><a class="toclist-link" href="#3-%E6%89%A9%E5%B1%95%EF%BC%9A%E7%94%A8%E5%9C%A8%E4%B8%8D%E9%82%A3%E4%B9%88%E6%96%B9%E4%BE%BF%E7%9A%84%E8%AF%AD%E8%A8%80%E4%B8%8A%EF%BC%9F"><span class="toclist-text">3. 扩展：用在不那么方便的语言上？</span></a></li></ol></div></details></section><section class="post-body"><p>此时对于我那幽默的《编译原理》课程还在用 C 语言写编译器的不满达到了顶峰。</p>
+<blockquote>
+<p>你说得对，但是《编译原理》是由 Alfred V. Aho, Monica S. Lam, Ravi Sethi 和 Jeffrey D. Ullman 等人自主研发的一款全旧计算机世界编程游戏。游戏发生在一个被称作「C–」的简化语言，在这里，选择这门课的人将被迫享受「GCC 7.5.0」，没有一点 5202 年该有的体验。玩家将扮演一位名为「C 程序员」的神秘角色，在自由的编码中邂逅各种各样、时机诡异的 Segment Fault 们，和他们一起泄露内存，感受 C 语言的恶心之处——同时，逐步发掘「都 5202 年了这帮人还在拿 39 年前的书教文法分析」的真相。</p>
+</blockquote>
+<p>但跑远了。总而言之这里介绍一种叫 parser combinator —— 解析器组合子的函数式手段，为您带来哪怕是手写递归下降也很舒适的体验（并非）</p>
+<span id="more"></span>
+<h3 id="0-介绍">0. 介绍<a class="header-anchor" href="#0-介绍"> ¶</a></h3>
+<p>Parser combinator（解析器组合子）是一种函数式编程中的技术，用于构建复杂语法分析器的工具。它的核心思想是：用小的、可组合的解析器函数构建更复杂的解析器。</p>
+<p>一个 parser combinator 就是一个函数，它接受一些解析器作为输入，返回一个新的、更复杂的解析器。它是一种“组合模式”，非常适合处理递归文法。</p>
+<p>一个经典的 Parser 可以是：</p>
+<pre><code class="hljs language-lean">abbrev Parser (α : <span class="hljs-built_in">Type</span>) <span class="hljs-symbol">:=</span> List Char → Option (α × List Char)
+</code></pre>
+<p>也就是说，一个 parser 就是是一个函数，接受 List Char 作为参数，如果解析成功，返回 <code>.some (α × List Char)</code> 为解析结果和剩余内容。如果失败，返回 <code>.none</code>.</p>
+<p>在这里，为了一步到位地解决报错，我们把返回类型改成 Except</p>
+<pre><code class="hljs language-lean">abbrev Parser (α : <span class="hljs-built_in">Type</span>) <span class="hljs-symbol">:=</span> List Char → Except String (α × List Char)
+</code></pre>
+<p>这样，如果报错就能看到一个字符串作为错误信息。</p>
+<p>对于不熟悉函数式写法的人，这是它的类似的 Rust 代码（懒得配平生命周期了）：</p>
+<pre><code class="hljs language-rust"><span class="hljs-meta">#![feature(type_alias_impl_trait)]</span>
+
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">Parser</span>&lt;T&gt;(<span class="hljs-type">Box</span>&lt;<span class="hljs-keyword">dyn</span> <span class="hljs-title function_ invoke__">FnOnce</span>(&amp;<span class="hljs-symbol">&#x27;static</span> <span class="hljs-type">str</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">Result</span>&lt;(T, &amp;<span class="hljs-symbol">&#x27;static</span> <span class="hljs-type">str</span>), <span class="hljs-type">String</span>&gt;&gt;)
+<span class="hljs-keyword">where</span>
+    T: <span class="hljs-symbol">&#x27;static</span>;
+
+<span class="hljs-keyword">impl</span>&lt;T&gt; Parser&lt;T&gt; &#123;
+    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">parse</span>(<span class="hljs-keyword">self</span>, input: &amp;<span class="hljs-symbol">&#x27;static</span> <span class="hljs-type">str</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">Result</span>&lt;(T, &amp;<span class="hljs-symbol">&#x27;static</span> <span class="hljs-type">str</span>), <span class="hljs-type">String</span>&gt; &#123;
+        <span class="hljs-keyword">self</span>.<span class="hljs-number">0</span>(input)
+    &#125;
+    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">chain</span>&lt;U&gt;(<span class="hljs-keyword">self</span>, other: Parser&lt;U&gt;) <span class="hljs-punctuation">-&gt;</span> Parser&lt;(T, U)&gt;
+    &#123;
+        <span class="hljs-keyword">let</span> <span class="hljs-variable">f</span> = <span class="hljs-keyword">self</span>.<span class="hljs-number">0</span>;
+        <span class="hljs-keyword">let</span> <span class="hljs-variable">g</span> = other.<span class="hljs-number">0</span>;
+        (<span class="hljs-keyword">move</span> |input: &amp;<span class="hljs-symbol">&#x27;static</span> <span class="hljs-type">str</span>| &#123;
+            <span class="hljs-keyword">let</span> (t, input) = <span class="hljs-title function_ invoke__">f</span>(input)?;
+            <span class="hljs-keyword">let</span> (u, input) = <span class="hljs-title function_ invoke__">g</span>(input)?;
+            <span class="hljs-title function_ invoke__">Ok</span>(((t, u), input))
+        &#125;)
+        .<span class="hljs-title function_ invoke__">into</span>()
+    &#125;
+&#125;
+
+<span class="hljs-keyword">impl</span>&lt;T, F&gt; <span class="hljs-built_in">From</span>&lt;F&gt; <span class="hljs-keyword">for</span> <span class="hljs-title class_">Parser</span>&lt;T&gt;
+<span class="hljs-keyword">where</span>
+    F: <span class="hljs-title function_ invoke__">FnOnce</span>(&amp;<span class="hljs-symbol">&#x27;static</span> <span class="hljs-type">str</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">Result</span>&lt;(T, &amp;<span class="hljs-symbol">&#x27;static</span> <span class="hljs-type">str</span>), <span class="hljs-type">String</span>&gt; + <span class="hljs-symbol">&#x27;static</span>
+&#123;
+    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">from</span>(value: F) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-keyword">Self</span> &#123;
+        <span class="hljs-title function_ invoke__">Parser</span>(<span class="hljs-type">Box</span>::<span class="hljs-title function_ invoke__">new</span>(value))
+    &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">char</span>(c: <span class="hljs-type">char</span>) <span class="hljs-punctuation">-&gt;</span> Parser&lt;<span class="hljs-type">char</span>&gt; &#123;
+    (<span class="hljs-keyword">move</span> |input: &amp;<span class="hljs-symbol">&#x27;static</span> <span class="hljs-type">str</span>| &#123;
+        <span class="hljs-keyword">if</span> input.<span class="hljs-title function_ invoke__">is_empty</span>() &#123;
+            <span class="hljs-keyword">return</span> <span class="hljs-title function_ invoke__">Err</span>(<span class="hljs-string">&quot;Input is empty&quot;</span>.<span class="hljs-title function_ invoke__">to_string</span>());
+        &#125;
+        <span class="hljs-keyword">if</span> input.<span class="hljs-title function_ invoke__">chars</span>().<span class="hljs-title function_ invoke__">next</span>().<span class="hljs-title function_ invoke__">unwrap</span>() == c &#123;
+            <span class="hljs-title function_ invoke__">Ok</span>((c, &amp;input[c.<span class="hljs-title function_ invoke__">len_utf8</span>()..]))
+        &#125; <span class="hljs-keyword">else</span> &#123;
+            <span class="hljs-title function_ invoke__">Err</span>(<span class="hljs-built_in">format!</span>(<span class="hljs-string">&quot;Expected &#x27;&#123;&#125;&#x27;, found &#x27;&#123;&#125;&#x27;&quot;</span>, c, input.<span class="hljs-title function_ invoke__">chars</span>().<span class="hljs-title function_ invoke__">next</span>().<span class="hljs-title function_ invoke__">unwrap</span>()))
+        &#125;
+    &#125;)
+    .<span class="hljs-title function_ invoke__">into</span>()
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() &#123;
+    <span class="hljs-keyword">let</span> <span class="hljs-variable">res</span> = <span class="hljs-title function_ invoke__">char</span>(<span class="hljs-string">&#x27;a&#x27;</span>).<span class="hljs-title function_ invoke__">parse</span>(<span class="hljs-string">&quot;anc&quot;</span>);
+    <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;Result: &#123;:?&#125;&quot;</span>, res);
+    <span class="hljs-keyword">let</span> <span class="hljs-variable">res</span> = <span class="hljs-title function_ invoke__">char</span>(<span class="hljs-string">&#x27;a&#x27;</span>).<span class="hljs-title function_ invoke__">chain</span>(<span class="hljs-title function_ invoke__">char</span>(<span class="hljs-string">&#x27;b&#x27;</span>)).<span class="hljs-title function_ invoke__">parse</span>(<span class="hljs-string">&quot;anc&quot;</span>);
+    <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;Result: &#123;:?&#125;&quot;</span>, res);
+    <span class="hljs-keyword">let</span> <span class="hljs-variable">res</span> = <span class="hljs-title function_ invoke__">char</span>(<span class="hljs-string">&#x27;a&#x27;</span>).<span class="hljs-title function_ invoke__">chain</span>(<span class="hljs-title function_ invoke__">char</span>(<span class="hljs-string">&#x27;b&#x27;</span>)).<span class="hljs-title function_ invoke__">parse</span>(<span class="hljs-string">&quot;abc&quot;</span>);
+    <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;Result: &#123;:?&#125;&quot;</span>, res);
+
+    <span class="hljs-comment">// Result: Ok((&#x27;a&#x27;, &quot;nc&quot;))</span>
+    <span class="hljs-comment">// Result: Err(&quot;Expected &#x27;b&#x27;, found &#x27;n&#x27;&quot;)</span>
+    <span class="hljs-comment">// Result: Ok(((&#x27;a&#x27;, &#x27;b&#x27;), &quot;c&quot;))</span>
+&#125;
+</code></pre>
+<p>其中，<code>chain</code> 就是一个 combinator，它用两个小的 parser 合成了一个大的 parser。</p>
+<h3 id="1-抽象">1. 抽象<a class="header-anchor" href="#1-抽象"> ¶</a></h3>
+<p>让我们再次请出万能的 Monad 来。关于 Monad 是什么，不妨看看<a href="https://lhcfl.github.io/2025/03/27/learn-monads/">所以这个 Monads 到底是什么啊之让我学学</a></p>
+<p>一个 parser 的合成过程经常需要前面的 parse 都 ok，一旦其中某一个不是 ok 的了，就短路返回 error。这是典型的 monad 行为</p>
+<pre><code class="hljs language-lean"><span class="hljs-theorem"><span class="hljs-keyword">instance</span> <span class="hljs-symbol">:</span></span> Monad Parser where
+  pure <span class="hljs-symbol">:=</span> <span class="hljs-keyword">fun</span> a =&gt;
+    <span class="hljs-keyword">fun</span> input =&gt; .ok (a, input)
+  bind <span class="hljs-symbol">:=</span> <span class="hljs-keyword">fun</span> parser f =&gt;
+    <span class="hljs-keyword">fun</span> input =&gt; <span class="hljs-keyword">do</span>
+      <span class="hljs-keyword">let</span> (a, rest) ← parser input
+      f a rest
+</code></pre>
+<p>实现了 monad 的特征以后，我们就能方便的使用 do-记号，如</p>
+<pre><code class="hljs language-lean"><span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">symbol</span> <span class="hljs-symbol">:</span></span> Parser $ Int <span class="hljs-symbol">:=</span>
+  <span class="hljs-keyword">fun</span> input =&gt;
+    <span class="hljs-keyword">match</span> input <span class="hljs-built_in">with</span>
+    | <span class="hljs-string">&#x27;+&#x27;</span> :: xs =&gt; .ok (<span class="hljs-number">1</span>, xs)
+    | <span class="hljs-string">&#x27;-&#x27;</span> :: xs =&gt; .ok (-<span class="hljs-number">1</span>, xs)
+    | xs =&gt; .ok (<span class="hljs-number">1</span>, xs)
+
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">digits</span> <span class="hljs-symbol">:</span></span> Parser $ List Char <span class="hljs-symbol">:=</span>
+  <span class="hljs-keyword">fun</span> input =&gt;
+    .ok $ input.span (·.isDigit)
+
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parseInt</span> <span class="hljs-symbol">:</span></span> Parser Json <span class="hljs-symbol">:=</span> <span class="hljs-keyword">do</span>
+  <span class="hljs-keyword">let</span> symbol ← symbol
+  <span class="hljs-keyword">let</span> numStr ← digits
+  <span class="hljs-keyword">match</span> numStr.asString.toInt? <span class="hljs-built_in">with</span>
+  | some n =&gt; <span class="hljs-keyword">return</span> Json.int $ symbol * n
+  | none   =&gt; fail <span class="hljs-string">&quot;expected an integer, but got non-digit characters&quot;</span>
+
+#eval parseInt <span class="hljs-string">&quot;12345abced12345&quot;</span>.data
+<span class="hljs-comment">-- Except.ok (Json.int 12345, [&#x27;a&#x27;, &#x27;b&#x27;, &#x27;c&#x27;, &#x27;e&#x27;, &#x27;d&#x27;, &#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, &#x27;4&#x27;, &#x27;5&#x27;])</span>
+</code></pre>
+<p>其次，一个 parser 还能实现 <code>Alternative</code>（选择子）。字面意义上地，</p>
+<blockquote>
+<p>An <code>Alternative</code> functor is an <code>Applicative</code> functor that can “fail” or be “empty” and a binary operation <code>&lt;|&gt;</code> that “collects values” or finds the “left-most success”.</p>
+<p>Important instances include</p>
+<ul>
+<li><code>Option</code>, where <code>failure := none</code> and <code>&lt;|&gt;</code> returns the left-most <code>some</code>.</li>
+<li>Parser combinators typically provide an <code>Applicative</code> instance for error-handling and backtracking.</li>
+</ul>
+<p>Error recovery and state can interact subtly. For example, the implementation of <code>Alternative</code> for <code>OptionT (StateT σ Id)</code> keeps modifications made to the state while recovering from failure, while <code>StateT σ (OptionT Id)</code> discards them.</p>
+</blockquote>
+<p>关于函子 functor 的概念我推荐阅读<a target="_blank" rel="noopener" href="https://sxyz.blog/functors-applicatives-and-monads-in-pictures/">图解 Functor、Applicative、Monad</a>。这样，我们用</p>
+<pre><code class="hljs language-lean">parser1 &lt;|&gt; parser2
+</code></pre>
+<p>就能描述“第一个解析成功的 parser”。</p>
+<p>或许 parser 还适用一些别的抽象，但我也是刚学，想到写什么就放些什么了（）总而言之，让我们又双叒叕开启愉快的 JSON 解析之旅。</p>
+<h3 id="2-实践：JSON-解析器">2. 实践：JSON 解析器<a class="header-anchor" href="#2-实践：JSON-解析器"> ¶</a></h3>
+<p>还是熟悉的 JSON</p>
+<pre><code class="hljs language-lean"><span class="hljs-keyword">inductive</span> Json where
+  | null
+  | bool (x: Bool)
+  | int  (x: Int)
+  | float(x: Float)
+  | str  (x: String)
+  | arr  (x: List Json)
+  | obj  (x: List (String × Json))
+deriving Repr
+</code></pre>
+<p>这次我们要正确地解析数字，所以引入了 int 和 float 类型。然后是准备工作：</p>
+<pre><code class="hljs language-lean">abbrev Parser (α : <span class="hljs-built_in">Type</span>) <span class="hljs-symbol">:=</span> List Char → Except String (α × List Char)
+
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">fail</span> <span class="hljs-params">(reason : String)</span> <span class="hljs-symbol">:</span></span> Parser α <span class="hljs-symbol">:=</span>
+  <span class="hljs-keyword">fun</span> _ =&gt; .error reason
+<span class="hljs-comment">-- 无论如何总是返回失败原因的函数</span>
+
+<span class="hljs-theorem"><span class="hljs-keyword">instance</span> <span class="hljs-symbol">:</span></span> Monad Parser where
+  pure <span class="hljs-symbol">:=</span> <span class="hljs-keyword">fun</span> a =&gt;
+    <span class="hljs-keyword">fun</span> input =&gt; .ok (a, input)
+  bind <span class="hljs-symbol">:=</span> <span class="hljs-keyword">fun</span> p f =&gt;
+    <span class="hljs-keyword">fun</span> input =&gt; <span class="hljs-keyword">do</span>
+      <span class="hljs-keyword">let</span> (a, rest) ← p input
+      f a rest
+
+<span class="hljs-theorem"><span class="hljs-keyword">instance</span> <span class="hljs-symbol">:</span></span> Alternative Parser where
+  failure <span class="hljs-symbol">:=</span> fail <span class="hljs-string">&quot;unknown error&quot;</span>
+  orElse p₁ p₂ <span class="hljs-symbol">:=</span> <span class="hljs-keyword">fun</span> input =&gt;
+      <span class="hljs-keyword">match</span> p₁ input <span class="hljs-built_in">with</span>
+      | .ok    r =&gt; .ok r
+      | .error _ =&gt; p₂ () input
+</code></pre>
+<p>接下来可以实践写几个辅助函数</p>
+<pre><code class="hljs language-lean"><span class="hljs-comment">-- 返回一个拿一个 char 的 parser</span>
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">char</span> <span class="hljs-params">(c : Char)</span> <span class="hljs-symbol">:</span></span> Parser Char <span class="hljs-symbol">:=</span>
+   <span class="hljs-keyword">fun</span> input =&gt;
+    <span class="hljs-keyword">match</span> input <span class="hljs-built_in">with</span>
+    | x :: xs =&gt;
+      if x == c then
+        .ok (c, xs)
+      else .error s!<span class="hljs-string">&quot;Expected &#x27;&#123;c&#125;&#x27;, got &#x27;&#123;x&#125;&#x27;&quot;</span>
+    | [] =&gt; .error s!<span class="hljs-string">&quot;Unexpected EOF, expected character &#x27;&#123;c&#125;&#x27;&quot;</span>
+
+<span class="hljs-comment">-- 返回一个拿走前面的 whitespace 的 parser</span>
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">whitespaces</span> <span class="hljs-symbol">:</span></span> Parser Unit <span class="hljs-symbol">:=</span>
+  <span class="hljs-keyword">fun</span> input =&gt;
+    .ok ((), input.dropWhile (·.isWhitespace))
+
+<span class="hljs-comment">-- 返回一个拿一个 + 或者 - 符号的 parser</span>
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">symbol</span> <span class="hljs-symbol">:</span></span> Parser $ Int <span class="hljs-symbol">:=</span>
+  <span class="hljs-keyword">fun</span> input =&gt;
+    <span class="hljs-keyword">match</span> input <span class="hljs-built_in">with</span>
+    | <span class="hljs-string">&#x27;+&#x27;</span> :: xs =&gt; .ok (<span class="hljs-number">1</span>, xs)
+    | <span class="hljs-string">&#x27;-&#x27;</span> :: xs =&gt; .ok (-<span class="hljs-number">1</span>, xs)
+    | xs =&gt; .ok (<span class="hljs-number">1</span>, xs)
+
+<span class="hljs-comment">-- 返回一个拿数字的 parser</span>
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">digits</span> <span class="hljs-symbol">:</span></span> Parser $ List Char <span class="hljs-symbol">:=</span>
+  <span class="hljs-keyword">fun</span> input =&gt;
+    .ok $ input.span (·.isDigit)
+
+</code></pre>
+<p>这样， number 的 parse 工作就变得很简单，只需要分两种情况：</p>
+<pre><code class="hljs language-lean"><span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parseInt</span> <span class="hljs-symbol">:</span></span> Parser Json <span class="hljs-symbol">:=</span> <span class="hljs-keyword">do</span>
+  <span class="hljs-keyword">let</span> symbol ← symbol
+  <span class="hljs-keyword">let</span> numStr ← digits
+  <span class="hljs-keyword">match</span> numStr.asString.toInt? <span class="hljs-built_in">with</span>
+  | some n =&gt; <span class="hljs-keyword">return</span> Json.int $ symbol * n
+  | none   =&gt; fail <span class="hljs-string">&quot;expected an integer, but got non-digit characters&quot;</span>
+
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">toFloat</span> <span class="hljs-params">(num : List Char)</span> <span class="hljs-params">(fraction : List Char)</span> <span class="hljs-symbol">:</span></span> Option Float <span class="hljs-symbol">:=</span> <span class="hljs-keyword">do</span>
+  <span class="hljs-keyword">let</span> num ← num.asString.toNat?
+  <span class="hljs-keyword">let</span> fra ← fraction.asString.toNat?
+  <span class="hljs-keyword">let</span> exp <span class="hljs-symbol">:=</span> <span class="hljs-number">0.1</span> ^ fraction.length.toFloat
+  <span class="hljs-keyword">return</span> num.toFloat + (fra.toFloat * exp)
+
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parseFloat</span> <span class="hljs-symbol">:</span></span> Parser Json <span class="hljs-symbol">:=</span> <span class="hljs-keyword">do</span>
+  <span class="hljs-keyword">let</span> symbol ← symbol
+  <span class="hljs-keyword">let</span> num ← digits
+  <span class="hljs-keyword">let</span> _ ← char <span class="hljs-string">&#x27;.&#x27;</span>
+  <span class="hljs-keyword">let</span> fraction ← digits
+  <span class="hljs-keyword">match</span> toFloat num fraction <span class="hljs-built_in">with</span>
+  | .some num =&gt; <span class="hljs-keyword">return</span> Json.float $ if symbol == -<span class="hljs-number">1</span> then -num else num
+  | .none =&gt; fail <span class="hljs-string">&quot;expected a float&quot;</span>
+
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parseNumber</span> <span class="hljs-symbol">:</span></span> Parser Json <span class="hljs-symbol">:=</span> <span class="hljs-keyword">do</span>
+  parseFloat &lt;|&gt; parseInt
+</code></pre>
+<p>现在我们的 <code>paserNumber</code> 就是一个既可以解析整数又可以解析浮点数的 parser 了！</p>
+<p>随后我们一鼓作气，把几个简单的 parser 写掉。先写字符串：</p>
+<pre><code class="hljs">def quotedString : Parser $ List Char := do
+  _ ← char &#x27;&quot;&#x27;
+  fun input =&gt;
+    let (str, last) := input.span (· != &#x27;&quot;&#x27;)
+    .ok (str, last.drop 1)
+
+def parseString : Parser Json := do
+  let str ← quotedString
+   return (Json.str str.asString)
+</code></pre>
+<p>为什么要分 quoted string 和 string 呢？因为后者直接得到了一个 <code>Json</code>，但我们还要在 object 那里复用获得字符串的 parser。</p>
+<p>随后是几个关键字，异常简单：</p>
+<pre><code class="hljs language-lean"><span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">keyword</span> <span class="hljs-params">(kw : String)</span> <span class="hljs-params">(val : Json)</span> <span class="hljs-symbol">:</span></span> Parser Json <span class="hljs-symbol">:=</span>
+  <span class="hljs-keyword">fun</span> input =&gt;
+    if input.asString.startsWith kw then
+      .ok (val, input.drop kw.length)
+    else .error s!<span class="hljs-string">&quot;Expected keyword &#x27;&#123;kw&#125;&#x27;, but got &#x27;&#123;input.asString&#125;&#x27;&quot;</span>
+
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parseTrue</span> <span class="hljs-symbol">:=</span></span> keyword <span class="hljs-string">&quot;true&quot;</span> $ Json.bool true
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parseFalse</span> <span class="hljs-symbol">:=</span></span> keyword <span class="hljs-string">&quot;false&quot;</span> $ Json.bool false
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parseNull</span> <span class="hljs-symbol">:=</span></span> keyword <span class="hljs-string">&quot;null&quot;</span> Json.null
+</code></pre>
+<p>现在是三个递归结构：</p>
+<pre><code class="hljs language-lean"><span class="hljs-comment">-- 这是一个辅助函数，用来把以 sep 分割的 a 生成一个 list parser</span>
+<span class="hljs-keyword">partial</span> <span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">sepBy</span> <span class="hljs-params">(α : Parser a)</span> <span class="hljs-params">(sep : Parser b)</span> <span class="hljs-symbol">:</span></span> Parser (List a) <span class="hljs-symbol">:=</span>
+  <span class="hljs-keyword">fun</span> input =&gt;
+    <span class="hljs-keyword">let</span> rec go (acc : List a) (input : List Char) : (List a × List Char) <span class="hljs-symbol">:=</span>
+      <span class="hljs-keyword">match</span> α input <span class="hljs-built_in">with</span>
+      | .ok (a, rest) =&gt;
+        <span class="hljs-keyword">match</span> sep rest <span class="hljs-built_in">with</span>
+        | .ok (_, rest<span class="hljs-string">&#x27;) =&gt; go (acc.concat a) rest&#x27;</span>
+        | .error _ =&gt; (acc.concat a, rest)
+      | .error _ =&gt; (acc, input)
+    .ok $ go [] input
+
+<span class="hljs-meta">mutual</span>
+  <span class="hljs-keyword">partial</span> <span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parseArray</span> <span class="hljs-symbol">:</span></span> Parser Json <span class="hljs-symbol">:=</span> <span class="hljs-keyword">do</span>
+    _ ← char <span class="hljs-string">&#x27;[&#x27;</span>
+    _ ← whitespaces
+    <span class="hljs-keyword">let</span> elems ← sepBy parseJson (char <span class="hljs-string">&#x27;,&#x27;</span>)
+    _ ← whitespaces
+    _ ← char <span class="hljs-string">&#x27;]&#x27;</span>
+    <span class="hljs-keyword">return</span> Json.arr elems
+
+  <span class="hljs-keyword">partial</span> <span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parseObject</span> <span class="hljs-symbol">:</span></span> Parser Json <span class="hljs-symbol">:=</span> <span class="hljs-keyword">do</span>
+    _ ← char <span class="hljs-string">&#x27;&#123;&#x27;</span>
+    _ ← whitespaces
+    <span class="hljs-keyword">let</span> pairs ← sepBy parsePair (char <span class="hljs-string">&#x27;,&#x27;</span>)
+    _ ← whitespaces
+    _ ← char <span class="hljs-string">&#x27;&#125;&#x27;</span>
+    <span class="hljs-keyword">return</span> Json.obj pairs
+
+  <span class="hljs-keyword">partial</span> <span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parsePair</span> <span class="hljs-symbol">:</span></span> Parser (String × Json) <span class="hljs-symbol">:=</span> <span class="hljs-keyword">do</span>
+    _ ← whitespaces
+    <span class="hljs-keyword">let</span> key ← quotedString
+    _ ← whitespaces
+    _ ← char <span class="hljs-string">&#x27;:&#x27;</span>
+    <span class="hljs-keyword">let</span> value ← parseJson
+    <span class="hljs-keyword">return</span> (key.asString, value)
+
+  <span class="hljs-keyword">partial</span> <span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parseJson</span> <span class="hljs-symbol">:</span></span> Parser Json <span class="hljs-symbol">:=</span> <span class="hljs-keyword">do</span>
+    <span class="hljs-keyword">let</span> _ ← whitespaces
+    <span class="hljs-keyword">let</span> json ← <span class="hljs-keyword">fun</span> str =&gt; <span class="hljs-keyword">match</span> str <span class="hljs-built_in">with</span>
+      | <span class="hljs-string">&#x27;n&#x27;</span> :: _ =&gt; parseNull str
+      | <span class="hljs-string">&#x27;t&#x27;</span> :: _ =&gt; parseTrue str
+      | <span class="hljs-string">&#x27;f&#x27;</span> :: _ =&gt; parseFalse str
+      | <span class="hljs-string">&#x27;[&#x27;</span> :: _ =&gt; parseArray str
+      | <span class="hljs-string">&#x27;&#123;&#x27;</span> :: _ =&gt; parseObject str
+      | <span class="hljs-string">&#x27;&quot;&#x27;</span> :: _ =&gt; parseString str
+      | _ =&gt; parseNumber str
+    <span class="hljs-keyword">let</span> _ ← whitespaces
+    <span class="hljs-keyword">return</span> json
+<span class="hljs-section">end</span>
+</code></pre>
+<p>整个逻辑极其清晰和简单！这就是 parser combinator 的魅力。回顾我们之前写的 lean4 的 json 大概长这样</p>
+<pre><code class="hljs language-lean"><span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parseJsonObject</span> <span class="hljs-params">(fuel: Nat)</span> <span class="hljs-params">(str: List Char)</span> <span class="hljs-symbol">:</span></span> Except String (List (String × Json) × List Char) <span class="hljs-symbol">:=</span> <span class="hljs-keyword">do</span>
+  <span class="hljs-keyword">match</span> fuel <span class="hljs-built_in">with</span>
+  | <span class="hljs-number">0</span> =&gt; .error <span class="hljs-string">&quot;out of fuel&quot;</span>
+  | .succ fuel =&gt;
+  <span class="hljs-keyword">let</span> mut xs <span class="hljs-symbol">:=</span> trimList str
+  <span class="hljs-keyword">let</span> mut ret : List (String × Json) <span class="hljs-symbol">:=</span> []
+  <span class="hljs-keyword">while</span> true <span class="hljs-keyword">do</span>
+    <span class="hljs-keyword">match</span> xs <span class="hljs-built_in">with</span>
+    | <span class="hljs-string">&#x27;&quot;&#x27;</span> :: next =&gt;
+      <span class="hljs-keyword">let</span> (key, next) ← parseJsonString next
+      xs <span class="hljs-symbol">:=</span> trimList next
+      if xs.head? != some <span class="hljs-string">&#x27;:&#x27;</span> then
+        .error <span class="hljs-string">&quot;expect `:` but got unexpected token&quot;</span>
+      else
+        xs <span class="hljs-symbol">:=</span> xs.tail
+      <span class="hljs-keyword">let</span> (val, next) ← parseJsonValue fuel xs
+      ret <span class="hljs-symbol">:=</span> ret.append [(key, val)]
+      <span class="hljs-keyword">match</span> trimList next <span class="hljs-built_in">with</span>
+      | <span class="hljs-string">&#x27;,&#x27;</span> :: next =&gt; xs <span class="hljs-symbol">:=</span> trimList next
+      | <span class="hljs-string">&#x27;&#125;&#x27;</span> :: next =&gt;
+        <span class="hljs-keyword">return</span> (ret, next)
+      | x =&gt; .error $ <span class="hljs-string">&quot;expect `,` or `&#125;` but got unexpected token:&quot;</span> ++ String.mk x
+    | <span class="hljs-string">&#x27;&#125;&#x27;</span> :: next =&gt;
+      <span class="hljs-keyword">return</span> (ret, next)
+    | x =&gt; .error $ <span class="hljs-string">&quot;unexpected token:&quot;</span> ++ String.mk x
+  <span class="hljs-keyword">return</span> ([], xs.tail)
+<span class="hljs-built_in">termination_by</span> fuel
+</code></pre>
+<p>虽然比起抽象更少的 gleam 还是很不错，但对比 parser combinator 的做法：</p>
+<pre><code class="hljs language-lean"><span class="hljs-keyword">partial</span> <span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parseObject</span> <span class="hljs-symbol">:</span></span> Parser Json <span class="hljs-symbol">:=</span> <span class="hljs-keyword">do</span>
+  _ ← char <span class="hljs-string">&#x27;&#123;&#x27;</span>
+  _ ← whitespaces
+  <span class="hljs-keyword">let</span> pairs ← sepBy parsePair (char <span class="hljs-string">&#x27;,&#x27;</span>)
+  _ ← whitespaces
+  _ ← char <span class="hljs-string">&#x27;&#125;&#x27;</span>
+  <span class="hljs-keyword">return</span> Json.obj pairs
+
+<span class="hljs-keyword">partial</span> <span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parsePair</span> <span class="hljs-symbol">:</span></span> Parser (String × Json) <span class="hljs-symbol">:=</span> <span class="hljs-keyword">do</span>
+  _ ← whitespaces
+  <span class="hljs-keyword">let</span> key ← quotedString
+  _ ← whitespaces
+  _ ← char <span class="hljs-string">&#x27;:&#x27;</span>
+  <span class="hljs-keyword">let</span> value ← parseJson
+  <span class="hljs-keyword">return</span> (key.asString, value)
+</code></pre>
+<p>显然，所有人都看得出来， parser combinator 的做法非常简洁明了，可读性极强。</p>
+<p>如果你正在编写一个传统的递归下降解析器来解析 JSON 数组，你可能会尝试在循环中解析语句，当它无法解析中间的逗号时停止。这个过程很难做到复用，除非你其实已经在写一个 parser combinator 了。比如我之前写的 C++ 的解析器：</p>
+<pre><code class="hljs language-cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Object</span> : <span class="hljs-keyword">public</span> Node &#123;
+  <span class="hljs-keyword">using</span> ObjectVT = std::unordered_map&lt;std::string, JSON&gt;;
+  ObjectVT value_&#123;&#125;;
+
+<span class="hljs-keyword">public</span>:
+  <span class="hljs-built_in">Object</span>() &#123;&#125;;
+  <span class="hljs-function"><span class="hljs-keyword">explicit</span> <span class="hljs-title">Object</span><span class="hljs-params">(ObjectVT &amp;&amp;val)</span> : value_(std::move(val)) &#123;</span>&#125;;
+  <span class="hljs-built_in">Object</span>(Object &amp;&amp;) = <span class="hljs-keyword">default</span>;
+  <span class="hljs-built_in">Object</span>(<span class="hljs-type">const</span> Object &amp;) = <span class="hljs-keyword">delete</span>; <span class="hljs-comment">// 删掉拷贝构造函数</span>
+  Object &amp;<span class="hljs-keyword">operator</span>=(Object &amp;&amp;) = <span class="hljs-keyword">default</span>;
+  Object &amp;<span class="hljs-keyword">operator</span>=(<span class="hljs-type">const</span> Object &amp;) = <span class="hljs-keyword">delete</span>;
+
+  <span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">static</span> std::unique_ptr&lt;Object&gt; <span class="hljs-title">parse</span><span class="hljs-params">(std::string_view &amp;sv, <span class="hljs-type">int</span> dep)</span> </span>&#123;
+    <span class="hljs-built_in">assert_depth</span>(sv, dep);
+    <span class="hljs-built_in">removeWhiteSpaces</span>(sv);
+    <span class="hljs-keyword">if</span> (sv[<span class="hljs-number">0</span>] != <span class="hljs-string">&#x27;&#123;&#x27;</span>)
+      <span class="hljs-keyword">throw</span> <span class="hljs-built_in">getJSONParseError</span>(sv, <span class="hljs-string">&quot;object start `&#123;`&quot;</span>);
+    sv.<span class="hljs-built_in">remove_prefix</span>(<span class="hljs-number">1</span>);
+    <span class="hljs-built_in">removeWhiteSpaces</span>(sv);
+    ObjectVT val;
+    <span class="hljs-type">bool</span> isTComma = <span class="hljs-literal">false</span>; <span class="hljs-comment">// 是不是尾随逗号</span>
+    <span class="hljs-keyword">while</span> (sv[<span class="hljs-number">0</span>] != <span class="hljs-string">&#x27;&#125;&#x27;</span>) &#123;
+      <span class="hljs-keyword">auto</span> key = String::<span class="hljs-built_in">parse</span>(sv); <span class="hljs-comment">// 解析 key</span>
+      <span class="hljs-keyword">if</span> (ENABLE_DUMPLICATED_KEY_DETECT &amp;&amp; val.<span class="hljs-built_in">contains</span>(key-&gt;<span class="hljs-built_in">value</span>())) &#123;
+        <span class="hljs-keyword">throw</span> <span class="hljs-built_in">getJSONParseError</span>(
+            sv, (<span class="hljs-string">&quot;unique key, but got dumplicated key `&quot;</span> + key-&gt;<span class="hljs-built_in">value</span>() + <span class="hljs-string">&quot;`&quot;</span>)
+                    .<span class="hljs-built_in">c_str</span>());
+      &#125; <span class="hljs-keyword">else</span> &#123;
+        <span class="hljs-built_in">removeWhiteSpaces</span>(sv);
+        <span class="hljs-keyword">if</span> (sv[<span class="hljs-number">0</span>] != <span class="hljs-string">&#x27;:&#x27;</span>) <span class="hljs-comment">// 解析 key :</span>
+          <span class="hljs-keyword">throw</span> <span class="hljs-built_in">getJSONParseError</span>(sv, <span class="hljs-string">&quot;object spliter `:`&quot;</span>);
+        sv.<span class="hljs-built_in">remove_prefix</span>(<span class="hljs-number">1</span>);
+        val.<span class="hljs-built_in">insert</span>(&#123;key-&gt;<span class="hljs-built_in">take</span>(), <span class="hljs-built_in">JSON</span>(Node::<span class="hljs-built_in">parse</span>(sv, dep + <span class="hljs-number">1</span>))&#125;);
+        <span class="hljs-built_in">removeWhiteSpaces</span>(sv); <span class="hljs-comment">// 解析 key : value</span>
+        <span class="hljs-keyword">switch</span> (sv[<span class="hljs-number">0</span>]) &#123;
+        <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;&#125;&#x27;</span>: <span class="hljs-comment">// 看看结束了没</span>
+          sv.<span class="hljs-built_in">remove_prefix</span>(<span class="hljs-number">1</span>);
+          <span class="hljs-keyword">return</span> std::<span class="hljs-built_in">make_unique</span>&lt;Object&gt;(std::<span class="hljs-built_in">move</span>(val));
+        <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;,&#x27;</span>:
+          sv.<span class="hljs-built_in">remove_prefix</span>(<span class="hljs-number">1</span>);
+          isTComma = <span class="hljs-literal">true</span>;
+          <span class="hljs-keyword">continue</span>;
+        <span class="hljs-keyword">default</span>:
+          <span class="hljs-keyword">throw</span> <span class="hljs-built_in">getJSONParseError</span>(sv, <span class="hljs-string">&quot;object spliter `,` or object end `&#125;`&quot;</span>);
+        &#125;
+      &#125;
+    &#125;
+    <span class="hljs-keyword">if</span> (isTComma &amp;&amp; !ENABLE_TRAILING_COMMA)
+      <span class="hljs-keyword">throw</span> <span class="hljs-built_in">getJSONParseError</span>(sv, <span class="hljs-string">&quot;next json value&quot;</span>);
+    sv.<span class="hljs-built_in">remove_prefix</span>(<span class="hljs-number">1</span>);
+    <span class="hljs-keyword">return</span> std::<span class="hljs-built_in">make_unique</span>&lt;Object&gt;(std::<span class="hljs-built_in">move</span>(val));
+  &#125;
+
+  <span class="hljs-comment">// ...</span>
+&#125;
+</code></pre>
+<p>但如你所见，使用函数式语言 parser combinator 的话，定义一个复用的解析器极其简单</p>
+<pre><code class="hljs language-lean"><span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">arrayElems</span> <span class="hljs-symbol">:=</span></span> sepBy parseJson (char <span class="hljs-string">&#x27;,&#x27;</span>)
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">urlParams</span> <span class="hljs-symbol">:=</span></span> sepBy (agg3 $ parseVar (char <span class="hljs-string">&#x27;=&#x27;</span>) parseVal) (char <span class="hljs-string">&#x27;&amp;&#x27;</span>)
+</code></pre>
+<h3 id="3-扩展：用在不那么方便的语言上？">3. 扩展：用在不那么方便的语言上？<a class="header-anchor" href="#3-扩展：用在不那么方便的语言上？"> ¶</a></h3>
+<p>显然这一套是很容易用在不那么方便的语言上的。对比<a href="/2025/01/06/gleam-intro/#%E5%AE%9E%E6%88%98%EF%BC%9A%E5%86%99%E4%B8%AA-JSON-Parser">刚接触函数式的时候写出来的幽默代码</a>，这套使用了解析器组合子的代码要好看很多，好理解很多</p>
+<pre><code class="hljs language-gleam">import gleam/dict
+import gleam/io
+import gleam/list
+import gleam/result
+import gleam/string
+
+<span class="hljs-keyword">pub</span> <span class="hljs-keyword">type</span> <span class="hljs-title class_">Node</span> &#123;
+  Nul
+  <span class="hljs-title function_ invoke__">Bol</span>(val: Bool)
+  <span class="hljs-title function_ invoke__">Num</span>(val: Int)
+  <span class="hljs-title function_ invoke__">Str</span>(val: <span class="hljs-type">String</span>)
+  <span class="hljs-title function_ invoke__">Arr</span>(val: <span class="hljs-title function_ invoke__">List</span>(Node))
+  <span class="hljs-title function_ invoke__">Obj</span>(val: dict.<span class="hljs-title function_ invoke__">Dict</span>(<span class="hljs-type">String</span>, Node))
+&#125;
+
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">Parser</span>(t) =
+  <span class="hljs-title function_ invoke__">fn</span>(<span class="hljs-type">String</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Result</span>(#(t, <span class="hljs-type">String</span>), <span class="hljs-type">String</span>)
+
+<span class="hljs-comment">// Parser 工具</span>
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">skip</span>(builder: <span class="hljs-title function_ invoke__">Parser</span>(a), f: <span class="hljs-title function_ invoke__">Parser</span>(b)) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(a) &#123;
+  <span class="hljs-title function_ invoke__">fn</span>(input: <span class="hljs-type">String</span>) &#123;
+    <span class="hljs-keyword">use</span> #(res, input) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">builder</span>(input))
+    <span class="hljs-keyword">use</span> #(_, input) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">f</span>(input))
+    <span class="hljs-title function_ invoke__">Ok</span>(#(res, input))
+  &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">result_is</span>(builder: <span class="hljs-title function_ invoke__">Parser</span>(a), f: <span class="hljs-title function_ invoke__">Parser</span>(b)) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(b) &#123;
+  <span class="hljs-title function_ invoke__">fn</span>(input: <span class="hljs-type">String</span>) &#123;
+    <span class="hljs-keyword">use</span> #(_, input) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">builder</span>(input))
+    <span class="hljs-keyword">use</span> #(res, input) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">f</span>(input))
+    <span class="hljs-title function_ invoke__">Ok</span>(#(res, input))
+  &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">or</span>(p1: <span class="hljs-title function_ invoke__">Parser</span>(a), p2: <span class="hljs-title function_ invoke__">Parser</span>(a)) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(a) &#123;
+  <span class="hljs-title function_ invoke__">fn</span>(input: <span class="hljs-type">String</span>) &#123;
+    case <span class="hljs-title function_ invoke__">p1</span>(input) &#123;
+      <span class="hljs-title function_ invoke__">Ok</span>(x) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Ok</span>(x)
+      <span class="hljs-title function_ invoke__">Error</span>(_) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">p2</span>(input)
+    &#125;
+  &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">map</span>(p: <span class="hljs-title function_ invoke__">Parser</span>(a), f: <span class="hljs-title function_ invoke__">fn</span>(a) <span class="hljs-punctuation">-&gt;</span> b) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(b) &#123;
+  <span class="hljs-title function_ invoke__">fn</span>(input: <span class="hljs-type">String</span>) &#123;
+    <span class="hljs-keyword">use</span> #(res, input) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">p</span>(input))
+    <span class="hljs-title function_ invoke__">Ok</span>(#(<span class="hljs-title function_ invoke__">f</span>(res), input))
+  &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">chain</span>(p1: <span class="hljs-title function_ invoke__">Parser</span>(a), p2: <span class="hljs-title function_ invoke__">Parser</span>(b)) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(#(a, b)) &#123;
+  <span class="hljs-title function_ invoke__">fn</span>(input: <span class="hljs-type">String</span>) &#123;
+    <span class="hljs-keyword">use</span> #(res1, input) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">p1</span>(input))
+    <span class="hljs-keyword">use</span> #(res2, input) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">p2</span>(input))
+    <span class="hljs-title function_ invoke__">Ok</span>(#(#(res1, res2), input))
+  &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">go_for_seq_by</span>(
+  p: <span class="hljs-title function_ invoke__">Parser</span>(a),
+  sep: <span class="hljs-title function_ invoke__">Parser</span>(b),
+  acc: <span class="hljs-title function_ invoke__">List</span>(a),
+  input: <span class="hljs-type">String</span>,
+) <span class="hljs-punctuation">-&gt;</span> #(<span class="hljs-title function_ invoke__">List</span>(a), <span class="hljs-type">String</span>) &#123;
+  case <span class="hljs-title function_ invoke__">p</span>(input) &#123;
+    <span class="hljs-title function_ invoke__">Ok</span>(#(val, rest)) <span class="hljs-punctuation">-&gt;</span>
+      case <span class="hljs-title function_ invoke__">sep</span>(rest) &#123;
+        <span class="hljs-title function_ invoke__">Ok</span>(#(_, rest)) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">go_for_seq_by</span>(p, sep, acc |&gt; list.<span class="hljs-title function_ invoke__">append</span>([val]), rest)
+        <span class="hljs-title function_ invoke__">Error</span>(_) <span class="hljs-punctuation">-&gt;</span> #(acc |&gt; list.<span class="hljs-title function_ invoke__">append</span>([val]), rest)
+      &#125;
+    <span class="hljs-title function_ invoke__">Error</span>(_) <span class="hljs-punctuation">-&gt;</span> #(acc, input)
+  &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">seq_by</span>(p: <span class="hljs-title function_ invoke__">Parser</span>(a), sep: <span class="hljs-title function_ invoke__">Parser</span>(b)) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(<span class="hljs-title function_ invoke__">List</span>(a)) &#123;
+  <span class="hljs-title function_ invoke__">fn</span>(input: <span class="hljs-type">String</span>) &#123; <span class="hljs-title function_ invoke__">Ok</span>(<span class="hljs-title function_ invoke__">go_for_seq_by</span>(p, sep, [], input)) &#125;
+&#125;
+
+<span class="hljs-comment">// JSON 工具函数</span>
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">char</span>(c: <span class="hljs-type">String</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(<span class="hljs-type">String</span>) &#123;
+  <span class="hljs-title function_ invoke__">fn</span>(<span class="hljs-type">str</span>: <span class="hljs-type">String</span>) &#123;
+    case <span class="hljs-type">str</span> |&gt; string.pop_grapheme &#123;
+      <span class="hljs-title function_ invoke__">Error</span>(Nil) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(<span class="hljs-string">&quot;Unexpected EOF&quot;</span>)
+      <span class="hljs-title function_ invoke__">Ok</span>(#(first, rest)) <span class="hljs-keyword">if</span> first == c <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Ok</span>(#(first, rest))
+      <span class="hljs-title function_ invoke__">Ok</span>(_) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(<span class="hljs-string">&quot;need char &#x27;&quot;</span> &lt;&gt; c &lt;&gt; <span class="hljs-string">&quot;&#x27;, got unexpected token &quot;</span> &lt;&gt; <span class="hljs-type">str</span>)
+    &#125;
+  &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">whitespace</span>() <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(#()) &#123;
+  <span class="hljs-title function_ invoke__">fn</span>(input: <span class="hljs-type">String</span>) &#123; <span class="hljs-title function_ invoke__">Ok</span>(#(#(), input |&gt; string.trim_start)) &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">ident</span>(id: <span class="hljs-type">String</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(<span class="hljs-type">String</span>) &#123;
+  <span class="hljs-title function_ invoke__">fn</span>(<span class="hljs-type">str</span>: <span class="hljs-type">String</span>) &#123;
+    case <span class="hljs-type">str</span> |&gt; string.<span class="hljs-title function_ invoke__">starts_with</span>(id) &#123;
+      True <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Ok</span>(#(id, <span class="hljs-type">str</span> |&gt; string.<span class="hljs-title function_ invoke__">drop_start</span>(string.<span class="hljs-title function_ invoke__">length</span>(id))))
+      False <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(<span class="hljs-string">&quot;need &quot;</span> &lt;&gt; id &lt;&gt; <span class="hljs-string">&quot;, got unexpected token &quot;</span> &lt;&gt; <span class="hljs-type">str</span>)
+    &#125;
+  &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">true_parser</span>() <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(Node) &#123;
+  <span class="hljs-title function_ invoke__">ident</span>(<span class="hljs-string">&quot;true&quot;</span>) |&gt; <span class="hljs-title function_ invoke__">map</span>(<span class="hljs-title function_ invoke__">fn</span>(_) &#123; <span class="hljs-title function_ invoke__">Bol</span>(val: True) &#125;)
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">false_parser</span>() <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(Node) &#123;
+  <span class="hljs-title function_ invoke__">ident</span>(<span class="hljs-string">&quot;false&quot;</span>) |&gt; <span class="hljs-title function_ invoke__">map</span>(<span class="hljs-title function_ invoke__">fn</span>(_) &#123; <span class="hljs-title function_ invoke__">Bol</span>(val: False) &#125;)
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">null_parser</span>() <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(Node) &#123;
+  <span class="hljs-title function_ invoke__">ident</span>(<span class="hljs-string">&quot;null&quot;</span>) |&gt; <span class="hljs-title function_ invoke__">map</span>(<span class="hljs-title function_ invoke__">fn</span>(_) &#123; Nul &#125;)
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">string_key_parser</span>() <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(<span class="hljs-type">String</span>) &#123;
+  <span class="hljs-title function_ invoke__">fn</span>(input: <span class="hljs-type">String</span>) &#123;
+    <span class="hljs-keyword">use</span> #(_, rest) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">char</span>(<span class="hljs-string">&quot;\&quot;&quot;</span>)(input))
+    case rest |&gt; string.<span class="hljs-title function_ invoke__">split_once</span>(<span class="hljs-string">&quot;\&quot;&quot;</span>) &#123;
+      <span class="hljs-title function_ invoke__">Ok</span>(#(val, rest)) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Ok</span>(#(val, rest))
+      <span class="hljs-title function_ invoke__">Error</span>(_) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(<span class="hljs-string">&quot;except string key, got unexpected token &quot;</span> &lt;&gt; input)
+    &#125;
+  &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">string_parser</span>() <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(Node) &#123;
+  <span class="hljs-title function_ invoke__">string_key_parser</span>() |&gt; <span class="hljs-title function_ invoke__">map</span>(<span class="hljs-title function_ invoke__">fn</span>(val) &#123; <span class="hljs-title function_ invoke__">Str</span>(val: val) &#125;)
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">array_parser</span>() <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(Node) &#123;
+  <span class="hljs-title function_ invoke__">char</span>(<span class="hljs-string">&quot;[&quot;</span>)
+  |&gt; <span class="hljs-title function_ invoke__">result_is</span>(
+    <span class="hljs-title function_ invoke__">json_parser</span>()
+    |&gt; <span class="hljs-title function_ invoke__">seq_by</span>(<span class="hljs-title function_ invoke__">char</span>(<span class="hljs-string">&quot;,&quot;</span>))
+    |&gt; <span class="hljs-title function_ invoke__">map</span>(<span class="hljs-title function_ invoke__">fn</span>(val) &#123; <span class="hljs-title function_ invoke__">Arr</span>(val) &#125;),
+  )
+  |&gt; <span class="hljs-title function_ invoke__">skip</span>(<span class="hljs-title function_ invoke__">whitespace</span>())
+  |&gt; <span class="hljs-title function_ invoke__">skip</span>(<span class="hljs-title function_ invoke__">char</span>(<span class="hljs-string">&quot;]&quot;</span>))
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">pair_parser</span>() <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(#(<span class="hljs-type">String</span>, Node)) &#123;
+  <span class="hljs-title function_ invoke__">whitespace</span>()
+  |&gt; <span class="hljs-title function_ invoke__">result_is</span>(<span class="hljs-title function_ invoke__">string_key_parser</span>())
+  |&gt; <span class="hljs-title function_ invoke__">skip</span>(<span class="hljs-title function_ invoke__">whitespace</span>())
+  |&gt; <span class="hljs-title function_ invoke__">skip</span>(<span class="hljs-title function_ invoke__">char</span>(<span class="hljs-string">&quot;:&quot;</span>))
+  |&gt; <span class="hljs-title function_ invoke__">chain</span>(<span class="hljs-title function_ invoke__">json_parser</span>())
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">object_parser</span>() <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(Node) &#123;
+  <span class="hljs-title function_ invoke__">char</span>(<span class="hljs-string">&quot;&#123;&quot;</span>)
+  |&gt; <span class="hljs-title function_ invoke__">skip</span>(<span class="hljs-title function_ invoke__">whitespace</span>())
+  |&gt; <span class="hljs-title function_ invoke__">result_is</span>(
+    <span class="hljs-title function_ invoke__">pair_parser</span>()
+    |&gt; <span class="hljs-title function_ invoke__">seq_by</span>(<span class="hljs-title function_ invoke__">char</span>(<span class="hljs-string">&quot;,&quot;</span>))
+    |&gt; <span class="hljs-title function_ invoke__">map</span>(<span class="hljs-title function_ invoke__">fn</span>(val) &#123; <span class="hljs-title function_ invoke__">Obj</span>(dict.<span class="hljs-title function_ invoke__">from_list</span>(val)) &#125;),
+  )
+  |&gt; <span class="hljs-title function_ invoke__">skip</span>(<span class="hljs-title function_ invoke__">whitespace</span>())
+  |&gt; <span class="hljs-title function_ invoke__">skip</span>(<span class="hljs-title function_ invoke__">char</span>(<span class="hljs-string">&quot;&#125;&quot;</span>))
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">json_parser</span>() <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(Node) &#123;
+  <span class="hljs-title function_ invoke__">fn</span>(input: <span class="hljs-type">String</span>) &#123;
+    <span class="hljs-keyword">let</span> <span class="hljs-variable">input</span> = input |&gt; string.trim_start
+    case input &#123;
+      <span class="hljs-string">&quot;t&quot;</span> &lt;&gt; _ <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">true_parser</span>()(input)
+      <span class="hljs-string">&quot;f&quot;</span> &lt;&gt; _ <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">false_parser</span>()(input)
+      <span class="hljs-string">&quot;n&quot;</span> &lt;&gt; _ <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">null_parser</span>()(input)
+      <span class="hljs-string">&quot;\&quot;&quot;</span> &lt;&gt; _ <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">string_parser</span>()(input)
+      <span class="hljs-string">&quot;[&quot;</span> &lt;&gt; _ <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">array_parser</span>()(input)
+      <span class="hljs-string">&quot;&#123;&quot;</span> &lt;&gt; _ <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">object_parser</span>()(input)
+      x <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(<span class="hljs-string">&quot;unexpected token &quot;</span> &lt;&gt; x)
+    &#125;
+  &#125;
+  <span class="hljs-comment">// eat whitespaces</span>
+  |&gt; <span class="hljs-title function_ invoke__">skip</span>(<span class="hljs-title function_ invoke__">whitespace</span>())
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">parse_json</span>(input: <span class="hljs-type">String</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Result</span>(Node, <span class="hljs-type">String</span>) &#123;
+  case <span class="hljs-title function_ invoke__">json_parser</span>()(input |&gt; string.trim_start) &#123;
+    <span class="hljs-title function_ invoke__">Ok</span>(#(node, rest)) <span class="hljs-punctuation">-&gt;</span> &#123;
+      case rest &#123;
+        <span class="hljs-string">&quot;&quot;</span> <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Ok</span>(node)
+        _ <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(<span class="hljs-string">&quot;unexpected token &quot;</span> &lt;&gt; rest)
+      &#125;
+    &#125;
+    <span class="hljs-title function_ invoke__">Error</span>(err) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(err)
+  &#125;
+&#125;
+
+<span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() &#123;
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">_</span> = io.<span class="hljs-title function_ invoke__">debug</span>(<span class="hljs-title function_ invoke__">parse_json</span>(<span class="hljs-string">&quot;null&quot;</span>))
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">_</span> = io.<span class="hljs-title function_ invoke__">debug</span>(<span class="hljs-title function_ invoke__">parse_json</span>(<span class="hljs-string">&quot;true&quot;</span>))
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">_</span> = io.<span class="hljs-title function_ invoke__">debug</span>(<span class="hljs-title function_ invoke__">parse_json</span>(<span class="hljs-string">&quot;false&quot;</span>))
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">_</span> = io.<span class="hljs-title function_ invoke__">debug</span>(<span class="hljs-title function_ invoke__">parse_json</span>(<span class="hljs-string">&quot;\&quot;wwww\&quot;&quot;</span>))
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">_</span> = io.<span class="hljs-title function_ invoke__">debug</span>(<span class="hljs-title function_ invoke__">parse_json</span>(<span class="hljs-string">&quot;&#123;&#125;&quot;</span>))
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">_</span> = io.<span class="hljs-title function_ invoke__">debug</span>(<span class="hljs-title function_ invoke__">parse_json</span>(<span class="hljs-string">&quot;&#123;\&quot;a\&quot;: true, \&quot;b\&quot;: [true, false, null]&#125;&quot;</span>))
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">_</span> = io.<span class="hljs-title function_ invoke__">debug</span>(<span class="hljs-title function_ invoke__">parse_json</span>(<span class="hljs-string">&quot;&#123;\&quot;a\&quot;  : true, \&quot;b\&quot;  : [true, false, null]&#125;&quot;</span>))
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">_</span> = io.<span class="hljs-title function_ invoke__">debug</span>(<span class="hljs-title function_ invoke__">parse_json</span>(<span class="hljs-string">&quot;[ true, false, null, \&quot;abcd\&quot; ]&quot;</span>))
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">_</span> = io.<span class="hljs-title function_ invoke__">debug</span>(<span class="hljs-title function_ invoke__">parse_json</span>(<span class="hljs-string">&quot;[true,false,null,\&quot;abcd\&quot;  ]&quot;</span>))
+
+  io.<span class="hljs-title function_ invoke__">debug</span>(<span class="hljs-string">&quot;done&quot;</span>)
+&#125;
+</code></pre>
+</section><section class="post-meta"><span class="info"><i class="fa fa-calendar"></i> <span class="date">2025-04-13</span>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Code/" title="Code">Code</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Functional/" title="Functional">Functional</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Lean/" title="Lean">Lean</a>  </span></section></article><p class="pagination"><a href="/2025/04/13/pfpl-note-7/" title="PFPL 笔记 - VI Dynamic Types">Previous</a><span>  </span><a href="/2025/04/08/lean4-json/" title="很难不承认 Lean4 真香 —— 然后写了一个简单的 JSON 解析器">Next</a></p><article class="comment-container"><div class="comment-container"><script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js" onload="(new Gitalk({&quot;clientID&quot;:&quot;12a250ac67f452906dd6&quot;,&quot;clientSecret&quot;:&quot;7422a9ecdc933d5e6facbc61d546bced40519f0b&quot;,&quot;repo&quot;:&quot;lhcfl.github.io&quot;,&quot;owner&quot;:&quot;lhcfl&quot;,&quot;admin&quot;:[&quot;lhcfl&quot;],&quot;id&quot;:&quot;学习在 Lean4 中使用 Parser Combinator&quot;,&quot;distractionFreeMode&quot;:false})).render(&quot;gitalk-comment-slot&quot;)"></script><div id="gitalk-comment-slot">Loading...</div></div></article></main><footer class="footer"><br><p class="powered_by">Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> and <a target="_blank" rel="noopener" href="https://github.com/Lhcfl/hexo-theme-sosimple">SoSimple</a></p></footer></body></html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Linca"><title>很难不承认 Lean4 真香 —— 然后写了一个简单的 JSON 解析器 · Zero Calorie Drink Shop</title><meta name="description" content="在之前的文章中我尝试了一下 Lean4 定理证明器——然后我是在并非干这个方向的所以后面就抛在脑后了
+后面因为学习函数式语言于是又捡起了 Lean4 函数式编程，然后……好吧我真的不得不说真香啊
+
+于是我又拿 Lean4 写了一个 JSON parser，说起来我真的好爱写 JSON 解析器啊（？）"><meta name="keywords" content="Code,Functional,Lean"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="mobile-web-app-capable" content="yes"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta id="site_data_static" data-url="/"><meta name="renderer" content="webkit"><link rel="shortcut icon" type="image/x-icon" href="/images/logo.png"><link rel="stylesheet" href="/js_complied/bundle.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><style>:root { --normal-font-face: LXGW WenKai, LXGW WenKai TC, 'Times New Roman', Times, serif; }</style><script src="/js_complied/bundle.js"></script><script>Utils.loadCSS("https://testingcf.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css");
+Utils.loadCSS("https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&display=swap");
+Utils.loadCSS("https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css");
+Utils.loadCSS("/css/font-awesome.min.css");</script><meta name="generator" content="Hexo 7.3.0"></head><body class="post-page"><noscript><link rel="stylesheet" href="https://testingcf.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&amp;display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"></noscript><nav class="nav"><a href="/">Home</a>&nbsp;&nbsp;<a href="/archives">Archives</a>&nbsp;&nbsp;<a href="/tags">Tags</a>&nbsp;&nbsp;<a href="/about">About</a>&nbsp;&nbsp;<a href="/links">Links</a>&nbsp;&nbsp;<a href="/search">Search</a>&nbsp;&nbsp;<a href="javascript:SoSimple.darkLightToggle()">Dark/Light Mode</a></nav><main class="main"><article class="post-container post-full"><header class="post-title"><h1>很难不承认 Lean4 真香 —— 然后写了一个简单的 JSON 解析器</h1></header><section class="post-body"><p>在之前的文章中我尝试了一下 Lean4 定理证明器——然后我是在并非干这个方向的所以后面就抛在脑后了</p>
+<p>后面因为学习函数式语言于是又捡起了 Lean4 函数式编程，然后……好吧我真的不得不说真香啊</p>
+<span id="more"></span>
+<p>于是我又拿 Lean4 写了一个 JSON parser，说起来我真的好爱写 JSON 解析器啊（？）（毕竟 JSON 是我们平时接触的最实用又最简单的可以拿 LL1 文法表达的东西</p>
+<p>首先我们定义一个经典的 JSON 结构。接触了一些 PL 理论以后不难看出这是一个 inductive type 即归纳类型</p>
+<pre><code class="hljs language-lean"><span class="hljs-keyword">inductive</span> Json where
+  | Number (n : String)
+  | Null
+  | Bool (b : Bool)
+  | String (s : String)
+  | Array (a : List Json)
+  | Object (o : List (String × Json))
+deriving Repr
+</code></pre>
+<p>为了懒得解析我们不妨直接用 String 存放一个数字。现在我们要开始写一个解析器了！首先这些函数是互相递归的所以我们先来一个 <code>mutual</code> 块。 Lean4 里面互相递归的函数得被 <code>mutual</code> 包起来。</p>
+<pre><code class="hljs language-lean"><span class="hljs-meta">mutual</span>
+
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parseJsonString</span> <span class="hljs-params">(str: List Char)</span> <span class="hljs-symbol">:</span></span> Except String (String × List Char) <span class="hljs-symbol">:=</span> <span class="hljs-keyword">do</span>
+  <span class="hljs-sorry">sorry</span>
+
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parseJsonObject</span> <span class="hljs-params">(fuel: Nat)</span> <span class="hljs-params">(str: List Char)</span> <span class="hljs-symbol">:</span></span> Except String (List (String × Json) × List Char) <span class="hljs-symbol">:=</span> <span class="hljs-keyword">do</span>
+  <span class="hljs-sorry">sorry</span>
+
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parseJsonArray</span> <span class="hljs-params">(fuel: Nat)</span> <span class="hljs-params">(str: List Char)</span> <span class="hljs-symbol">:</span></span> Except String (List Json × List Char) <span class="hljs-symbol">:=</span> <span class="hljs-keyword">do</span>
+  <span class="hljs-sorry">sorry</span>
+
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parseJsonNumber</span> <span class="hljs-params">(str: List Char)</span> <span class="hljs-symbol">:</span></span> Except String (String × List Char) <span class="hljs-symbol">:=</span>
+  <span class="hljs-sorry">sorry</span>
+
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parseJsonValue</span> <span class="hljs-params">(fuel: Nat)</span> <span class="hljs-params">(str: List Char)</span><span class="hljs-symbol">:</span></span> Except String (Json × List Char) <span class="hljs-symbol">:=</span> <span class="hljs-keyword">do</span>
+  <span class="hljs-sorry">sorry</span>
+
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parseJson</span> <span class="hljs-params">(str: String)</span> <span class="hljs-symbol">:</span></span> Except String Json <span class="hljs-symbol">:=</span> <span class="hljs-keyword">do</span>
+  <span class="hljs-sorry">sorry</span>
+
+<span class="hljs-section">end</span>
+</code></pre>
+<p>fuel 在这里是最大递归层级，如果 fuel 用光了就强制停止 parse 的过程。为什么我们要引入 fuel 呢？答案很简单：</p>
+<p><s>因为我不会证明它停机</s></p>
+<p>虽然作为一个 JSON 解析器它停机是比较显然的，但是 Lean4 不这样觉得，所以你得向它证明停机。证明这个停机需要一些设计，反正我不会，所以在询问了 GPT 并且得不到正确的答复以后我选择从心：直接丢个最大递归深度进去肯定是停机的，Lean4 也很容易自动证明这一点</p>
+<p>（当然你也可以直接使用 <code>partial def</code> 告诉 Lean4 这个函数根本就可能不停机，但是问题不大，何况这个函数明明就是会停机的我们应该坚守原则）</p>
+<p>好的那么让我们上代码！</p>
+<pre><code class="hljs language-lean"><span class="hljs-keyword">inductive</span> Json where
+  | Number (n : String)
+  | Null
+  | Bool (b : Bool)
+  | String (s : String)
+  | Array (a : List Json)
+  | Object (o : List (String × Json))
+deriving Repr
+
+<span class="hljs-meta">mutual</span>
+
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">trimList</span> <span class="hljs-params">(str: List Char)</span> <span class="hljs-symbol">:</span></span> List Char <span class="hljs-symbol">:=</span>
+  str.dropWhile (·.isWhitespace)
+
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parseJsonString</span> <span class="hljs-params">(str: List Char)</span> <span class="hljs-symbol">:</span></span> Except String (String × List Char) <span class="hljs-symbol">:=</span> <span class="hljs-keyword">do</span>
+  <span class="hljs-keyword">let</span> mut xs <span class="hljs-symbol">:=</span> str
+  <span class="hljs-keyword">let</span> mut str : List Char <span class="hljs-symbol">:=</span> []
+  for ch <span class="hljs-keyword">in</span> xs <span class="hljs-keyword">do</span>
+    <span class="hljs-keyword">match</span> ch <span class="hljs-built_in">with</span>
+    | <span class="hljs-string">&#x27;&quot;&#x27;</span> =&gt; <span class="hljs-keyword">return</span> (.mk str, xs.tail) <span class="hljs-comment">-- 可以直接写引号但是这个博客的幽默高亮有问题</span>
+    | x =&gt;
+      str <span class="hljs-symbol">:=</span> str ++ [x]
+      xs <span class="hljs-symbol">:=</span> xs.tail
+  <span class="hljs-keyword">return</span> (.mk str, xs)
+
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parseJsonObject</span> <span class="hljs-params">(fuel: Nat)</span> <span class="hljs-params">(str: List Char)</span> <span class="hljs-symbol">:</span></span> Except String (List (String × Json) × List Char) <span class="hljs-symbol">:=</span> <span class="hljs-keyword">do</span>
+  <span class="hljs-keyword">match</span> fuel <span class="hljs-built_in">with</span>
+  | <span class="hljs-number">0</span> =&gt; .error <span class="hljs-string">&quot;out of fuel&quot;</span>
+  | .succ fuel =&gt;
+  <span class="hljs-keyword">let</span> mut xs <span class="hljs-symbol">:=</span> trimList str
+  <span class="hljs-keyword">let</span> mut ret : List (String × Json) <span class="hljs-symbol">:=</span> []
+  <span class="hljs-keyword">while</span> true <span class="hljs-keyword">do</span>
+    <span class="hljs-keyword">match</span> xs <span class="hljs-built_in">with</span>
+    | <span class="hljs-string">&#x27;&quot;&#x27;</span> :: next =&gt;
+      <span class="hljs-keyword">let</span> (key, next) ← parseJsonString next
+      xs <span class="hljs-symbol">:=</span> trimList next
+      if xs.head? != some <span class="hljs-string">&#x27;:&#x27;</span> then
+        .error <span class="hljs-string">&quot;expect `:` but got unexpected token&quot;</span>
+      else
+        xs <span class="hljs-symbol">:=</span> xs.tail
+      <span class="hljs-keyword">let</span> (val, next) ← parseJsonValue fuel xs
+      ret <span class="hljs-symbol">:=</span> ret.append [(key, val)]
+      <span class="hljs-keyword">match</span> trimList next <span class="hljs-built_in">with</span>
+      | <span class="hljs-string">&#x27;,&#x27;</span> :: next =&gt; xs <span class="hljs-symbol">:=</span> trimList next
+      | <span class="hljs-string">&#x27;&#125;&#x27;</span> :: next =&gt;
+        <span class="hljs-keyword">return</span> (ret, next)
+      | x =&gt; .error $ <span class="hljs-string">&quot;expect `,` or `&#125;` but got unexpected token:&quot;</span> ++ String.mk x
+    | <span class="hljs-string">&#x27;&#125;&#x27;</span> :: next =&gt;
+      <span class="hljs-keyword">return</span> (ret, next)
+    | x =&gt; .error $ <span class="hljs-string">&quot;unexpected token:&quot;</span> ++ String.mk x
+  <span class="hljs-keyword">return</span> ([], xs.tail)
+<span class="hljs-built_in">termination_by</span> fuel
+
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parseJsonArray</span> <span class="hljs-params">(fuel: Nat)</span> <span class="hljs-params">(str: List Char)</span> <span class="hljs-symbol">:</span></span> Except String (List Json × List Char) <span class="hljs-symbol">:=</span> <span class="hljs-keyword">do</span>
+  <span class="hljs-keyword">match</span> fuel <span class="hljs-built_in">with</span>
+  | <span class="hljs-number">0</span> =&gt; .error <span class="hljs-string">&quot;out of fuel&quot;</span>
+  | .succ fuel =&gt;
+  <span class="hljs-keyword">let</span> mut xs <span class="hljs-symbol">:=</span> trimList str
+  <span class="hljs-keyword">let</span> mut ret : List Json <span class="hljs-symbol">:=</span> []
+  <span class="hljs-keyword">while</span> xs.head? != some <span class="hljs-string">&#x27;]&#x27;</span> <span class="hljs-keyword">do</span>
+    <span class="hljs-keyword">let</span> (car, next) ← parseJsonValue fuel xs
+    ret <span class="hljs-symbol">:=</span> ret.append [car]
+    <span class="hljs-keyword">match</span> trimList next <span class="hljs-built_in">with</span>
+    | <span class="hljs-string">&#x27;,&#x27;</span> :: next =&gt; xs <span class="hljs-symbol">:=</span> trimList next
+    | <span class="hljs-string">&#x27;]&#x27;</span> :: next =&gt;
+      <span class="hljs-keyword">return</span> (ret, next)
+    | _ =&gt; .error <span class="hljs-string">&quot;unexpected token&quot;</span>
+  <span class="hljs-keyword">return</span> ([], xs.tail)
+<span class="hljs-built_in">termination_by</span> fuel
+
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parseJsonNumber</span> <span class="hljs-params">(str: List Char)</span> <span class="hljs-symbol">:</span></span> Except String (String × List Char) <span class="hljs-symbol">:=</span>
+  <span class="hljs-keyword">let</span> (num, xs) <span class="hljs-symbol">:=</span> str.span (·.isDigit)
+  <span class="hljs-keyword">match</span> num.length <span class="hljs-built_in">with</span>
+  | <span class="hljs-number">0</span> =&gt; .error <span class="hljs-string">&quot;unexpected token&quot;</span>
+  | _ =&gt; .ok (.mk num, xs)
+
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parseJsonValue</span> <span class="hljs-params">(fuel: Nat)</span> <span class="hljs-params">(str: List Char)</span><span class="hljs-symbol">:</span></span> Except String (Json × List Char) <span class="hljs-symbol">:=</span> <span class="hljs-keyword">do</span>
+  <span class="hljs-keyword">match</span> fuel <span class="hljs-built_in">with</span>
+  | <span class="hljs-number">0</span> =&gt; .error <span class="hljs-string">&quot;out of fuel&quot;</span>
+  | .succ fuel =&gt;
+  <span class="hljs-keyword">match</span> trimList str <span class="hljs-built_in">with</span>
+  | <span class="hljs-string">&#x27;n&#x27;</span>::<span class="hljs-string">&#x27;u&#x27;</span>::<span class="hljs-string">&#x27;l&#x27;</span>::<span class="hljs-string">&#x27;l&#x27;</span>::xs =&gt; .ok (Json.Null, xs)
+  | <span class="hljs-string">&#x27;t&#x27;</span>::<span class="hljs-string">&#x27;r&#x27;</span>::<span class="hljs-string">&#x27;u&#x27;</span>::<span class="hljs-string">&#x27;e&#x27;</span>::xs =&gt; .ok $ (Json.Bool true, xs)
+  | <span class="hljs-string">&#x27;f&#x27;</span>::<span class="hljs-string">&#x27;a&#x27;</span>::<span class="hljs-string">&#x27;l&#x27;</span>::<span class="hljs-string">&#x27;s&#x27;</span>::<span class="hljs-string">&#x27;e&#x27;</span>::xs =&gt; .ok $ (Json.Bool false, xs)
+  | <span class="hljs-string">&#x27;[&#x27;</span> :: xs =&gt; <span class="hljs-keyword">do</span>
+    <span class="hljs-keyword">let</span> (inner, next) ← parseJsonArray fuel xs
+    <span class="hljs-keyword">return</span> (Json.Array inner, next)
+  | <span class="hljs-string">&#x27;&#123;&#x27;</span> :: xs =&gt; <span class="hljs-keyword">do</span>
+    <span class="hljs-keyword">let</span> (inner, next) ← parseJsonObject fuel xs
+    <span class="hljs-keyword">return</span> (Json.Object inner, next)
+  | <span class="hljs-string">&#x27;&quot;&#x27;</span> :: xs =&gt; <span class="hljs-keyword">do</span>
+    <span class="hljs-keyword">let</span> (str, next) ← parseJsonString xs
+    <span class="hljs-keyword">return</span> (Json.String str, next)
+  | maybe_number =&gt; <span class="hljs-keyword">do</span>
+    <span class="hljs-keyword">let</span> (num, next) ← parseJsonNumber maybe_number
+    <span class="hljs-keyword">return</span> (Json.Number num, next)
+<span class="hljs-built_in">termination_by</span> fuel
+
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parseJson</span> <span class="hljs-params">(str: String)</span> <span class="hljs-symbol">:</span></span> Except String Json <span class="hljs-symbol">:=</span> <span class="hljs-keyword">do</span>
+  <span class="hljs-keyword">let</span> (json, next) ← parseJsonValue <span class="hljs-number">999</span> str.data
+  <span class="hljs-keyword">match</span> trimList next <span class="hljs-built_in">with</span>
+  | [] =&gt; <span class="hljs-keyword">return</span> json
+  | x =&gt; .error $ <span class="hljs-string">&quot;unexpected token after json: &quot;</span>.append x.toString
+
+<span class="hljs-section">end</span>
+
+#eval parseJsonNumber <span class="hljs-string">&quot;1234abc&quot;</span>.data
+
+#eval <span class="hljs-string">&quot;123waf32e&quot;</span>.data.span (·.isDigit)
+
+
+<span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">read_and_parse</span> <span class="hljs-symbol">:</span></span> IO (Except String Json) <span class="hljs-symbol">:=</span> <span class="hljs-keyword">do</span>
+  <span class="hljs-keyword">let</span> json ← IO.FS.readFile <span class="hljs-string">&quot;some.json&quot;</span>
+  IO.println json
+  <span class="hljs-keyword">return</span> parseJson json
+
+#eval read_and_parse
+
+#eval <span class="hljs-string">&quot;true&quot;</span>.data
+
+#eval parseJson <span class="hljs-string">&quot;true&quot;</span>
+#eval parseJson <span class="hljs-string">&quot;false&quot;</span>
+#eval parseJson <span class="hljs-string">&quot;[true, false]&quot;</span>
+#eval parseJson <span class="hljs-string">&quot;\&quot;hello world\&quot;&quot;</span>
+#eval parseJson <span class="hljs-string">&quot;111&quot;</span>
+#eval parseJson <span class="hljs-string">&quot;[\&quot;hello world\&quot;, true, false, [1,2,3, &#123;\&quot;s\&quot;: null&#125;], null, [\&quot;hello\&quot;]]&quot;</span>
+#eval parseJson <span class="hljs-string">&quot;&#123;\&quot;hello\&quot;: \&quot;world\&quot;, \&quot;foo\&quot;: [1, 2, 3], \&quot;bar\&quot;: &#123;\&quot;baz\&quot;: true&#125;&#125;&quot;</span>
+#eval parseJson <span class="hljs-string">&quot;&#123;\&quot;hello\&quot;: \&quot;world\&quot;, \&quot;foo\&quot;: null&#125;&quot;</span>
+</code></pre>
+<p>在这份代码中你可以非常直观地看到 Lean4 的优越之处。作为一个 pure 的 functional language 它为你提供了原生的 for 和 while 语法糖。语法糖的底层细节我们懒得讲解，但这是 Lean4 中一个非常甜的地方——显然没人说 for / while 循环就不是纯函数了，那么为什么不使用甜甜的语法糖呢？</p>
+<p>所以你可以直接写</p>
+<pre><code class="hljs language-lean"><span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parseJsonString</span> <span class="hljs-params">(str: List Char)</span> <span class="hljs-symbol">:</span></span> Except String (String × List Char) <span class="hljs-symbol">:=</span> <span class="hljs-keyword">do</span>
+  <span class="hljs-keyword">let</span> mut xs <span class="hljs-symbol">:=</span> str
+  <span class="hljs-keyword">let</span> mut str : List Char <span class="hljs-symbol">:=</span> []
+  for ch <span class="hljs-keyword">in</span> xs <span class="hljs-keyword">do</span>
+    <span class="hljs-keyword">match</span> ch <span class="hljs-built_in">with</span>
+    | <span class="hljs-string">&#x27;&quot;&#x27;</span> =&gt; <span class="hljs-keyword">return</span> (.mk str, xs.tail)
+    | x =&gt;
+      str <span class="hljs-symbol">:=</span> str ++ [x]
+      xs <span class="hljs-symbol">:=</span> xs.tail
+  <span class="hljs-keyword">return</span> (.mk str, xs)
+</code></pre>
+<p>而在另一些不够甜的纯函数式语言中就不得不</p>
+<pre><code class="hljs language-gleam"><span class="hljs-keyword">fn</span> <span class="hljs-title function_">read_str</span>(<span class="hljs-type">str</span>: <span class="hljs-type">String</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Result</span>(ParseStrResult, <span class="hljs-type">String</span>) &#123;
+  case <span class="hljs-type">str</span> |&gt; string.pop_grapheme &#123;
+    <span class="hljs-title function_ invoke__">Error</span>(Nil) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(<span class="hljs-string">&quot;Unexpected EOF&quot;</span>)
+    <span class="hljs-title function_ invoke__">Ok</span>(#(first, rest)) <span class="hljs-punctuation">-&gt;</span>
+      case first &#123;
+        <span class="hljs-string">&quot;\&quot;&quot;</span> <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Ok</span>(<span class="hljs-title function_ invoke__">ParseStrResult</span>(<span class="hljs-string">&quot;&quot;</span>, rest))
+        _ <span class="hljs-punctuation">-&gt;</span>
+          <span class="hljs-title function_ invoke__">read_str</span>(rest)
+          |&gt; result.<span class="hljs-title function_ invoke__">map</span>(<span class="hljs-title function_ invoke__">fn</span>(res) &#123;
+            <span class="hljs-title function_ invoke__">ParseStrResult</span>(first &lt;&gt; res.result, res.rest)
+          &#125;)
+      &#125;
+  &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">parse_str</span>(<span class="hljs-type">str</span>: <span class="hljs-type">String</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Result</span>(ParseStrResult, <span class="hljs-type">String</span>) &#123;
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">str</span> = <span class="hljs-type">str</span> |&gt; string.trim_start
+  case <span class="hljs-type">str</span> &#123;
+    <span class="hljs-string">&quot;\&quot;&quot;</span> &lt;&gt; content <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">read_str</span>(content)
+    x <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(<span class="hljs-string">&quot;unexpected token &quot;</span> &lt;&gt; x)
+  &#125;
+&#125;
+</code></pre>
+<p>一点也不直观，蠢蠢的</p>
+<p>同时，你可以在这份代码中直观地看到 monads 的魅力。Except 显然也是一个 monad，所以可以使用 do 记号完美完成“不出错则继续，出错则跳出”的逻辑。不得不说，看到</p>
+<pre><code class="hljs language-lean">  | <span class="hljs-string">&#x27;[&#x27;</span> :: xs =&gt; <span class="hljs-keyword">do</span>
+    <span class="hljs-keyword">let</span> (inner, next) ← parseJsonArray fuel xs
+    <span class="hljs-keyword">return</span> (Json.Array inner, next)
+</code></pre>
+<p>这样的代码，又直观又好看，这才是函数式语言优美的地方</p>
+<p>总而言之，Lean4 真香，uwu</p>
+</section><section class="post-meta"><span class="info"><i class="fa fa-calendar"></i> <span class="date">2025-04-08</span>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Code/" title="Code">Code</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Functional/" title="Functional">Functional</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Lean/" title="Lean">Lean</a>  </span></section></article><p class="pagination"><a href="/2025/04/13/lean4-parser-combinator/" title="学习在 Lean4 中使用 Parser Combinator">Previous</a><span>  </span><a href="/2025/04/07/strong-typed/" title="一千个计算机人有一千个强类型">Next</a></p><article class="comment-container"><div class="comment-container"><script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js" onload="(new Gitalk({&quot;clientID&quot;:&quot;12a250ac67f452906dd6&quot;,&quot;clientSecret&quot;:&quot;7422a9ecdc933d5e6facbc61d546bced40519f0b&quot;,&quot;repo&quot;:&quot;lhcfl.github.io&quot;,&quot;owner&quot;:&quot;lhcfl&quot;,&quot;admin&quot;:[&quot;lhcfl&quot;],&quot;id&quot;:&quot;很难不承认 Lean4 真香 —— 然后写了一个简单的 JSON 解析器&quot;,&quot;distractionFreeMode&quot;:false})).render(&quot;gitalk-comment-slot&quot;)"></script><div id="gitalk-comment-slot">Loading...</div></div></article></main><footer class="footer"><br><p class="powered_by">Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> and <a target="_blank" rel="noopener" href="https://github.com/Lhcfl/hexo-theme-sosimple">SoSimple</a></p></footer></body></html>

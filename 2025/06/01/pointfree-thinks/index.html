@@ -1,0 +1,316 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Linca"><title>Point-free Style 思考 · Zero Calorie Drink Shop</title><meta name="description" content="Point-free style can (clearly) lead to Obfuscation when used unwisely. As higher-order functions are chained together, it can become harder to mentall"><meta name="keywords" content="Code,Functional,Haskell"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="mobile-web-app-capable" content="yes"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta id="site_data_static" data-url="/"><meta name="renderer" content="webkit"><link rel="shortcut icon" type="image/x-icon" href="/images/logo.png"><link rel="stylesheet" href="/js_complied/bundle.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><style>:root { --normal-font-face: LXGW WenKai, LXGW WenKai TC, 'Times New Roman', Times, serif; }</style><script src="/js_complied/bundle.js"></script><script>Utils.loadCSS("https://testingcf.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css");
+Utils.loadCSS("https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&display=swap");
+Utils.loadCSS("https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css");
+Utils.loadCSS("/css/font-awesome.min.css");</script><meta name="generator" content="Hexo 7.3.0"></head><body class="post-page"><noscript><link rel="stylesheet" href="https://testingcf.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&amp;display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"></noscript><nav class="nav"><a href="/">Home</a>&nbsp;&nbsp;<a href="/archives">Archives</a>&nbsp;&nbsp;<a href="/tags">Tags</a>&nbsp;&nbsp;<a href="/about">About</a>&nbsp;&nbsp;<a href="/links">Links</a>&nbsp;&nbsp;<a href="/search">Search</a>&nbsp;&nbsp;<a href="javascript:SoSimple.darkLightToggle()">Dark/Light Mode</a></nav><main class="main"><article class="post-container post-full"><header class="post-title"><h1>Point-free Style 思考</h1></header><section class="post-body"><blockquote>
+<p>Point-free style can (clearly) lead to Obfuscation when used unwisely. As higher-order functions are chained together, it can become harder to mentally infer the types of expressions. The mental cues to an expression’s type (explicit function arguments, and the number of arguments) go missing.</p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="https://wiki.haskell.org/Pointfree">https://wiki.haskell.org/Pointfree</a></p>
+<span id="more"></span>
+<h3 id="从猫头鹰运算符说起……">从猫头鹰运算符说起……<a class="header-anchor" href="#从猫头鹰运算符说起……"> ¶</a></h3>
+<p>The owl <code>((.)$(.))</code> has type <code>(a -&gt; b -&gt; c) -&gt; a -&gt; (a1 -&gt; b) -&gt; a1 -&gt; c</code>, and in pointful style can be written as <code>\a b c d -&gt; a b (c d)</code>.</p>
+<p>Example</p>
+<pre><code class="hljs">&gt; ((.)$(.)) (==) 1 (1+) 0
+True
+</code></pre>
+<p>相信大家看到这个抽象东西第一反应是 “什么勾八玩意” 吧！但是其实它还是挺好理解的，只要知道</p>
+<pre><code class="hljs language-haskell">(.) f g x = f (g x)
+($) = id
+</code></pre>
+<p>所以这个运算符其实是 <code>id (.) (.)</code></p>
+<p>也就是 <code>(.) (.)</code> <s>这个是不是叫奶子运算符</s></p>
+<pre><code class="hljs language-lean">(.) $ (.)
+  = (.) (.)
+  = <span class="hljs-keyword">λ</span> a b     =&gt; (.) (a b)   <span class="hljs-comment">-- 补充两个被省略的参数</span>
+  = <span class="hljs-keyword">λ</span> a b c d =&gt; (a b) (c d) <span class="hljs-comment">-- 补充两个被省略的参数</span>
+  = <span class="hljs-keyword">λ</span> a b c d =&gt; a b (c d)   <span class="hljs-comment">-- 消去冗余括号</span>
+</code></pre>
+<p>猫头鹰还有一个进阶版本：</p>
+<pre><code class="hljs">((.).(.))
+</code></pre>
+<p>它也可以用类似的方式推导</p>
+<pre><code class="hljs language-lean">((.).(.))
+  = <span class="hljs-keyword">λ</span> a       =&gt; (.) ((.) a)     <span class="hljs-comment">-- 补充一个被省略的参数</span>
+  = <span class="hljs-keyword">λ</span> a b c   =&gt; (.) ((.) a) b c <span class="hljs-comment">-- 补充两个被省略的参数</span>
+  = <span class="hljs-keyword">λ</span> a b c   =&gt; ((.) a) (b c)   <span class="hljs-comment">-- 一次消去</span>
+  = <span class="hljs-keyword">λ</span> a b c   =&gt; (.) a (b c)     <span class="hljs-comment">-- 冗余括号消去</span>
+  = <span class="hljs-keyword">λ</span> a b c d =&gt; (.) a (b c) d   <span class="hljs-comment">-- 再补个参数</span>
+  = <span class="hljs-keyword">λ</span> a b c d =&gt; a ((b c) d)     <span class="hljs-comment">-- 消去</span>
+  = <span class="hljs-keyword">λ</span> a b c d =&gt; a (b c d)       <span class="hljs-comment">-- 消去冗余括号</span>
+</code></pre>
+<h3 id="喂喂你-Pointless-了！">喂喂你 Pointless 了！<a class="header-anchor" href="#喂喂你-Pointless-了！"> ¶</a></h3>
+<p>Point-free 当然不全是这样的奇技淫巧 —— 当然这个也称不上多奇技淫巧，简单的 β-规约 而已</p>
+<p>Point-free 虽然看上去眼花缭乱，但是它其实是培养你对于函数是一等公民，以及函数是一个整体，并且是一个可以用于构建更复杂函数的基本单位的这样一种认知。这在组合子里面非常有用。</p>
+<p>当然大家还是一般不会用 <code>(.).(.)</code> 这么抽象的东西的……这样写就真的 Pointless 了</p>
+<p>当你写下</p>
+<pre><code class="hljs language-haskell"><span class="hljs-title">sum&#x27;</span> xs = foldr (+) <span class="hljs-number">0</span> xs
+</code></pre>
+<p>的时候，应该能很容易意识到</p>
+<pre><code class="hljs language-haskell"><span class="hljs-title">sum</span> = foldr (+) <span class="hljs-number">0</span>
+</code></pre>
+<p>这件事，因为 <code>foldr (+) 0</code> 实际上组合出了 sum 的逻辑。而一个熟练的函数式写手，应该对后者更熟悉而不是前者。</p>
+<p>拿 Parser Combinator 举例子，我在<a href="/2025/04/13/lean4-parser-combinator/">学习在 Lean4 中使用 Parser Combinator</a> 中很自然而然地写下了 pointfree 的逻辑，因为只要你把 parser 的函数看成可以组合的积木，而不需要关心它的实际参数来源的话，pointfree 写法就是最自然的：</p>
+<pre><code class="hljs language-lean"><span class="hljs-meta">mutual</span>
+  <span class="hljs-keyword">partial</span> <span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parseArray</span> <span class="hljs-symbol">:</span></span> Parser Json <span class="hljs-symbol">:=</span> <span class="hljs-keyword">do</span>
+    _ ← char <span class="hljs-string">&#x27;[&#x27;</span>
+    _ ← whitespaces
+    <span class="hljs-keyword">let</span> elems ← sepBy parseJson (char <span class="hljs-string">&#x27;,&#x27;</span>)
+    _ ← whitespaces
+    _ ← char <span class="hljs-string">&#x27;]&#x27;</span>
+    <span class="hljs-keyword">return</span> Json.arr elems
+
+  <span class="hljs-keyword">partial</span> <span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parseObject</span> <span class="hljs-symbol">:</span></span> Parser Json <span class="hljs-symbol">:=</span> <span class="hljs-keyword">do</span>
+    _ ← char <span class="hljs-string">&#x27;&#123;&#x27;</span>
+    _ ← whitespaces
+    <span class="hljs-keyword">let</span> pairs ← sepBy parsePair (char <span class="hljs-string">&#x27;,&#x27;</span>)
+    _ ← whitespaces
+    _ ← char <span class="hljs-string">&#x27;&#125;&#x27;</span>
+    <span class="hljs-keyword">return</span> Json.obj pairs
+
+  <span class="hljs-keyword">partial</span> <span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parsePair</span> <span class="hljs-symbol">:</span></span> Parser (String × Json) <span class="hljs-symbol">:=</span> <span class="hljs-keyword">do</span>
+    _ ← whitespaces
+    <span class="hljs-keyword">let</span> key ← quotedString
+    _ ← whitespaces
+    _ ← char <span class="hljs-string">&#x27;:&#x27;</span>
+    <span class="hljs-keyword">let</span> value ← parseJson
+    <span class="hljs-keyword">return</span> (key.asString, value)
+
+  <span class="hljs-keyword">partial</span> <span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parseJson</span> <span class="hljs-symbol">:</span></span> Parser Json <span class="hljs-symbol">:=</span> <span class="hljs-keyword">do</span>
+    <span class="hljs-keyword">let</span> _ ← whitespaces
+    <span class="hljs-keyword">let</span> json ← <span class="hljs-keyword">fun</span> str =&gt; <span class="hljs-keyword">match</span> str <span class="hljs-built_in">with</span>
+      | <span class="hljs-string">&#x27;n&#x27;</span> :: _ =&gt; parseNull str
+      | <span class="hljs-string">&#x27;t&#x27;</span> :: _ =&gt; parseTrue str
+      | <span class="hljs-string">&#x27;f&#x27;</span> :: _ =&gt; parseFalse str
+      | <span class="hljs-string">&#x27;[&#x27;</span> :: _ =&gt; parseArray str
+      | <span class="hljs-string">&#x27;&#123;&#x27;</span> :: _ =&gt; parseObject str
+      | <span class="hljs-string">&#x27;&quot;&#x27;</span> :: _ =&gt; parseString str
+      | _ =&gt; parseNumber str
+    <span class="hljs-keyword">let</span> _ ← whitespaces
+    <span class="hljs-keyword">return</span> json
+<span class="hljs-section">end</span>
+</code></pre>
+<p><s>当然如果你再入味一点，你可能会写出这种 shit：</s></p>
+<pre><code class="hljs language-lean"><span class="hljs-keyword">partial</span> <span class="hljs-theorem"><span class="hljs-keyword">def</span> <span class="hljs-title">parseObject</span> <span class="hljs-symbol">:</span></span> Parser Json <span class="hljs-symbol">:=</span>
+  Json.obj &lt;$&gt; (
+    char <span class="hljs-string">&#x27;&#123;&#x27;</span> *&gt; whitespaces *&gt; (
+      sepBy parsePair (char <span class="hljs-string">&#x27;,&#x27;</span>)
+    ) &lt;* whitespaces &lt;* char <span class="hljs-string">&#x27;&#125;&#x27;</span>
+  )
+</code></pre>
+<p>相比之下，同为函数式语言，由于没有很好的 currying，Gleam 重构上述代码写出来的解析器就凌乱不堪：</p>
+<pre><code class="hljs language-gleam"><span class="hljs-keyword">fn</span> <span class="hljs-title function_">object_parser</span>() <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(Node) &#123;
+  <span class="hljs-title function_ invoke__">fn</span>(input: <span class="hljs-type">String</span>) &#123;
+    <span class="hljs-keyword">use</span> #(_, input) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">char</span>(<span class="hljs-string">&quot;&#123;&quot;</span>)(input))
+    <span class="hljs-keyword">let</span> <span class="hljs-variable">input</span> = input |&gt; string.trim
+    <span class="hljs-keyword">use</span> #(val, input) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">seq_by</span>(
+      <span class="hljs-title function_ invoke__">pair_parser</span>(),
+      <span class="hljs-title function_ invoke__">char</span>(<span class="hljs-string">&quot;,&quot;</span>) |&gt; <span class="hljs-title function_ invoke__">chain</span>(<span class="hljs-title function_ invoke__">whitespace</span>()),
+    )(input))
+    <span class="hljs-keyword">let</span> <span class="hljs-variable">input</span> = input |&gt; string.trim
+    <span class="hljs-keyword">use</span> #(_, input) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">char</span>(<span class="hljs-string">&quot;&#125;&quot;</span>)(input))
+    <span class="hljs-title function_ invoke__">Ok</span>(#(<span class="hljs-title function_ invoke__">Obj</span>(dict.<span class="hljs-title function_ invoke__">from_list</span>(val)), input))
+  &#125;
+&#125;
+</code></pre>
+<details>
+<summary>完整代码</summary>
+<pre><code class="hljs language-gleam">import gleam/dict
+import gleam/io
+import gleam/list
+import gleam/result
+import gleam/string
+
+<span class="hljs-keyword">pub</span> <span class="hljs-keyword">type</span> <span class="hljs-title class_">Node</span> &#123;
+  Nul
+  <span class="hljs-title function_ invoke__">Bol</span>(val: Bool)
+  <span class="hljs-title function_ invoke__">Num</span>(val: Int)
+  <span class="hljs-title function_ invoke__">Str</span>(val: <span class="hljs-type">String</span>)
+  <span class="hljs-title function_ invoke__">Arr</span>(val: <span class="hljs-title function_ invoke__">List</span>(Node))
+  <span class="hljs-title function_ invoke__">Obj</span>(val: dict.<span class="hljs-title function_ invoke__">Dict</span>(<span class="hljs-type">String</span>, Node))
+&#125;
+
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">Parser</span>(t) =
+  <span class="hljs-title function_ invoke__">fn</span>(<span class="hljs-type">String</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Result</span>(#(t, <span class="hljs-type">String</span>), <span class="hljs-type">String</span>)
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">or</span>(p1: <span class="hljs-title function_ invoke__">Parser</span>(a), p2: <span class="hljs-title function_ invoke__">Parser</span>(a)) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(a) &#123;
+  <span class="hljs-title function_ invoke__">fn</span>(input: <span class="hljs-type">String</span>) &#123;
+    case <span class="hljs-title function_ invoke__">p1</span>(input) &#123;
+      <span class="hljs-title function_ invoke__">Ok</span>(x) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Ok</span>(x)
+      <span class="hljs-title function_ invoke__">Error</span>(_) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">p2</span>(input)
+    &#125;
+  &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">chain</span>(p1: <span class="hljs-title function_ invoke__">Parser</span>(a), p2: <span class="hljs-title function_ invoke__">Parser</span>(b)) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(#(a, b)) &#123;
+  <span class="hljs-title function_ invoke__">fn</span>(input: <span class="hljs-type">String</span>) &#123;
+    <span class="hljs-keyword">use</span> #(res1, input) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">p1</span>(input))
+    <span class="hljs-keyword">use</span> #(res2, input) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">p2</span>(input))
+    <span class="hljs-title function_ invoke__">Ok</span>(#(#(res1, res2), input))
+  &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">char</span>(c: <span class="hljs-type">String</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(<span class="hljs-type">String</span>) &#123;
+  <span class="hljs-title function_ invoke__">fn</span>(<span class="hljs-type">str</span>: <span class="hljs-type">String</span>) &#123;
+    case <span class="hljs-type">str</span> |&gt; string.pop_grapheme &#123;
+      <span class="hljs-title function_ invoke__">Error</span>(Nil) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(<span class="hljs-string">&quot;Unexpected EOF&quot;</span>)
+      <span class="hljs-title function_ invoke__">Ok</span>(#(first, rest)) <span class="hljs-keyword">if</span> first == c <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Ok</span>(#(first, rest))
+      <span class="hljs-title function_ invoke__">Ok</span>(_) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(<span class="hljs-string">&quot;unexpected token &quot;</span> &lt;&gt; <span class="hljs-type">str</span>)
+    &#125;
+  &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">whitespace</span>() <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(#()) &#123;
+  <span class="hljs-title function_ invoke__">fn</span>(input: <span class="hljs-type">String</span>) &#123; <span class="hljs-title function_ invoke__">Ok</span>(#(#(), input |&gt; string.trim)) &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">ident</span>(id: <span class="hljs-type">String</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(<span class="hljs-type">String</span>) &#123;
+  <span class="hljs-title function_ invoke__">fn</span>(<span class="hljs-type">str</span>: <span class="hljs-type">String</span>) &#123;
+    case <span class="hljs-type">str</span> |&gt; string.<span class="hljs-title function_ invoke__">starts_with</span>(id) &#123;
+      True <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Ok</span>(#(id, <span class="hljs-type">str</span> |&gt; string.<span class="hljs-title function_ invoke__">drop_start</span>(string.<span class="hljs-title function_ invoke__">length</span>(id))))
+      False <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(<span class="hljs-string">&quot;unexpected token &quot;</span> &lt;&gt; <span class="hljs-type">str</span>)
+    &#125;
+  &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">true_parser</span>() <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(Node) &#123;
+  <span class="hljs-title function_ invoke__">fn</span>(input: <span class="hljs-type">String</span>) &#123;
+    <span class="hljs-keyword">use</span> #(_, rest) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">ident</span>(<span class="hljs-string">&quot;true&quot;</span>)(input))
+    <span class="hljs-title function_ invoke__">Ok</span>(#(<span class="hljs-title function_ invoke__">Bol</span>(val: True), rest))
+  &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">false_parser</span>() <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(Node) &#123;
+  <span class="hljs-title function_ invoke__">fn</span>(input: <span class="hljs-type">String</span>) &#123;
+    <span class="hljs-keyword">use</span> #(_, rest) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">ident</span>(<span class="hljs-string">&quot;false&quot;</span>)(input))
+    <span class="hljs-title function_ invoke__">Ok</span>(#(<span class="hljs-title function_ invoke__">Bol</span>(val: False), rest))
+  &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">null_parser</span>() <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(Node) &#123;
+  <span class="hljs-title function_ invoke__">fn</span>(input: <span class="hljs-type">String</span>) &#123;
+    <span class="hljs-keyword">use</span> #(_, rest) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">ident</span>(<span class="hljs-string">&quot;null&quot;</span>)(input))
+    <span class="hljs-title function_ invoke__">Ok</span>(#(Nul, rest))
+  &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">string_key_parser</span>() <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(<span class="hljs-type">String</span>) &#123;
+  <span class="hljs-title function_ invoke__">fn</span>(input: <span class="hljs-type">String</span>) &#123;
+    <span class="hljs-keyword">use</span> #(_, rest) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">char</span>(<span class="hljs-string">&quot;\&quot;&quot;</span>)(input))
+    case rest |&gt; string.<span class="hljs-title function_ invoke__">split_once</span>(<span class="hljs-string">&quot;\&quot;&quot;</span>) &#123;
+      <span class="hljs-title function_ invoke__">Ok</span>(#(val, rest)) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Ok</span>(#(val, rest))
+      <span class="hljs-title function_ invoke__">Error</span>(_) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(<span class="hljs-string">&quot;unexpected token &quot;</span> &lt;&gt; input)
+    &#125;
+  &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">string_parser</span>() <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(Node) &#123;
+  <span class="hljs-title function_ invoke__">fn</span>(input: <span class="hljs-type">String</span>) &#123;
+    <span class="hljs-keyword">use</span> #(_, rest) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">char</span>(<span class="hljs-string">&quot;\&quot;&quot;</span>)(input))
+    case rest |&gt; string.<span class="hljs-title function_ invoke__">split_once</span>(<span class="hljs-string">&quot;\&quot;&quot;</span>) &#123;
+      <span class="hljs-title function_ invoke__">Ok</span>(#(val, rest)) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Ok</span>(#(<span class="hljs-title function_ invoke__">Str</span>(val: val), rest))
+      <span class="hljs-title function_ invoke__">Error</span>(_) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(<span class="hljs-string">&quot;unexpected token &quot;</span> &lt;&gt; input)
+    &#125;
+  &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">go_for_seq_by</span>(
+  p: <span class="hljs-title function_ invoke__">Parser</span>(a),
+  sep: <span class="hljs-title function_ invoke__">Parser</span>(b),
+  acc: <span class="hljs-title function_ invoke__">List</span>(a),
+  input: <span class="hljs-type">String</span>,
+) <span class="hljs-punctuation">-&gt;</span> #(<span class="hljs-title function_ invoke__">List</span>(a), <span class="hljs-type">String</span>) &#123;
+  case <span class="hljs-title function_ invoke__">p</span>(input) &#123;
+    <span class="hljs-title function_ invoke__">Ok</span>(#(val, rest)) <span class="hljs-punctuation">-&gt;</span>
+      case <span class="hljs-title function_ invoke__">sep</span>(rest) &#123;
+        <span class="hljs-title function_ invoke__">Ok</span>(#(_, rest)) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">go_for_seq_by</span>(p, sep, acc |&gt; list.<span class="hljs-title function_ invoke__">append</span>([val]), rest)
+        <span class="hljs-title function_ invoke__">Error</span>(_) <span class="hljs-punctuation">-&gt;</span> #(acc |&gt; list.<span class="hljs-title function_ invoke__">append</span>([val]), rest)
+      &#125;
+    <span class="hljs-title function_ invoke__">Error</span>(_) <span class="hljs-punctuation">-&gt;</span> #(acc, input)
+  &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">seq_by</span>(p: <span class="hljs-title function_ invoke__">Parser</span>(a), sep: <span class="hljs-title function_ invoke__">Parser</span>(b)) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(<span class="hljs-title function_ invoke__">List</span>(a)) &#123;
+  <span class="hljs-title function_ invoke__">fn</span>(input: <span class="hljs-type">String</span>) &#123; <span class="hljs-title function_ invoke__">Ok</span>(<span class="hljs-title function_ invoke__">go_for_seq_by</span>(p, sep, [], input)) &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">array_parser</span>() <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(Node) &#123;
+  <span class="hljs-title function_ invoke__">fn</span>(input: <span class="hljs-type">String</span>) &#123;
+    <span class="hljs-keyword">use</span> #(_, input) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">char</span>(<span class="hljs-string">&quot;[&quot;</span>)(input))
+    <span class="hljs-keyword">let</span> <span class="hljs-variable">input</span> = input |&gt; string.trim
+    <span class="hljs-keyword">use</span> #(val, input) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">seq_by</span>(
+      <span class="hljs-title function_ invoke__">json_parser</span>(),
+      <span class="hljs-title function_ invoke__">char</span>(<span class="hljs-string">&quot;,&quot;</span>) |&gt; <span class="hljs-title function_ invoke__">chain</span>(<span class="hljs-title function_ invoke__">whitespace</span>()),
+    )(input))
+    <span class="hljs-keyword">let</span> <span class="hljs-variable">input</span> = input |&gt; string.trim
+    <span class="hljs-keyword">use</span> #(_, input) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">char</span>(<span class="hljs-string">&quot;]&quot;</span>)(input))
+    <span class="hljs-title function_ invoke__">Ok</span>(#(<span class="hljs-title function_ invoke__">Arr</span>(val), input))
+  &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">pair_parser</span>() <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(#(<span class="hljs-type">String</span>, Node)) &#123;
+  <span class="hljs-title function_ invoke__">fn</span>(input: <span class="hljs-type">String</span>) &#123;
+    <span class="hljs-keyword">let</span> <span class="hljs-variable">input</span> = input |&gt; string.trim
+    <span class="hljs-keyword">use</span> #(key, input) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">string_key_parser</span>()(input))
+    <span class="hljs-keyword">let</span> <span class="hljs-variable">input</span> = input |&gt; string.trim
+    <span class="hljs-keyword">use</span> #(_, input) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">char</span>(<span class="hljs-string">&quot;:&quot;</span>)(input))
+    <span class="hljs-keyword">let</span> <span class="hljs-variable">input</span> = input |&gt; string.trim
+    <span class="hljs-keyword">use</span> #(val, input) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">json_parser</span>()(input))
+    <span class="hljs-keyword">let</span> <span class="hljs-variable">input</span> = input |&gt; string.trim
+    <span class="hljs-title function_ invoke__">Ok</span>(#(#(key, val), input))
+  &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">object_parser</span>() <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(Node) &#123;
+  <span class="hljs-title function_ invoke__">fn</span>(input: <span class="hljs-type">String</span>) &#123;
+    <span class="hljs-keyword">use</span> #(_, input) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">char</span>(<span class="hljs-string">&quot;&#123;&quot;</span>)(input))
+    <span class="hljs-keyword">let</span> <span class="hljs-variable">input</span> = input |&gt; string.trim
+    <span class="hljs-keyword">use</span> #(val, input) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">seq_by</span>(
+      <span class="hljs-title function_ invoke__">pair_parser</span>(),
+      <span class="hljs-title function_ invoke__">char</span>(<span class="hljs-string">&quot;,&quot;</span>) |&gt; <span class="hljs-title function_ invoke__">chain</span>(<span class="hljs-title function_ invoke__">whitespace</span>()),
+    )(input))
+    <span class="hljs-keyword">let</span> <span class="hljs-variable">input</span> = input |&gt; string.trim
+    <span class="hljs-keyword">use</span> #(_, input) &lt;- result.<span class="hljs-title function_ invoke__">then</span>(<span class="hljs-title function_ invoke__">char</span>(<span class="hljs-string">&quot;&#125;&quot;</span>)(input))
+    <span class="hljs-title function_ invoke__">Ok</span>(#(<span class="hljs-title function_ invoke__">Obj</span>(dict.<span class="hljs-title function_ invoke__">from_list</span>(val)), input))
+  &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">json_parser</span>() <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Parser</span>(Node) &#123;
+  <span class="hljs-title function_ invoke__">fn</span>(input: <span class="hljs-type">String</span>) &#123;
+    case input |&gt; string.trim &#123;
+      <span class="hljs-string">&quot;t&quot;</span> &lt;&gt; _ <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">true_parser</span>()(input)
+      <span class="hljs-string">&quot;f&quot;</span> &lt;&gt; _ <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">false_parser</span>()(input)
+      <span class="hljs-string">&quot;n&quot;</span> &lt;&gt; _ <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">null_parser</span>()(input)
+      <span class="hljs-string">&quot;\&quot;&quot;</span> &lt;&gt; _ <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">string_parser</span>()(input)
+      <span class="hljs-string">&quot;[&quot;</span> &lt;&gt; _ <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">array_parser</span>()(input)
+      <span class="hljs-string">&quot;&#123;&quot;</span> &lt;&gt; _ <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">object_parser</span>()(input)
+      x <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(<span class="hljs-string">&quot;unexpected token &quot;</span> &lt;&gt; x)
+    &#125;
+  &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">parse_json</span>(input: <span class="hljs-type">String</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Result</span>(Node, <span class="hljs-type">String</span>) &#123;
+  case <span class="hljs-title function_ invoke__">json_parser</span>()(input |&gt; string.trim) &#123;
+    <span class="hljs-title function_ invoke__">Ok</span>(#(node, rest)) <span class="hljs-punctuation">-&gt;</span> &#123;
+      case rest &#123;
+        <span class="hljs-string">&quot;&quot;</span> <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Ok</span>(node)
+        _ <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(<span class="hljs-string">&quot;unexpected token &quot;</span> &lt;&gt; rest)
+      &#125;
+    &#125;
+    <span class="hljs-title function_ invoke__">Error</span>(err) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-title function_ invoke__">Error</span>(err)
+  &#125;
+&#125;
+
+<span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() &#123;
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">_</span> = io.<span class="hljs-title function_ invoke__">debug</span>(<span class="hljs-title function_ invoke__">parse_json</span>(<span class="hljs-string">&quot;null&quot;</span>))
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">_</span> = io.<span class="hljs-title function_ invoke__">debug</span>(<span class="hljs-title function_ invoke__">parse_json</span>(<span class="hljs-string">&quot;true&quot;</span>))
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">_</span> = io.<span class="hljs-title function_ invoke__">debug</span>(<span class="hljs-title function_ invoke__">parse_json</span>(<span class="hljs-string">&quot;false&quot;</span>))
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">_</span> = io.<span class="hljs-title function_ invoke__">debug</span>(<span class="hljs-title function_ invoke__">parse_json</span>(<span class="hljs-string">&quot;\&quot;wwww\&quot;&quot;</span>))
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">_</span> = io.<span class="hljs-title function_ invoke__">debug</span>(<span class="hljs-title function_ invoke__">parse_json</span>(<span class="hljs-string">&quot;&#123;&#125;&quot;</span>))
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">_</span> = io.<span class="hljs-title function_ invoke__">debug</span>(<span class="hljs-title function_ invoke__">parse_json</span>(<span class="hljs-string">&quot;&#123;\&quot;a\&quot;: true, \&quot;b\&quot;: [true, false, null]&#125;&quot;</span>))
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">_</span> = io.<span class="hljs-title function_ invoke__">debug</span>(<span class="hljs-title function_ invoke__">parse_json</span>(<span class="hljs-string">&quot;[ true, false, null, \&quot;abcd\&quot; ]&quot;</span>))
+
+  io.<span class="hljs-title function_ invoke__">debug</span>(<span class="hljs-string">&quot;done&quot;</span>)
+&#125;
+</code></pre>
+</details>
+<p>为什么 Gleam 这样写就凌乱不堪？因为核心观念，即函数可以自由地组合，在这里没有得到很好的体现。还是以一种描述过程的写法去写函数式，自然会如此。</p>
+</section><section class="post-meta"><span class="info"><i class="fa fa-calendar"></i> <span class="date">2025-06-01</span>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Code/" title="Code">Code</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Functional/" title="Functional">Functional</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Haskell/" title="Haskell">Haskell</a>  </span></section></article><p class="pagination"><a href="/2025/05/30/sml-intro/" title="Standard ML 尝旧">Next</a></p><article class="comment-container"><div class="comment-container"><script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js" onload="(new Gitalk({&quot;clientID&quot;:&quot;12a250ac67f452906dd6&quot;,&quot;clientSecret&quot;:&quot;7422a9ecdc933d5e6facbc61d546bced40519f0b&quot;,&quot;repo&quot;:&quot;lhcfl.github.io&quot;,&quot;owner&quot;:&quot;lhcfl&quot;,&quot;admin&quot;:[&quot;lhcfl&quot;],&quot;id&quot;:&quot;Point-free Style 思考&quot;,&quot;distractionFreeMode&quot;:false})).render(&quot;gitalk-comment-slot&quot;)"></script><div id="gitalk-comment-slot">Loading...</div></div></article></main><footer class="footer"><br><p class="powered_by">Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> and <a target="_blank" rel="noopener" href="https://github.com/Lhcfl/hexo-theme-sosimple">SoSimple</a></p></footer></body></html>

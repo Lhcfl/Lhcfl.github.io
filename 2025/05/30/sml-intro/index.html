@@ -1,0 +1,55 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Linca"><title>Standard ML 尝旧 · Zero Calorie Drink Shop</title><meta name="description" content="Standard ML（SML），是一个函数式、指令式、模块化的通用的编程语言，具有编译时间类型检查和类型推论。它流行于编译器作者和编程语言研究者和自动定理证明研究者之中。
+虽然这玩意是 1983 年的老登了，但是还能看到许多比较现代的东西——不得不感叹 PL 与工程语言的割裂。1972 年 C 语"><meta name="keywords" content="Code,Programing Language,Functional"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="mobile-web-app-capable" content="yes"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta id="site_data_static" data-url="/"><meta name="renderer" content="webkit"><link rel="shortcut icon" type="image/x-icon" href="/images/logo.png"><link rel="stylesheet" href="/js_complied/bundle.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><style>:root { --normal-font-face: LXGW WenKai, LXGW WenKai TC, 'Times New Roman', Times, serif; }</style><script src="/js_complied/bundle.js"></script><script>Utils.loadCSS("https://testingcf.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css");
+Utils.loadCSS("https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&display=swap");
+Utils.loadCSS("https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css");
+Utils.loadCSS("/css/font-awesome.min.css");</script><meta name="generator" content="Hexo 7.3.0"></head><body class="post-page"><noscript><link rel="stylesheet" href="https://testingcf.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&amp;display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"></noscript><nav class="nav"><a href="/">Home</a>&nbsp;&nbsp;<a href="/archives">Archives</a>&nbsp;&nbsp;<a href="/tags">Tags</a>&nbsp;&nbsp;<a href="/about">About</a>&nbsp;&nbsp;<a href="/links">Links</a>&nbsp;&nbsp;<a href="/search">Search</a>&nbsp;&nbsp;<a href="javascript:SoSimple.darkLightToggle()">Dark/Light Mode</a></nav><main class="main"><article class="post-container post-full"><header class="post-title"><h1>Standard ML 尝旧</h1></header><section class="post-body"><p>Standard ML（SML），是一个函数式、指令式、模块化的通用的编程语言，具有编译时间类型检查和类型推论。它流行于编译器作者和编程语言研究者和自动定理证明研究者之中。</p>
+<p>虽然这玩意是 1983 年的老登了，但是还能看到许多比较现代的东西——不得不感叹 PL 与工程语言的割裂。1972 年 C 语言被发明，1973 年 ML 被发明，一边是 <code>void*</code> 满天飞的弱类型语言，一边已经是用了 Hindley-Milner 类型推论的 sound 的语言了。</p>
+<p>总而言之读了一下 <a target="_blank" rel="noopener" href="https://www.cs.cmu.edu/~rwh/isml/book.pdf">Programing in Standard ML</a> (又是你啊， Robert Harper) ，写写对 Standard ML 的主观感受</p>
+<span id="more"></span>
+<h3 id="美观性">美观性<a class="header-anchor" href="#美观性"> ¶</a></h3>
+<p><s>sound 的语言千篇一律， beautiful 的语言万里挑一</s></p>
+<p>不知为什么我觉得 Standard ML 比 OCaml 还好看……可能是<s>法国人有点极端了</s>，比如 OCaml 一个败好感的点是独树一帜的用分号 <code>;</code> 分割 List，因为 <code>[1,2,3]</code> 会被解释成 <code>(int * int * int) list = [(1, 2, 3)]</code>，可能是为了让语言更没有歧义吧。</p>
+<p>让我们用一个经典的 <s>时间复杂度超级烂的</s> fibonacci 数计算引入，它在 Standard ML 下能写成</p>
+<pre><code class="hljs language-ml"><span class="hljs-keyword">fun</span> fib <span class="hljs-number">0</span> = <span class="hljs-number">1</span>
+  | fib <span class="hljs-number">1</span> = <span class="hljs-number">1</span>
+  | fib n = fib (n - <span class="hljs-number">1</span>) + fib (n - <span class="hljs-number">2</span>)
+
+<span class="hljs-keyword">fun</span> main <span class="hljs-literal">()</span> = <span class="hljs-keyword">let</span>
+  <span class="hljs-keyword">val</span> n = <span class="hljs-number">10</span>
+  <span class="hljs-keyword">val</span> result = fib n
+<span class="hljs-keyword">in</span>
+  print (<span class="hljs-string">&quot;Fibonacci of &quot;</span> ^ <span class="hljs-type">Int</span>.toString n ^ <span class="hljs-string">&quot; is &quot;</span> ^ <span class="hljs-type">Int</span>.toString result ^ <span class="hljs-string">&quot;\n&quot;</span>)
+<span class="hljs-keyword">end</span>
+
+<span class="hljs-keyword">val</span> _ = main <span class="hljs-literal">()</span>
+</code></pre>
+<p>我个人有点喜爱 <code>fun</code> 这个关键字，因为这个关键词看上去比较 fun（？</p>
+<p>Standard ML 的函数书写有股比较早的风味，可以看到，经常是在函数里我们会有 <code>let in</code> expression，把所有要用到的变量放在视觉前面，最后用一个 expression 解决问题，让人~<s>不禁想起 K&amp;R Style C</s>，考虑到 Standard ML 是 1983 年的老东西了，可能真有一点相似之处</p>
+<p>相比于 OCaml 的完全等价的代码：</p>
+<pre><code class="hljs language-ocaml"><span class="hljs-keyword">let</span> <span class="hljs-keyword">rec</span> fib = <span class="hljs-keyword">function</span>
+  | <span class="hljs-number">0</span> -&gt; <span class="hljs-number">1</span>
+  | <span class="hljs-number">1</span> -&gt; <span class="hljs-number">1</span>
+  | n -&gt; fib (n - <span class="hljs-number">1</span>) + fib (n - <span class="hljs-number">2</span>)
+
+<span class="hljs-keyword">let</span> main =
+  <span class="hljs-keyword">let</span> n = <span class="hljs-number">10</span> <span class="hljs-keyword">in</span>
+  <span class="hljs-keyword">let</span> result = fib n <span class="hljs-keyword">in</span>
+  print_endline (<span class="hljs-string">&quot;Fibonacci of &quot;</span> ^ <span class="hljs-type">Int</span>.to_string n ^ <span class="hljs-string">&quot; is &quot;</span> ^ <span class="hljs-type">Int</span>.to_string result ^ <span class="hljs-string">&quot;\n&quot;</span>)
+</code></pre>
+<p>感觉还是比 OCaml 的略微好看一些。虽然 OCaml 不区分函数与变量，全部用 let 定义做法要更显现出函数和变量其实是一致的要更优雅一些，但是我还是会觉得用 fun 提示词更加容易让人能分析代码。</p>
+<p><s>当然都没有 Haskell 好看</s></p>
+<h3 id="结构严谨">结构严谨<a class="header-anchor" href="#结构严谨"> ¶</a></h3>
+<p>其实一开始以为 ML 系语言是用缩进区分 block 的，仔细看才发现不对，ML 是缩进不敏感的…… （更喜欢了）</p>
+<p>所以之前的 OCaml 代码完全可以压缩到一行：</p>
+<pre><code class="hljs language-ocaml"><span class="hljs-keyword">let</span> <span class="hljs-keyword">rec</span> fib = <span class="hljs-keyword">function</span>|<span class="hljs-number">0</span>-&gt;<span class="hljs-number">1</span>|<span class="hljs-number">1</span>-&gt;<span class="hljs-number">1</span>|n-&gt;fib(n-<span class="hljs-number">1</span>)+fib(n-<span class="hljs-number">2</span>)<span class="hljs-keyword">let</span> main=<span class="hljs-keyword">let</span> n=<span class="hljs-number">10</span> <span class="hljs-keyword">in</span> <span class="hljs-keyword">let</span> result=fib n <span class="hljs-keyword">in</span> print_endline(<span class="hljs-string">&quot;Fibonacci of &quot;</span>^<span class="hljs-type">Int</span>.to_string n^<span class="hljs-string">&quot; is &quot;</span>^<span class="hljs-type">Int</span>.to_string result^<span class="hljs-string">&quot;\n&quot;</span>)
+</code></pre>
+<p>惭愧的是之前一直以为要么用大括号区分块，要么用缩进，直到和 GPT 抱怨的时候才突然发现 ML 系是靠关键字自动划分 block 的，做到了虽然没有大括号，但是比缩进方便修改、比大括号好看的效果</p>
+<h3 id="异常">异常<a class="header-anchor" href="#异常"> ¶</a></h3>
+<p>我不太喜欢的东西。</p>
+<p>Standard ML 诞生的年代还没有给异常 typing 的足够的理论支持，所以 Standard ML 也采用了无法被写进类型声明的异常机制。</p>
+<p>当然异常机制是可以的，毕竟一些东西其实没办法用 <code>Result&lt;T, E&gt;</code> 表达，比如用户按下 Ctrl-C 这样的时间造成的中断，用 Exception 是很自然的，但用 Result 就很坏</p>
+<p>但是用它来做错误处理还是有点太容易漏了，不够严格，尤其是明明 ML 系有 <code>'a option</code> 这样的东西，为什么要写 <code>hd : 'a list -&gt; 'a</code> 这样的东西啊啊，只能说大概是时代局限性了</p>
+<h3 id="ML-特色的-a">ML 特色的 <code>'a</code><a class="header-anchor" href="#ML-特色的-a"> ¶</a></h3>
+<p>还有说到这个 <code>'a</code> 我就不得不给吐槽我第一次知道原来 <code>'a</code> 发音是 α …… 这对吗这呃不对吧，为了不加入 unicode 支持你选择用 <code>'a 'b 'c</code> 这样别扭的东西表达 α β γ 吗那很坏了</p>
+<p>类型构造器用和函数一样的方式优点非常多，但是 ML 不知道为什么就选择了很抽象的逆序类型类，比如 <code>'a list</code> 是 idris 的 <code>List a</code>，可能当时发明的时候人们觉得这样 <code>int list</code> 念起来顺畅？问题是 <code>List Int</code> 也能念成 List of int 啊，感觉这也是个设计失误吧大概</p>
+</section><section class="post-meta"><span class="info"><i class="fa fa-calendar"></i> <span class="date">2025-05-30</span>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Code/" title="Code">Code</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Programing-Language/" title="Programing Language">Programing Language</a>  </span><span class="info"><i class="fa fa-tag"></i> <a href="/tags/Functional/" title="Functional">Functional</a>  </span></section></article><p class="pagination"><a href="/2025/06/01/pointfree-thinks/" title="Point-free Style 思考">Previous</a><span>  </span><a href="/2025/05/21/suisuinian/" title="碎碎念">Next</a></p><article class="comment-container"><div class="comment-container"><script defer src="https://unpkg.com/gitalk/dist/gitalk.min.js" onload="(new Gitalk({&quot;clientID&quot;:&quot;12a250ac67f452906dd6&quot;,&quot;clientSecret&quot;:&quot;7422a9ecdc933d5e6facbc61d546bced40519f0b&quot;,&quot;repo&quot;:&quot;lhcfl.github.io&quot;,&quot;owner&quot;:&quot;lhcfl&quot;,&quot;admin&quot;:[&quot;lhcfl&quot;],&quot;id&quot;:&quot;Standard ML 尝旧&quot;,&quot;distractionFreeMode&quot;:false})).render(&quot;gitalk-comment-slot&quot;)"></script><div id="gitalk-comment-slot">Loading...</div></div></article></main><footer class="footer"><br><p class="powered_by">Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> and <a target="_blank" rel="noopener" href="https://github.com/Lhcfl/hexo-theme-sosimple">SoSimple</a></p></footer></body></html>
