@@ -1,0 +1,243 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/webp" href="/_astro/logo.zcK9pHo2_2eS7vq.webp"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Zero Calorie Drink Shop" href="https://lhcfl.github.io/rss.xml"><meta name="generator" content="Astro v5.10.0"><!-- Font preloads --><link rel="preload" href="/fonts/atkinson-regular.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/fonts/atkinson-bold.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://lhcfl.github.io/blog/notesofvim/"><!-- Primary Meta Tags --><title>Vim学习笔记 ⬝ Zero Calorie Drink Shop</title><meta name="title" content="Vim学习笔记 ⬝ Zero Calorie Drink Shop"><meta name="description" content="Vim 的学习笔记
+"><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://lhcfl.github.io/blog/notesofvim/"><meta property="og:title" content="Vim学习笔记 ⬝ Zero Calorie Drink Shop"><meta property="og:description" content="Vim 的学习笔记
+"><meta property="og:image" content="https://lhcfl.github.io/blog/notesofvim/undefined"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://lhcfl.github.io/blog/notesofvim/"><meta property="twitter:title" content="Vim学习笔记 ⬝ Zero Calorie Drink Shop"><meta property="twitter:description" content="Vim 的学习笔记
+"><meta property="twitter:image" content="https://lhcfl.github.io/blog/notesofvim/undefined"><meta name="astro-view-transitions-enabled" content="true"><meta name="astro-view-transitions-fallback" content="animate"><script type="module" src="/_astro/ClientRouter.astro_astro_type_script_index_0_lang.AM2StPgK.js"></script><link rel="stylesheet" href="/_astro/_slug_.C8NM8-sw.css"><script type="module" src="/_astro/page.sN3tJsal.js"></script></head> <body> <div class="app"> <header class="navbar shadow-lg fixed backdrop-blur-md z-30"> <div class="navbar-start"> <a href="/" class="lg:ml-4"> <div class="nav-site-avatar avatar w-10"> <img src="/_astro/logo.zcK9pHo2_2eS7vq.webp" alt="Zero Calorie Drink Shop" loading="eager" decoding="async" fetchpriority="auto" width="100" height="100"> </div> <span class="nav-site-title text-lg font-bold max-lg:hidden ml-2">Zero Calorie Drink Shop</span> </a> </div> <nav class="navbar-center"> <div class="internal-links drop-shadow-sm drop-shadow-base-100"> <a href="/" role="button" class="header-link btn btn-ghost max-sm:btn-sm max-sm:btn-circle" aria-label="Home"> <svg width="1em" height="1em" class="nav-icon max-sm:text-xl" data-icon="mingcute:home-3-line">   <symbol id="ai:mingcute:home-3-line" viewBox="0 0 24 24"><g fill="none"><path d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"/><path fill="currentColor" d="M10.772 2.688a2 2 0 0 1 2.317-.099l.139.1l8.384 6.52c.721.561.37 1.692-.499 1.785l-.116.006H20v8a2 2 0 0 1-1.85 1.995L18 21H6a2 2 0 0 1-1.994-1.85L4 19v-8h-.997C2.09 11 1.671 9.892 2.3 9.285l.088-.076zM12 4.267L5.625 9.225c.229.185.375.468.375.785V19h3v-5a3 3 0 1 1 6 0v5h3v-8.99c0-.317.146-.6.375-.785zM12 13a1 1 0 0 0-1 1v5h2v-5a1 1 0 0 0-1-1"/></g></symbol><use href="#ai:mingcute:home-3-line"></use>  </svg> <span class="nav-text max-sm:hidden"> Home </span> </a><a href="/archives" role="button" class="header-link btn btn-ghost max-sm:btn-sm max-sm:btn-circle" aria-label="Archives"> <svg width="1em" height="1em" class="nav-icon max-sm:text-xl" data-icon="mingcute:archive-line">   <symbol id="ai:mingcute:archive-line" viewBox="0 0 24 24"><g fill="none" fill-rule="evenodd"><path d="m12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036q-.016-.004-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z"/><path fill="currentColor" d="M16.586 3A2 2 0 0 1 18 3.586L20.414 6A2 2 0 0 1 21 7.414V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7.414A2 2 0 0 1 3.586 6L6 3.586A2 2 0 0 1 7.414 3zM19 9H5v10h14zm-7 1a1 1 0 0 1 1 1v3.186l.414-.414a1 1 0 1 1 1.414 1.414l-2.12 2.121a1 1 0 0 1-1.415 0l-2.121-2.121a1 1 0 1 1 1.414-1.414l.414.414V11a1 1 0 0 1 1-1m4.586-5H7.414l-2 2h13.172z"/></g></symbol><use href="#ai:mingcute:archive-line"></use>  </svg> <span class="nav-text max-sm:hidden"> Archives </span> </a><a href="/tags" role="button" class="header-link btn btn-ghost max-sm:btn-sm max-sm:btn-circle" aria-label="Tags"> <svg width="1em" height="1em" class="nav-icon max-sm:text-xl" data-icon="mingcute:tag-2-line">   <symbol id="ai:mingcute:tag-2-line" viewBox="0 0 24 24"><g fill="none"><path d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"/><path fill="currentColor" d="M10.238 4.827a3 3 0 0 1 2.122.878l6.485 6.486a3 3 0 0 1 0 4.242l-4.243 4.243a3 3 0 0 1-4.242 0l-6.486-6.485a3 3 0 0 1-.878-2.122V7.327a2.5 2.5 0 0 1 2.5-2.5zm0 2H5.496a.5.5 0 0 0-.5.5v4.742a1 1 0 0 0 .292.707l6.486 6.486a1 1 0 0 0 1.414 0l4.243-4.243a1 1 0 0 0 0-1.414L10.945 7.12a1 1 0 0 0-.707-.293M7.531 9.362a1.5 1.5 0 1 1 2.121 2.122a1.5 1.5 0 0 1-2.121-2.122M11.652 2a3 3 0 0 1 2.122.878l7.192 7.193a1 1 0 0 1-1.414 1.414L12.36 4.29a1 1 0 0 0-.708-.29H7a1 1 0 0 1 0-2z"/></g></symbol><use href="#ai:mingcute:tag-2-line"></use>  </svg> <span class="nav-text max-sm:hidden"> Tags </span> </a><a href="/about" role="button" class="header-link btn btn-ghost max-sm:btn-sm max-sm:btn-circle" aria-label="About"> <svg width="1em" height="1em" class="nav-icon max-sm:text-xl" data-icon="mingcute:user-3-line">   <symbol id="ai:mingcute:user-3-line" viewBox="0 0 24 24"><g fill="none" fill-rule="evenodd"><path d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"/><path fill="currentColor" d="M12 13c2.396 0 4.575.694 6.178 1.672c.8.488 1.484 1.064 1.978 1.69c.486.615.844 1.351.844 2.138c0 .845-.411 1.511-1.003 1.986c-.56.45-1.299.748-2.084.956c-1.578.417-3.684.558-5.913.558s-4.335-.14-5.913-.558c-.785-.208-1.524-.506-2.084-.956C3.41 20.01 3 19.345 3 18.5c0-.787.358-1.523.844-2.139c.494-.625 1.177-1.2 1.978-1.69C7.425 13.695 9.605 13 12 13m0 2c-2.023 0-3.843.59-5.136 1.379c-.647.394-1.135.822-1.45 1.222c-.324.41-.414.72-.414.899c0 .122.037.251.255.426c.249.2.682.407 1.344.582C7.917 19.858 9.811 20 12 20c2.19 0 4.083-.143 5.4-.492c.663-.175 1.096-.382 1.345-.582c.218-.175.255-.304.255-.426c0-.18-.09-.489-.413-.899c-.316-.4-.804-.828-1.451-1.222C15.843 15.589 14.023 15 12 15m0-13a5 5 0 1 1 0 10a5 5 0 0 1 0-10m0 2a3 3 0 1 0 0 6a3 3 0 0 0 0-6"/></g></symbol><use href="#ai:mingcute:user-3-line"></use>  </svg> <span class="nav-text max-sm:hidden"> About </span> </a><a href="/links" role="button" class="header-link btn btn-ghost max-sm:btn-sm max-sm:btn-circle" aria-label="Links"> <svg width="1em" height="1em" class="nav-icon max-sm:text-xl" data-icon="mingcute:link-3-line">   <symbol id="ai:mingcute:link-3-line" viewBox="0 0 24 24"><g fill="none" fill-rule="evenodd"><path d="m12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036q-.016-.004-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z"/><path fill="currentColor" d="M1 10a5 5 0 0 1 5-5h6a5 5 0 0 1 0 10a1 1 0 1 1 0-2a3 3 0 1 0 0-6H6a3 3 0 0 0-.75 5.906a1 1 0 0 1-.5 1.936A5 5 0 0 1 1 10m11 1a3 3 0 1 0 0 6h6a3 3 0 0 0 .75-5.905a1 1 0 0 1 .5-1.937A5.002 5.002 0 0 1 18 19h-6a5 5 0 0 1 0-10a1 1 0 1 1 0 2"/></g></symbol><use href="#ai:mingcute:link-3-line"></use>  </svg> <span class="nav-text max-sm:hidden"> Links </span> </a><a href="/search" role="button" class="header-link btn btn-ghost max-sm:btn-sm max-sm:btn-circle" aria-label="Search"> <svg width="1em" height="1em" class="nav-icon max-sm:text-xl" data-icon="mingcute:search-3-line">   <symbol id="ai:mingcute:search-3-line" viewBox="0 0 24 24"><g fill="none" fill-rule="evenodd"><path d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"/><path fill="currentColor" d="M10.5 4a6.5 6.5 0 1 0 0 13a6.5 6.5 0 0 0 0-13M2 10.5a8.5 8.5 0 1 1 15.176 5.262l3.652 3.652a1 1 0 0 1-1.414 1.414l-3.652-3.652A8.5 8.5 0 0 1 2 10.5M9.5 7a1 1 0 0 1 1-1a4.5 4.5 0 0 1 4.5 4.5a1 1 0 1 1-2 0A2.5 2.5 0 0 0 10.5 8a1 1 0 0 1-1-1"/></g></symbol><use href="#ai:mingcute:search-3-line"></use>  </svg> <span class="nav-text max-sm:hidden"> Search </span> </a> </div> </nav> <div class="navbar-end drop-shadow-sm drop-shadow-base-100"> <style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var e=async t=>{await(await t())()};(self.Astro||(self.Astro={})).load=e;window.dispatchEvent(new Event("astro:load"));})();</script><script>(()=>{var A=Object.defineProperty;var g=(i,o,a)=>o in i?A(i,o,{enumerable:!0,configurable:!0,writable:!0,value:a}):i[o]=a;var d=(i,o,a)=>g(i,typeof o!="symbol"?o+"":o,a);{let i={0:t=>m(t),1:t=>a(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(a(t)),5:t=>new Set(a(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>1/0*t},o=t=>{let[l,e]=t;return l in i?i[l](e):void 0},a=t=>t.map(o),m=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([l,e])=>[l,o(e)]));class y extends HTMLElement{constructor(){super(...arguments);d(this,"Component");d(this,"hydrator");d(this,"hydrate",async()=>{var b;if(!this.hydrator||!this.isConnected)return;let e=(b=this.parentElement)==null?void 0:b.closest("astro-island[ssr]");if(e){e.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let c=this.querySelectorAll("astro-slot"),n={},h=this.querySelectorAll("template[data-astro-template]");for(let r of h){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("data-astro-template")||"default"]=r.innerHTML,r.remove())}for(let r of c){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("name")||"default"]=r.innerHTML)}let p;try{p=this.hasAttribute("props")?m(JSON.parse(this.getAttribute("props"))):{}}catch(r){let s=this.getAttribute("component-url")||"<unknown>",v=this.getAttribute("component-export");throw v&&(s+=` (export ${v})`),console.error(`[hydrate] Error parsing props for component ${s}`,this.getAttribute("props"),r),r}let u;await this.hydrator(this)(this.Component,p,n,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))});d(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),c.disconnect(),this.childrenConnectedCallback()},c=new MutationObserver(()=>{var n;((n=this.lastChild)==null?void 0:n.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});c.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}async start(){let e=JSON.parse(this.getAttribute("opts")),c=this.getAttribute("client");if(Astro[c]===void 0){window.addEventListener(`astro:${c}`,()=>this.start(),{once:!0});return}try{await Astro[c](async()=>{let n=this.getAttribute("renderer-url"),[h,{default:p}]=await Promise.all([import(this.getAttribute("component-url")),n?import(n):()=>()=>{}]),u=this.getAttribute("component-export")||"default";if(!u.includes("."))this.Component=h[u];else{this.Component=h;for(let f of u.split("."))this.Component=this.Component[f]}return this.hydrator=p,this.hydrate},e,this)}catch(n){console.error(`[astro-island] Error hydrating ${this.getAttribute("component-url")}`,n)}}attributeChangedCallback(){this.hydrate()}}d(y,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",y)}})();</script><astro-island uid="2kV5bF" component-url="/_astro/DarkLightToggle.DEOs3l7r.js" component-export="default" renderer-url="/_astro/client.svelte.CCG2NewT.js" props="{}" ssr client="load" opts="{&quot;name&quot;:&quot;DarkLightToggle&quot;,&quot;value&quot;:true}" await-children><!--[--><label class="swap swap-rotate" for="theme-toggle" aria-hidden="true"><input id="theme-toggle" name="theme-toggle" type="checkbox"/> <!--[!--><!--]--><!----> <!--[!--><!--]--><!----> <span class="size-0 opacity-0">Toggle theme</span></label><!--]--><!--astro:end--></astro-island> </div> </header> <div class="main-content max-w-230 min-h-screen m-auto px-4 pt-25"> <main>  <article class="blog-post card card-lg md:shadow-sm rounded-lg"> <div class="md:card-body"> <div class="post-title text-4xl font-bold"> <h1>Vim学习笔记</h1> </div> <div class="markdown-body is-detailed">  <p>Vim 的学习笔记</p>
+<!-- more -->
+<hr>
+<h2 id="基础按键">基础按键</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>按键</th><th>作用</th></tr></thead><tbody><tr><td>什么都不按 　　　　</td><td>普通模式</td></tr><tr><td><kbd>i</kbd></td><td>输入模式</td></tr><tr><td><kbd>Esc</kbd></td><td>从输入模式退出</td></tr><tr><td><kbd>：</kbd></td><td>命令模式</td></tr><tr><td><kbd>v</kbd></td><td>可视模式</td></tr><tr><td><kbd>↑</kbd></td><td>上</td></tr><tr><td><kbd>↓</kbd></td><td>下</td></tr><tr><td><kbd>←</kbd></td><td>左</td></tr><tr><td><kbd>→</kbd></td><td>右</td></tr></tbody></table>
+<h2 id="基础命令">基础命令</h2>
+<h3 id="普通模式">普通模式</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>命令</th><th>作用</th></tr></thead><tbody><tr><td><code>:open [file]</code></td><td>打开文件</td></tr><tr><td><code>:qa!</code></td><td>强退</td></tr><tr><td><code>:![command]</code></td><td>在 shell 执行<code>[command]</code>这条命令</td></tr><tr><td><code>:w</code></td><td>保存</td></tr><tr><td><code>:q</code></td><td>退出</td></tr><tr><td><code>:set</code></td><td>设置</td></tr><tr><td><code>:set guifont [font]</code></td><td>设置字体为<code>[font]</code></td></tr><tr><td><code>:set guifont [font]:h[number]</code>　　　　</td><td>设置字体为<code>[font]</code>，字号为<code>[number]</code></td></tr><tr><td><code>dd</code></td><td>删除整行</td></tr><tr><td><code>[number]dd</code></td><td>删除下<code>[number]</code>行</td></tr><tr><td><code>u</code></td><td>撤销</td></tr><tr><td><code>[number]=[方向键]</code></td><td>向<code>[方向键]</code>方向<code>[number]</code>行自动缩进</td></tr><tr><td><code>r</code></td><td>用你下一个输入的字符替换后面一个字符</td></tr></tbody></table>
+<h3 id="可视模式">可视模式</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>命令</th><th>作用</th></tr></thead><tbody><tr><td><code>y</code>　　　　</td><td>复制</td></tr><tr><td><code>p</code></td><td>粘贴</td></tr></tbody></table>
+<h2 id="一个方便的vimrc">一个方便的.vimrc</h2>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="vim"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> ts</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">4</span><span style="color:#032F62;--shiki-dark:#9ECBFF">                    "设置tab为4空格</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> expandtab</span><span style="color:#032F62;--shiki-dark:#9ECBFF">               "用空格替代tab</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> nocompatible</span><span style="color:#6A737D;--shiki-dark:#6A737D">            " 关闭 vi 兼容模式</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">syntax on</span><span style="color:#6A737D;--shiki-dark:#6A737D">                   " 自动语法高亮</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> number</span><span style="color:#6A737D;--shiki-dark:#6A737D">                  " 显示行号</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> cursorline</span><span style="color:#6A737D;--shiki-dark:#6A737D">              " 突出显示当前行</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> ruler</span><span style="color:#6A737D;--shiki-dark:#6A737D">                   " 打开状态栏标尺</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> shiftwidth</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">4</span><span style="color:#6A737D;--shiki-dark:#6A737D">            " 设定 &#x3C;&#x3C; 和 >> 命令移动时的宽度为 4</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> softtabstop</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">4</span><span style="color:#6A737D;--shiki-dark:#6A737D">           " 使得按退格键时可以一次删掉 4 个空格</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">colorscheme</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> molokai</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> nobackup</span><span style="color:#6A737D;--shiki-dark:#6A737D">                " 覆盖文件时不备份</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> autochdir</span><span style="color:#6A737D;--shiki-dark:#6A737D">               " 自动切换当前目录为当前文件所在的目录</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">"filetype plugin indent on   " 开启插件</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> backupcopy</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">yes</span><span style="color:#6A737D;--shiki-dark:#6A737D">          " 设置备份时的行为为覆盖</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> ignorecase</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> smartcase</span><span style="color:#6A737D;--shiki-dark:#6A737D">    " 搜索时忽略大小写，但在有一个或以上大写字母时仍保持对大小写敏感</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> nowrapscan</span><span style="color:#6A737D;--shiki-dark:#6A737D">              " 禁止在搜索到文件两端时重新搜索</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> incsearch</span><span style="color:#6A737D;--shiki-dark:#6A737D">               " 输入搜索内容时就显示搜索结果</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> hlsearch</span><span style="color:#6A737D;--shiki-dark:#6A737D">                " 搜索时高亮显示被找到的文本</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> noerrorbells</span><span style="color:#6A737D;--shiki-dark:#6A737D">            " 关闭错误信息响铃</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> novisualbell</span><span style="color:#6A737D;--shiki-dark:#6A737D">            " 关闭使用可视响铃代替呼叫</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> t_vb</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#6A737D;--shiki-dark:#6A737D">                   " 置空错误铃声的终端代码</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> magic</span><span style="color:#6A737D;--shiki-dark:#6A737D">                   " 设置魔术</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> hidden</span><span style="color:#6A737D;--shiki-dark:#6A737D">                  " 允许在有未保存的修改时切换缓冲区，此时的修改由 vim 负责保存</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> guioptions</span><span style="color:#24292E;--shiki-dark:#E1E4E8">-</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">T</span><span style="color:#6A737D;--shiki-dark:#6A737D">           " 隐藏工具栏</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> guioptions</span><span style="color:#24292E;--shiki-dark:#E1E4E8">-</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">m</span><span style="color:#6A737D;--shiki-dark:#6A737D">           " 隐藏菜单栏</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> smartindent</span><span style="color:#6A737D;--shiki-dark:#6A737D">             " 开启新行时使用智能自动缩进</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> backspace</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">indent,</span><span style="color:#005CC5;--shiki-dark:#79B8FF">eol</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,start</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">                            " 不设定在插入状态无法用退格键和 Delete 键删除回车符</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> cmdheight</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#6A737D;--shiki-dark:#6A737D">             " 设定命令行的行数为 1</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> laststatus</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#6A737D;--shiki-dark:#6A737D">            " 显示状态栏 (默认值为 1, 无法显示状态栏)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> statusline</span><span style="color:#D73A49;--shiki-dark:#F97583">=\</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> %</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">%F</span><span style="color:#005cc5;--shiki-dark:#79b8ff">[</span><span style="color:#24292E;--shiki-dark:#E1E4E8">%1*%M%*%n%R%H</span><span style="color:#005cc5;--shiki-dark:#79b8ff">]</span><span style="color:#24292E;--shiki-dark:#E1E4E8">%=\ %y</span><span style="color:#D73A49;--shiki-dark:#F97583">\</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> %</span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#005cc5;--shiki-dark:#79b8ff">(</span><span style="color:#24292E;--shiki-dark:#E1E4E8">%</span><span style="color:#e36209;--shiki-dark:#ffab70">{</span><span style="color:#005CC5;--shiki-dark:#79B8FF">&#x26;fileformat</span><span style="color:#e36209;--shiki-dark:#ffab70">}</span><span style="color:#D73A49;--shiki-dark:#F97583">\</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> %</span><span style="color:#e36209;--shiki-dark:#ffab70">{</span><span style="color:#005CC5;--shiki-dark:#79B8FF">&#x26;encoding</span><span style="color:#e36209;--shiki-dark:#ffab70">}</span><span style="color:#D73A49;--shiki-dark:#F97583">\</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> %c:%l/%L%</span><span style="color:#005cc5;--shiki-dark:#79b8ff">)</span><span style="color:#D73A49;--shiki-dark:#F97583">\</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">                            " 设置在状态行显示的信息</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">"set foldenable              " 开始折叠</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">"</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">"set foldmethod=syntax       " 设置语法折叠</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">"</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">"set foldcolumn=0            " 设置折叠区域的宽度</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">"</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">"setlocal foldlevel=1        " 设置折叠层数为</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">"</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">"set foldclose=all           " 设置为自动关闭折叠</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">"</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">"inoremap &#x3C;space> @=((foldclosed(line('.')) &#x3C; 0) ? 'zc' : 'zo')&#x3C;CR></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">                            " 用空格键来开关折叠</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">set</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> whichwrap</span><span style="color:#D73A49;--shiki-dark:#F97583">+=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005cc5;--shiki-dark:#79b8ff">[</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span><span style="color:#005cc5;--shiki-dark:#79b8ff">]</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">inoremap</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> </span><span style="color:rgba(255, 18, 18, 0.8);--shiki-dark:rgba(255, 18, 18, 0.8)">(</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> </span><span style="color:#e36209;--shiki-dark:#ffab70">(</span><span style="color:#e36209;--shiki-dark:#ffab70">)</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#005CC5;--shiki-dark:#79B8FF">LEFT</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">inoremap</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> </span><span style="color:rgba(255, 18, 18, 0.8);--shiki-dark:rgba(255, 18, 18, 0.8)">{</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> </span><span style="color:#5a32a3;--shiki-dark:#b392f0">{</span><span style="color:#5a32a3;--shiki-dark:#b392f0">}</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#005CC5;--shiki-dark:#79B8FF">LEFT</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">inoremap</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> </span><span style="color:rgba(255, 18, 18, 0.8);--shiki-dark:rgba(255, 18, 18, 0.8)">[</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> </span><span style="color:#005cc5;--shiki-dark:#79b8ff">[</span><span style="color:#005cc5;--shiki-dark:#79b8ff">]</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#005CC5;--shiki-dark:#79B8FF">LEFT</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">" 插件类快捷键</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">map</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> </span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#005CC5;--shiki-dark:#79B8FF">c-b</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> :NERDTreeToggle</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#005CC5;--shiki-dark:#79B8FF">CR</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">inoremap</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> </span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#005CC5;--shiki-dark:#79B8FF">silent</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#005CC5;--shiki-dark:#79B8FF">expr</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#005CC5;--shiki-dark:#79B8FF">Tab</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> </span><span style="color:#6F42C1;--shiki-dark:#B392F0">pumvisible</span><span style="color:#005cc5;--shiki-dark:#79b8ff">(</span><span style="color:#005cc5;--shiki-dark:#79b8ff">)</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> </span><span style="color:#D73A49;--shiki-dark:#F97583">?</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "&#x3C;C-y>"</span><span style="color:#D73A49;--shiki-dark:#F97583"> : </span><span style="color:#6F42C1;--shiki-dark:#B392F0">coc#pum#visible</span><span style="color:#005cc5;--shiki-dark:#79b8ff">(</span><span style="color:#005cc5;--shiki-dark:#79b8ff">)</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> </span><span style="color:#D73A49;--shiki-dark:#F97583">?</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> coc#_select_confirm</span><span style="color:#005cc5;--shiki-dark:#79b8ff">(</span><span style="color:#005cc5;--shiki-dark:#79b8ff">)</span><span style="color:#D73A49;--shiki-dark:#F97583"> : </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"&#x3C;Tab>"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">" Use vim-plug</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">" Plugged Start</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">" Vim-Plug Start</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">call</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> plug#begin</span><span style="color:#005cc5;--shiki-dark:#79b8ff">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'~/.vim/plugged'</span><span style="color:#005cc5;--shiki-dark:#79b8ff">)</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">Plug</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 'itchyny/lightline.vim'</span><span style="color:#6A737D;--shiki-dark:#6A737D">         " lightline插件底部状态栏</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">Plug</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 'scrooloose/nerdtree'</span><span style="color:#6A737D;--shiki-dark:#6A737D">           " NERDTree</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">Plug</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 'Chiel92/vim-autoformat'</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">Plug</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 'dense-analysis/ale'</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">Plug</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 'neoclide/coc.nvim'</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">call</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> plug#end</span><span style="color:#005cc5;--shiki-dark:#79b8ff">(</span><span style="color:#005cc5;--shiki-dark:#79b8ff">)</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">" Vim-Plug End</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">" autocmd VimEnter * NERDTree</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">" Plugged End</span></span>
+<span class="line"></span></code></pre>  </div> <hr> <p class="post-meta flex flex-wrap items-center gap-2 mt-4"> <span class="date flex gap-1 items-center flex-shrink-0"> <svg width="1em" height="1em" data-icon="mingcute:calendar-2-line">   <symbol id="ai:mingcute:calendar-2-line" viewBox="0 0 24 24"><g fill="none" fill-rule="evenodd"><path d="m12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036q-.016-.004-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z"/><path fill="currentColor" d="M16 3a1 1 0 0 1 1 1v1h2a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2V4a1 1 0 0 1 2 0v1h6V4a1 1 0 0 1 1-1M8 7H5v2h14V7h-3zm-3 4v8h14v-8zm2 2a1 1 0 0 1 1-1h.01a1 1 0 1 1 0 2H8a1 1 0 0 1-1-1m1 2a1 1 0 1 0 0 2h.01a1 1 0 1 0 0-2zm3-2a1 1 0 0 1 1-1h.01a1 1 0 1 1 0 2H12a1 1 0 0 1-1-1m1 2a1 1 0 1 0 0 2h.01a1 1 0 1 0 0-2zm3-2a1 1 0 0 1 1-1h.01a1 1 0 1 1 0 2H16a1 1 0 0 1-1-1m1 2a1 1 0 1 0 0 2h.01a1 1 0 1 0 0-2z"/></g></symbol><use href="#ai:mingcute:calendar-2-line"></use>  </svg> <time datetime="2018-10-07T13:19:09.000Z"> Oct 7, 2018 </time> </span> <span class="tags flex flex-wrap gap-2 max-w-full overflow-hidden text-ellipsis"> <a class="tag-item post-meta-badge" href="/tags/Vim/"> <svg width="1em" height="1em" class="flex-shrink-0" data-icon="mingcute:tag-line">   <symbol id="ai:mingcute:tag-line" viewBox="0 0 24 24"><g fill="none" fill-rule="evenodd"><path d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"/><path fill="currentColor" d="M10.537 2.164a3 3 0 0 1 2.244.727l.15.14l7.822 7.823a3 3 0 0 1 .135 4.098l-.135.144l-5.657 5.657a3 3 0 0 1-4.098.135l-.144-.135L3.03 12.93a3 3 0 0 1-.878-2.188l.011-.205l.472-5.185a3 3 0 0 1 2.537-2.695l.179-.021zm.308 1.989l-.127.003l-5.185.472a1 1 0 0 0-.888.787l-.017.118l-.472 5.185a1 1 0 0 0 .206.703l.083.095l7.823 7.823a1 1 0 0 0 1.32.083l.094-.083l5.657-5.657a1 1 0 0 0 .083-1.32l-.083-.094l-7.823-7.823a1 1 0 0 0-.671-.292M7.317 7.318a3 3 0 1 1 4.243 4.243a3 3 0 0 1-4.243-4.243m2.829 1.414a1 1 0 1 0-1.415 1.414a1 1 0 0 0 1.415-1.414"/></g></symbol><use href="#ai:mingcute:tag-line"></use>  </svg> Vim </a><a class="tag-item post-meta-badge" href="/tags/Code/"> <svg width="1em" height="1em" viewBox="0 0 24 24" class="flex-shrink-0" data-icon="mingcute:tag-line">   <use href="#ai:mingcute:tag-line"></use>  </svg> Code </a> </span> <span class="categories flex flex-wrap gap-2 max-w-full overflow-hidden text-ellipsis">  </span> </p> </div> </article>  </main> </div> <footer class="mt-20"> <div class="text-center mb-4">
+&copy; 2025 Linca. All rights reserved.
+</div> </footer> <div class="float-buttons" aria-hidden="true" data-astro-cid-sfphkekt> <div class="back-to-top" data-astro-cid-sfphkekt> <div class="tooltip" data-tip="Scroll to top" data-astro-cid-sfphkekt> <button onclick="window.scrollTo({ top: 0, behavior: 'smooth' })" class="btn btn-circle btn-lg md:btn-xl" aria-label="Scroll to top" data-astro-cid-sfphkekt> <svg width="1em" height="1em" class="text-lg md:text-xl" data-astro-cid-sfphkekt="true" data-icon="mingcute:arrow-up-line">   <symbol id="ai:mingcute:arrow-up-line" viewBox="0 0 24 24"><g fill="none"><path d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"/><path fill="currentColor" d="M12.707 3.636a1 1 0 0 0-1.414 0L5.636 9.293a1 1 0 1 0 1.414 1.414L11 6.757V20a1 1 0 1 0 2 0V6.757l3.95 3.95a1 1 0 0 0 1.414-1.414z"/></g></symbol><use href="#ai:mingcute:arrow-up-line"></use>  </svg> </button> </div> </div> </div> <script type="module">document.addEventListener("scroll",()=>{window.scrollY>100?document.body.classList.add("is-scrolled"):document.body.classList.remove("is-scrolled")});</script>  </div> </body></html>
