@@ -1,0 +1,1 @@
+import{a1 as h,ac as t,a2 as b,ah as c,ai as k}from"./template.C_hw8II2.js";function u(a,s){return a===s||a?.[k]===s}function d(a={},s,f,S){return h(()=>{var i,r;return t(()=>{i=r,r=[],b(()=>{a!==f(...r)&&(s(a,...r),i&&u(f(...i),a)&&s(null,...i))})}),()=>{c(()=>{r&&u(f(...r),a)&&s(null,...r)})}}),a}export{d as b};
