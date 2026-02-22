@@ -1,0 +1,1 @@
+import{ad as t,X as b,W as d,z as h,ae as k}from"./template.CV872nZy.js";function u(r,i){return r===i||r?.[k]===i}function c(r={},i,f,S){return t(()=>{var a,s;return b(()=>{a=s,s=[],d(()=>{r!==f(...s)&&(i(r,...s),a&&u(f(...a),r)&&i(null,...a))})}),()=>{h(()=>{s&&u(f(...s),r)&&i(null,...s)})}}),r}export{c as b};
