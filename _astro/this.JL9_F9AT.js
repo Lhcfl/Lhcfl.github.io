@@ -1,0 +1,1 @@
+import{ae as t,Y as b,X as h,K as k,af as S}from"./template.rdR_U_uw.js";function u(r,f){return r===f||r?.[S]===f}function c(r={},f,a,T){return t(()=>{var i,s;return b(()=>{i=s,s=[],h(()=>{r!==a(...s)&&(f(r,...s),i&&u(a(...i),r)&&f(null,...i))})}),()=>{k(()=>{s&&u(a(...s),r)&&f(null,...s)})}}),r}export{c as b};
