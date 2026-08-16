@@ -1,0 +1,1 @@
+import{t as e}from"./prefetch.DNE423yt.js";e();

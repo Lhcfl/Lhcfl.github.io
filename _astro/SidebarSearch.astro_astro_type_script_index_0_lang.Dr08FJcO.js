@@ -1,0 +1,1 @@
+import{t as e}from"./search-window.L48cdipH.js";customElements.define(`sidebar-search`,class extends HTMLElement{connectedCallback(){this.setAttribute(`tabindex`,`0`),this.setAttribute(`role`,`button`),this.addEventListener(`click`,()=>{document.dispatchEvent(new e)})}});
