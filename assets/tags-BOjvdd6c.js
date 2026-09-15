@@ -1,0 +1,1 @@
+import{i as e}from"./queries-D84xriuL.js";var t=(()=>{let t=new Map;for(let n of e)if(!n.frontmatter.hidden)for(let e of n.tags)t.set(e,[...t.get(e)??[],n]);return[...t.entries()].map(([e,t])=>({tag:e,posts:t})).sort((e,t)=>t.posts.length-e.posts.length||e.tag.localeCompare(t.tag))})();t.map(e=>e.tag);function n(e){return t.find(t=>t.tag===e)}export{t as n,n as t};

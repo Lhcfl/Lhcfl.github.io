@@ -1,0 +1,1 @@
+var e={frontmatter:{date:`2025-02-09T23:50:19`,tags:[],comments:!1,categories:[]},titleHtml:``,html:`<p>陪伴我 4 年的<ruby>及腰长发<rt>其实都到臀部了</rt></ruby>今日卒，谨以此发文对其表达深切的悼念（）</p>`,headings:[]};export{e as default};

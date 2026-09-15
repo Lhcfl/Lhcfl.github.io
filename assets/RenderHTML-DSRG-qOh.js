@@ -1,0 +1,1 @@
+import{A as e,D as t,I as n,L as r,c as i,i as a,l as o}from"./web-BP3mPUl8.js";var s=e(`<div>`);function c(e){return r(n,{get when(){return e.html},get children(){var n=o(s);return i(()=>({e:e.class,t:e.html}),({e,t:r},i)=>{a(n,e,i?.e),r!==i?.t&&t(n,`innerHTML`,r)}),n}})}export{c as t};

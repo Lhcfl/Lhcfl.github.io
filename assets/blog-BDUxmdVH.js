@@ -1,0 +1,1 @@
+import{L as e}from"./web-BP3mPUl8.js";import{t}from"./site-MOJDtXRt.js";import{t as n}from"./dist-DWq5Xjby.js";import{t as r}from"./Layout-DgnKrTKS.js";import{t as i}from"./PostList-Drlf0OL8.js";function a(){return e(r,{title:`文章`,get children(){return[e(n,{get children(){return`文章 · ${t.title}`}}),e(i,{})]}})}export{a as default};

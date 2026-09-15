@@ -1,0 +1,21 @@
+var e={frontmatter:{title:`在 Hexo 老瓶装新酒`,date:`2024-09-04T14:29:12`,tags:[`Hexo`,`Code`],copyright:`CC BY-SA 4.0`,categories:[]},titleHtml:`在 Hexo 老瓶装新酒`,html:`<p>我在 2018 年建立这个博客以后，就一直没有换过其它博客平台。试过 Wordpress，也试过 Writefreely，总还是没有 Hexo 之类的静态站点生成器来得又快又好。当然现在似乎更流行别的结构了，Hugo，vuepress，毕竟 Hexo 已经是个有十来岁的老家伙了。在前端，十年足以发生翻天覆地的变化，而 Hexo 已经被远远的甩在后头。</p>
+<p>实际上，我对 Hexo 多少有一点恋旧情绪，毕竟它是我第一次尝试自建博客，也是我第一次尝试 Contribute 到开源项目。截至我写的时候，这个博客使用的主题 Anatolo 还是我 Star 数最高的个人项目。</p>
+<p>但 Hexo 的确是老了。正如我的朋友所说，<a href="https://blog.yunyi.beiyan.us/posts/removeHexo/">Hexo 的表演该落幕了，让它退场吧</a>。 Hexo 大多数主题都是用的是裸的 <code>&#x3C;script></code> 标签引入前端库，少有主题加入代码压缩，几乎没有主题使用过 typescript。 文档也疏于维护， <code>hexo-utils</code> 更是<a href="https://lhcfl.github.io/2024/09/03/make-blog-support-lean/#Step-3-%E6%8A%8A-hexo-utils-%E7%9A%84%E8%AF%AD%E8%A8%80%E5%AE%9A%E4%B9%89%E6%96%87%E4%BB%B6%E9%87%8C%E6%B7%BB%E5%8A%A0%E4%B8%8A-Lean">代码奇奇怪怪</a> 。</p>
+<p>但我还是不忍心彻底放弃 Hexo。因此，我花了一个晚上的时间，对我博客的 Client 进行了重写。同时也是为了探索，像 Hexo 这样的老东西还可不可能与现代化的前端技术相集成。</p>
+<!-- more -->
+<h2 id="引入-rollup-和-typescript"><a href="#引入-rollup-和-typescript">引入 Rollup 和 typescript</a></h2>
+<p>实际上，我这个博客的前端已经是进行重写过的。旧的 Anatolo 是在我学习 JavaScript 的时候写的，里面充斥着奇怪地全局变量与污染。类型检查更是完全没有，阅读代码难于登天（呃也没这么离谱了）</p>
+<p>后来我对它进行了重写。当时我并没有什么野心，只是将散乱的全局变量收拾到了 <code>Anatolo</code> 一个全局变量里，将 <code>Anatolo</code> 作为静态生成的模板中的简单 js 与复杂的 js 的交互桥梁。</p>
+<p>但是这种写法还是几乎没有什么类型提示。因为实际上所有文件还是简单地用 <code>&#x3C;script></code> 被引入，然后放在全局作用域里执行。</p>
+<p>所以我尝试了 rollup. 这个过程比我想象的甚至更简单。我编写 js， 然后 rollup 负责将它们塞进同一个 js 文件里，压缩，加载到静态文件中。有一瞬间，我甚至有些纳闷，为什么我之前没试试这样做呢？</p>
+<p>尤其是当你可以书写类型以后。我承认我真的不喜欢写测试，因此类型提示真的能帮我避免许多愚蠢的错误。</p>
+<h2 id="抛弃-jquery"><a href="#抛弃-jquery">抛弃 jQuery</a></h2>
+<p>jQuery 是我当时抄 hexo-theme-icarus 的时候引入的。但现在，现代化 js 内置的 HTML 操作已经足够方便，不再需要 jQuery 去方便对 HTML 进行操作了。</p>
+<p>更何况，jQuery 的 ajax 等不会返回 Promise，而是返回一些被包裹的 thenable，对于书写 typescript 会很烦躁。</p>
+<p>我大约花了三个小时去把原先的 jQuery 代码全部改造成原生 JS。将 jQuery 的以来去除后，需要加载的 js 文件甚至一下子就降低了上百 KB。</p>
+<h2 id="引入-jsx"><a href="#引入-jsx">引入 JSX</a></h2>
+<p>当上面的工作做完以后，引入 JSX 也变得简单了很多。 JSX 本质上是由 typescript 引擎解析并转变成 h 函数的形式。比如下面的代码实际上会编译成这样：</p>
+<pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">const</span><span style="color:#005CC5"> element</span><span style="color:#D73A49"> =</span><span style="color:#24292E"> </span><span style="color:#24292E">&#x3C;</span><span style="color:#22863A">h1</span><span style="color:#6F42C1"> className</span><span style="color:#D73A49">=</span><span style="color:#032F62">"greeting"</span><span style="color:#24292E">></span><span style="color:#24292E">Hello, world!</span><span style="color:#24292E">&#x3C;</span><span style="color:#24292E">/</span><span style="color:#22863A">h1</span><span style="color:#24292E">></span><span style="color:#24292E">;</span></span></code></pre>
+<pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">const</span><span style="color:#005CC5"> element</span><span style="color:#D73A49"> =</span><span style="color:#6F42C1"> h</span><span style="color:#005cc5">(</span><span style="color:#032F62">"h1"</span><span style="color:#24292E">, </span><span style="color:#e36209">{</span><span style="color:#24292E"> className: </span><span style="color:#032F62">"greeting"</span><span style="color:#24292E"> </span><span style="color:#e36209">}</span><span style="color:#24292E">, </span><span style="color:#032F62">"Hello, world!"</span><span style="color:#005cc5">)</span><span style="color:#24292E">;</span></span></code></pre>
+<p>当然，为了我们这个小小的博客，我们还是不希望引入 React 或者 Vue 这种重量级的前端引擎的。至少这会导致数百 KB 的 js 膨胀。</p>
+<p>因此我们可以自己写 h 函数完成这样的事情。令我惊喜的是，的确可以。<a href="https://github.com/Lhcfl/hexo-theme-anatolo/blob/master/src/utils/html-helper.ts">Anatolo 就使用了仅仅 30 行完成一个简单的 h 函数</a>，用在 Anatolo 限定的，无需懒更新的场景上。这使得 Anatolo 的代码中用 JSX 格式构造在之前会很复杂的 HTML 模板变成可能。</p>`,headings:[{depth:2,slug:`引入-rollup-和-typescript`,text:`引入 Rollup 和 typescript`},{depth:2,slug:`抛弃-jquery`,text:`抛弃 jQuery`},{depth:2,slug:`引入-jsx`,text:`引入 JSX`}]};export{e as default};

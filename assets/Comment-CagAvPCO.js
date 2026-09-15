@@ -1,0 +1,2 @@
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/GitalkComments-KlTFna9p.js","assets/rolldown-runtime-hePW80VL.js","assets/web-BP3mPUl8.js","assets/site-MOJDtXRt.js","assets/GitalkComments-L-_uAc3p.css"])))=>i.map(i=>d[i]);
+import{L as e,M as t,o as n}from"./web-BP3mPUl8.js";var r=n(()=>t(()=>import(`./GitalkComments-KlTFna9p.js`),__vite__mapDeps([0,1,2,3,4])),void 0,`src/components/GitalkComments.tsx`);function i(t){return e(r,{get id(){return t.id},get class(){return t.class},fallback:null})}export{i as t};
