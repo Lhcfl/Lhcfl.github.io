@@ -1,0 +1,47 @@
+var e={frontmatter:{title:`Standard ML 尝旧`,date:`2025-05-30T20:56:16`,tags:[`Code`,`Functional`,`PL`],copyright:`CC BY-SA 4.0`,categories:[]},titleHtml:`Standard ML 尝旧`,html:`<p>Standard ML（SML），是一个函数式、指令式、模块化的通用的编程语言，具有编译时间类型检查和类型推论。它流行于编译器作者和编程语言研究者和自动定理证明研究者之中。</p>
+<p>虽然这玩意是 1983 年的老登了，但是还能看到许多比较现代的东西——不得不感叹 PL 与工程语言的割裂。1972 年 C 语言被发明，1973 年 ML 被发明，一边是 <code>void*</code> 满天飞的弱类型语言，一边已经是用了 Hindley-Milner 类型推论的 sound 的语言了。</p>
+<p>总而言之读了一下 <a href="https://www.cs.cmu.edu/~rwh/isml/book.pdf">Programing in Standard ML</a> (又是你啊， Robert Harper) ，写写对 Standard ML 的主观感受</p>
+<!-- more -->
+<h2 id="美观性"><a href="#美观性">美观性</a></h2>
+<p><del>sound 的语言千篇一律， beautiful 的语言万里挑一</del></p>
+<p>不知为什么我觉得 Standard ML 比 OCaml 还好看……可能是<del>法国人有点极端了</del>，比如 OCaml 一个败好感的点是独树一帜的用分号 <code>;</code> 分割 List，因为 <code>[1,2,3]</code> 会被解释成 <code>(int * int * int) list = [(1, 2, 3)]</code>，可能是为了让语言更没有歧义吧。</p>
+<p>让我们用一个经典的 <del>时间复杂度超级烂的</del> fibonacci 数计算引入，它在 Standard ML 下能写成</p>
+<pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">fun fib 0 = 1</span></span>
+<span class="line"><span style="color:#24292E">  | fib 1 = 1</span></span>
+<span class="line"><span style="color:#24292E">  | fib n = fib </span><span style="color:#005cc5">(</span><span style="color:#24292E">n - 1</span><span style="color:#005cc5">)</span><span style="color:#24292E"> + fib </span><span style="color:#005cc5">(</span><span style="color:#24292E">n - 2</span><span style="color:#005cc5">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">fun main </span><span style="color:#005cc5">(</span><span style="color:#005cc5">)</span><span style="color:#24292E"> = </span><span style="color:#D73A49;text-decoration:underline">let</span></span>
+<span class="line"><span style="color:#24292E">  val </span><span style="color:#6F42C1">n</span><span style="color:#005CC5"> =</span><span style="color:#005CC5"> 10</span></span>
+<span class="line"><span>  </span><span style="color:#005CC5;text-decoration:underline">val</span><span style="color:#6F42C1"> result</span><span style="color:#005CC5"> =</span><span style="color:#24292E"> fib n</span></span>
+<span class="line"><span style="color:#24292E">in</span></span>
+<span class="line"><span style="color:#24292E">  print </span><span style="color:#005cc5">(</span><span style="color:#24292E">"Fibonacci of " ^ Int.toString n ^ " is " ^ Int.toString result ^ "\\n"</span><span style="color:#005cc5">)</span></span>
+<span class="line"><span style="color:#24292E">end</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#005CC5;text-decoration:underline">val</span><span style="color:#005CC5;font-weight:bold"> _</span><span style="color:#005CC5"> =</span><span style="color:#24292E"> main </span><span style="color:#005cc5">(</span><span style="color:#005cc5">)</span></span></code></pre>
+<p>我个人有点喜爱 <code>fun</code> 这个关键字，因为这个关键词看上去比较 fun（？</p>
+<p>Standard ML 的函数书写有股比较早的风味，可以看到，经常是在函数里我们会有 <code>let in</code> expression，把所有要用到的变量放在视觉前面，最后用一个 expression 解决问题，让人~~~不禁想起 K&#x26;R Style C~~，考虑到 Standard ML 是 1983 年的老东西了，可能真有一点相似之处</p>
+<p>相比于 OCaml 的完全等价的代码：</p>
+<pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49;text-decoration:underline">let</span><span style="color:#032F62"> rec</span><span style="color:#6F42C1"> fib</span><span style="color:#005CC5"> =</span><span style="color:#D73A49"> function</span></span>
+<span class="line"><span style="color:#005CC5">  |</span><span style="color:#005CC5"> 0</span><span style="color:#005CC5"> -</span><span style="color:#005CC5">></span><span style="color:#005CC5"> 1</span></span>
+<span class="line"><span style="color:#005CC5">  |</span><span style="color:#005CC5"> 1</span><span style="color:#005CC5"> -</span><span style="color:#005CC5">></span><span style="color:#005CC5"> 1</span></span>
+<span class="line"><span style="color:#005CC5">  |</span><span> </span><span style="color:#005CC5;text-decoration:underline">n</span><span style="color:#005CC5"> -</span><span style="color:#005CC5">></span><span style="color:#24292E"> fib </span><span style="color:#005cc5">(</span><span style="color:#24292E">n </span><span style="color:#032F62">-</span><span style="color:#005CC5"> 1</span><span style="color:#005cc5">)</span><span style="color:#24292E"> </span><span style="color:#032F62">+</span><span style="color:#24292E"> fib </span><span style="color:#005cc5">(</span><span style="color:#24292E">n </span><span style="color:#032F62">-</span><span style="color:#005CC5"> 2</span><span style="color:#005cc5">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;text-decoration:underline">let</span><span style="color:#6F42C1"> main</span><span style="color:#005CC5"> =</span></span>
+<span class="line"><span>  </span><span style="color:#D73A49;text-decoration:underline">let</span><span style="color:#6F42C1"> n</span><span style="color:#005CC5"> =</span><span style="color:#005CC5"> 10</span><span> </span><span style="color:#D73A49;text-decoration:underline">in</span></span>
+<span class="line"><span>  </span><span style="color:#D73A49;text-decoration:underline">let</span><span style="color:#6F42C1"> result</span><span style="color:#005CC5"> =</span><span style="color:#24292E"> fib n </span><span style="color:#D73A49;text-decoration:underline">in</span></span>
+<span class="line"><span style="color:#24292E">  print_endline </span><span style="color:#005cc5">(</span><span style="color:#032F62">"Fibonacci of "</span><span style="color:#032F62"> ^</span><span style="color:#005CC5"> Int</span><span style="color:#D73A49">.</span><span style="color:#24292E">to_string n </span><span style="color:#032F62">^</span><span style="color:#032F62"> " is "</span><span style="color:#032F62"> ^</span><span style="color:#005CC5"> Int</span><span style="color:#D73A49">.</span><span style="color:#24292E">to_string result </span><span style="color:#032F62">^</span><span style="color:#032F62"> "\\n"</span><span style="color:#005cc5">)</span></span></code></pre>
+<p>感觉还是比 OCaml 的略微好看一些。虽然 OCaml 不区分函数与变量，全部用 let 定义做法要更显现出函数和变量其实是一致的要更优雅一些，但是我还是会觉得用 fun 提示词更加容易让人能分析代码。</p>
+<p><del>当然都没有 Haskell 好看</del></p>
+<h2 id="结构严谨"><a href="#结构严谨">结构严谨</a></h2>
+<p>其实一开始以为 ML 系语言是用缩进区分 block 的，仔细看才发现不对，ML 是缩进不敏感的…… （更喜欢了）</p>
+<p>所以之前的 OCaml 代码完全可以压缩到一行：</p>
+<pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49;text-decoration:underline">let</span><span style="color:#032F62"> rec</span><span style="color:#6F42C1"> fib</span><span style="color:#005CC5"> =</span><span style="color:#D73A49"> function</span><span style="color:#005CC5">|0</span><span style="color:#032F62">-></span><span style="color:#005CC5">1|1-</span><span style="color:#005CC5">></span><span style="color:#005CC5">1|</span><span style="color:#005CC5;text-decoration:underline">n</span><span style="color:#005CC5">-</span><span style="color:#005CC5">></span><span style="color:#24292E">fib</span><span style="color:#005cc5">(</span><span style="color:#24292E">n</span><span style="color:#032F62">-</span><span style="color:#005CC5">1</span><span style="color:#005cc5">)</span><span style="color:#032F62">+</span><span style="color:#24292E">fib</span><span style="color:#005cc5">(</span><span style="color:#24292E">n</span><span style="color:#032F62">-</span><span style="color:#005CC5">2</span><span style="color:#005cc5">)</span><span style="color:#D73A49;text-decoration:underline">let</span><span style="color:#6F42C1"> main</span><span style="color:#005CC5">=</span><span style="color:#D73A49;text-decoration:underline">let</span><span style="color:#6F42C1"> n</span><span style="color:#005CC5">=10</span><span style="color:#24292E"> in </span><span style="color:#D73A49;text-decoration:underline">let</span><span style="color:#6F42C1"> result</span><span style="color:#005CC5">=</span><span style="color:#24292E">fib n in print_endline</span><span style="color:#005cc5">(</span><span style="color:#24292E">"Fibonacci of "^Int.to_string n^" is "^Int.to_string result^"\\n"</span><span style="color:#005cc5">)</span></span></code></pre>
+<p>惭愧的是之前一直以为要么用大括号区分块，要么用缩进，直到和 GPT 抱怨的时候才突然发现 ML 系是靠关键字自动划分 block 的，做到了虽然没有大括号，但是比缩进方便修改、比大括号好看的效果</p>
+<h2 id="异常"><a href="#异常">异常</a></h2>
+<p>我不太喜欢的东西。</p>
+<p>Standard ML 诞生的年代还没有给异常 typing 的足够的理论支持，所以 Standard ML 也采用了无法被写进类型声明的异常机制。</p>
+<p>当然异常机制是可以的，毕竟一些东西其实没办法用 <code>Result&#x3C;T, E></code> 表达，比如用户按下 Ctrl-C 这样的时间造成的中断，用 Exception 是很自然的，但用 Result 就很坏</p>
+<p>但是用它来做错误处理还是有点太容易漏了，不够严格，尤其是明明 ML 系有 <code>'a option</code> 这样的东西，为什么要写 <code>hd : 'a list -> 'a</code> 这样的东西啊啊，只能说大概是时代局限性了</p>
+<h2 id="ml-特色的-a"><a href="#ml-特色的-a">ML 特色的 <code>'a</code></a></h2>
+<p>还有说到这个 <code>'a</code> 我就不得不给吐槽我第一次知道原来 <code>'a</code> 发音是 α …… 这对吗这呃不对吧，为了不加入 unicode 支持你选择用 <code>'a 'b 'c</code> 这样别扭的东西表达 α β γ 吗那很坏了</p>
+<p>类型构造器用和函数一样的方式优点非常多，但是 ML 不知道为什么就选择了很抽象的逆序类型类，比如 <code>'a list</code> 是 idris 的 <code>List a</code>，可能当时发明的时候人们觉得这样 <code>int list</code> 念起来顺畅？问题是 <code>List Int</code> 也能念成 List of int 啊，感觉这也是个设计失误吧大概</p>`,headings:[{depth:2,slug:`美观性`,text:`美观性`},{depth:2,slug:`结构严谨`,text:`结构严谨`},{depth:2,slug:`异常`,text:`异常`},{depth:2,slug:`ml-特色的-a`,text:`ML 特色的 'a`}]};export{e as default};

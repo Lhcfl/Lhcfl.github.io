@@ -1,0 +1,253 @@
+<!DOCTYPE html><html _hk=000 lang="zh-CN"><head><meta charset="utf-8"><meta name="color-scheme" content="light"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/assets/logo-CcmJiDNG.png"><link rel="alternate" type="application/rss+xml" title="Zero Calorie Drink Shop" href="/rss.xml"><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><title data-dh="title" data-dhf="Zero Calorie Drink Shop">Vim学习笔记 · Zero Calorie Drink Shop</title><meta name="description" content="The blog of Linca."><meta name="author" content="Linca"><!--$--><script>window._$HY||(e=>{let t=e=>e&&e.hasAttribute&&(e.hasAttribute("_hk")?e:t(e.host&&e.host.nodeType?e.host:e.parentNode));["click","input"].forEach((o=>document.addEventListener(o,(o=>{if(!e.events)return;let s=t(o.composedPath&&o.composedPath()[0]||o.target);s&&!e.completed.has(s)&&e.events.push([s,o])}))))})(_$HY={events:[],completed:new WeakSet,r:new Proxy({},{set:(r,k,v)=>(v instanceof Promise&&v.catch(()=>{}),r[k]=v,!0)}),s:{},fe(){}});</script><script>(self.$R=self.$R||{})[""]=[];_$HY.r["links"]=1;_$HY.r["post[\"2018-10-07-notesofvim\"]"]=$R[0]=($R[1]=($R[2]=() => {
+	const resolver = {
+		p: 0,
+		s: 0,
+		f: 0
+	};
+	resolver.p = new Promise((resolve, reject) => {
+		resolver.s = resolve;
+		resolver.f = reject;
+	});
+	return resolver;
+})()).p;_$HY.r["002008c_fr"]=$R[3]=($R[4]=$R[2]()).p;_$HY.r["002008c0031000"]=$R[5]=($R[6]=$R[2]()).p;($R[17]=(resolver, data) => {
+	resolver.s(data);
+	resolver.p.s = 1;
+	resolver.p.v = data;
+})($R[1],$R[7]={frontmatter:$R[8]={title:"Vim学习笔记",date:"2018-10-07T13:19:09",tags:$R[9]=["Vim","Code"],toc:!0,thumbnail:"https://gitee.com/lhcfl/photobed/raw/master/ACG/57.jpg",copyright:"CC BY-SA 3.0",categories:$R[10]=[]},titleHtml:"Vim学习笔记",html:"\x3Cp>Vim 的学习笔记\x3C/p>\n\x3C!-- more -->\n\x3Chr>\n\x3Ch2 id=\"基础按键\">\x3Ca href=\"#基础按键\">基础按键\x3C/a>\x3C/h2>\n\x3Ctable>\n\x3Cthead>\n\x3Ctr>\n\x3Cth>按键\x3C/th>\n\x3Cth>作用\x3C/th>\n\x3C/tr>\n\x3C/thead>\n\x3Ctbody>\n\x3Ctr>\n\x3Ctd>什么都不按 　　　　\x3C/td>\n\x3Ctd>普通模式\x3C/td>\n\x3C/tr>\n\x3Ctr>\n\x3Ctd>\x3Ckbd>i\x3C/kbd>\x3C/td>\n\x3Ctd>输入模式\x3C/td>\n\x3C/tr>\n\x3Ctr>\n\x3Ctd>\x3Ckbd>Esc\x3C/kbd>\x3C/td>\n\x3Ctd>从输入模式退出\x3C/td>\n\x3C/tr>\n\x3Ctr>\n\x3Ctd>\x3Ckbd>：\x3C/kbd>\x3C/td>\n\x3Ctd>命令模式\x3C/td>\n\x3C/tr>\n\x3Ctr>\n\x3Ctd>\x3Ckbd>v\x3C/kbd>\x3C/td>\n\x3Ctd>可视模式\x3C/td>\n\x3C/tr>\n\x3Ctr>\n\x3Ctd>\x3Ckbd>↑\x3C/kbd>\x3C/td>\n\x3Ctd>上\x3C/td>\n\x3C/tr>\n\x3Ctr>\n\x3Ctd>\x3Ckbd>↓\x3C/kbd>\x3C/td>\n\x3Ctd>下\x3C/td>\n\x3C/tr>\n\x3Ctr>\n\x3Ctd>\x3Ckbd>←\x3C/kbd>\x3C/td>\n\x3Ctd>左\x3C/td>\n\x3C/tr>\n\x3Ctr>\n\x3Ctd>\x3Ckbd>→\x3C/kbd>\x3C/td>\n\x3Ctd>右\x3C/td>\n\x3C/tr>\n\x3C/tbody>\n\x3C/table>\n\x3Ch2 id=\"基础命令\">\x3Ca href=\"#基础命令\">基础命令\x3C/a>\x3C/h2>\n\x3Ch3 id=\"普通模式\">\x3Ca href=\"#普通模式\">普通模式\x3C/a>\x3C/h3>\n\x3Ctable>\n\x3Cthead>\n\x3Ctr>\n\x3Cth>命令\x3C/th>\n\x3Cth>作用\x3C/th>\n\x3C/tr>\n\x3C/thead>\n\x3Ctbody>\n\x3Ctr>\n\x3Ctd>\x3Ccode>:open [file]\x3C/code>\x3C/td>\n\x3Ctd>打开文件\x3C/td>\n\x3C/tr>\n\x3Ctr>\n\x3Ctd>\x3Ccode>:qa!\x3C/code>\x3C/td>\n\x3Ctd>强退\x3C/td>\n\x3C/tr>\n\x3Ctr>\n\x3Ctd>\x3Ccode>:![command]\x3C/code>\x3C/td>\n\x3Ctd>在 shell 执行\x3Ccode>[command]\x3C/code>这条命令\x3C/td>\n\x3C/tr>\n\x3Ctr>\n\x3Ctd>\x3Ccode>:w\x3C/code>\x3C/td>\n\x3Ctd>保存\x3C/td>\n\x3C/tr>\n\x3Ctr>\n\x3Ctd>\x3Ccode>:q\x3C/code>\x3C/td>\n\x3Ctd>退出\x3C/td>\n\x3C/tr>\n\x3Ctr>\n\x3Ctd>\x3Ccode>:set\x3C/code>\x3C/td>\n\x3Ctd>设置\x3C/td>\n\x3C/tr>\n\x3Ctr>\n\x3Ctd>\x3Ccode>:set guifont [font]\x3C/code>\x3C/td>\n\x3Ctd>设置字体为\x3Ccode>[font]\x3C/code>\x3C/td>\n\x3C/tr>\n\x3Ctr>\n\x3Ctd>\x3Ccode>:set guifont [font]:h[number]\x3C/code>　　　　\x3C/td>\n\x3Ctd>设置字体为\x3Ccode>[font]\x3C/code>，字号为\x3Ccode>[number]\x3C/code>\x3C/td>\n\x3C/tr>\n\x3Ctr>\n\x3Ctd>\x3Ccode>dd\x3C/code>\x3C/td>\n\x3Ctd>删除整行\x3C/td>\n\x3C/tr>\n\x3Ctr>\n\x3Ctd>\x3Ccode>[number]dd\x3C/code>\x3C/td>\n\x3Ctd>删除下\x3Ccode>[number]\x3C/code>行\x3C/td>\n\x3C/tr>\n\x3Ctr>\n\x3Ctd>\x3Ccode>u\x3C/code>\x3C/td>\n\x3Ctd>撤销\x3C/td>\n\x3C/tr>\n\x3Ctr>\n\x3Ctd>\x3Ccode>[number]=[方向键]\x3C/code>\x3C/td>\n\x3Ctd>向\x3Ccode>[方向键]\x3C/code>方向\x3Ccode>[number]\x3C/code>行自动缩进\x3C/td>\n\x3C/tr>\n\x3Ctr>\n\x3Ctd>\x3Ccode>r\x3C/code>\x3C/td>\n\x3Ctd>用你下一个输入的字符替换后面一个字符\x3C/td>\n\x3C/tr>\n\x3C/tbody>\n\x3C/table>\n\x3Ch3 id=\"可视模式\">\x3Ca href=\"#可视模式\">可视模式\x3C/a>\x3C/h3>\n\x3Ctable>\n\x3Cthead>\n\x3Ctr>\n\x3Cth>命令\x3C/th>\n\x3Cth>作用\x3C/th>\n\x3C/tr>\n\x3C/thead>\n\x3Ctbody>\n\x3Ctr>\n\x3Ctd>\x3Ccode>y\x3C/code>　　　　\x3C/td>\n\x3Ctd>复制\x3C/td>\n\x3C/tr>\n\x3Ctr>\n\x3Ctd>\x3Ccode>p\x3C/code>\x3C/td>\n\x3Ctd>粘贴\x3C/td>\n\x3C/tr>\n\x3C/tbody>\n\x3C/table>\n\x3Ch2 id=\"一个方便的vimrc\">\x3Ca href=\"#一个方便的vimrc\">一个方便的.vimrc\x3C/a>\x3C/h2>\n\x3Cpre class=\"shiki github-light\" style=\"background-color:#fff;color:#24292e\" tabindex=\"0\">\x3Ccode>\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">set\x3C/span>\x3Cspan style=\"color:#005CC5\"> ts\x3C/span>\x3Cspan style=\"color:#D73A49\">=\x3C/span>\x3Cspan style=\"color:#005CC5\">4\x3C/span>\x3Cspan style=\"color:#032F62\">                    \"设置tab为4空格\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">set\x3C/span>\x3Cspan style=\"color:#005CC5\"> expandtab\x3C/span>\x3Cspan style=\"color:#032F62\">               \"用空格替代tab\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">set\x3C/span>\x3Cspan style=\"color:#005CC5\"> nocompatible\x3C/span>\x3Cspan style=\"color:#6A737D\">            \" 关闭 vi 兼容模式\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">syntax on\x3C/span>\x3Cspan style=\"color:#6A737D\">                   \" 自动语法高亮\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">set\x3C/span>\x3Cspan style=\"color:#005CC5\"> number\x3C/span>\x3Cspan style=\"color:#6A737D\">                  \" 显示行号\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">set\x3C/span>\x3Cspan style=\"color:#005CC5\"> cursorline\x3C/span>\x3Cspan style=\"color:#6A737D\">              \" 突出显示当前行\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">set\x3C/span>\x3Cspan style=\"color:#005CC5\"> ruler\x3C/span>\x3Cspan style=\"color:#6A737D\">                   \" 打开状态栏标尺\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">set\x3C/span>\x3Cspan style=\"color:#005CC5\"> shiftwidth\x3C/span>\x3Cspan style=\"color:#D73A49\">=\x3C/span>\x3Cspan style=\"color:#005CC5\">4\x3C/span>\x3Cspan style=\"color:#6A737D\">            \" 设定 &#x3C;&#x3C; 和 >> 命令移动时的宽度为 4\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">set\x3C/span>\x3Cspan style=\"color:#005CC5\"> softtabstop\x3C/span>\x3Cspan style=\"color:#D73A49\">=\x3C/span>\x3Cspan style=\"color:#005CC5\">4\x3C/span>\x3Cspan style=\"color:#6A737D\">           \" 使得按退格键时可以一次删掉 4 个空格\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">colorscheme\x3C/span>\x3Cspan style=\"color:#24292E\"> molokai\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">set\x3C/span>\x3Cspan style=\"color:#005CC5\"> nobackup\x3C/span>\x3Cspan style=\"color:#6A737D\">                \" 覆盖文件时不备份\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">set\x3C/span>\x3Cspan style=\"color:#005CC5\"> autochdir\x3C/span>\x3Cspan style=\"color:#6A737D\">               \" 自动切换当前目录为当前文件所在的目录\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#6A737D\">\"filetype plugin indent on   \" 开启插件\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">set\x3C/span>\x3Cspan style=\"color:#005CC5\"> backupcopy\x3C/span>\x3Cspan style=\"color:#D73A49\">=\x3C/span>\x3Cspan style=\"color:#24292E\">yes\x3C/span>\x3Cspan style=\"color:#6A737D\">          \" 设置备份时的行为为覆盖\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">set\x3C/span>\x3Cspan style=\"color:#005CC5\"> ignorecase\x3C/span>\x3Cspan style=\"color:#005CC5\"> smartcase\x3C/span>\x3Cspan style=\"color:#6A737D\">    \" 搜索时忽略大小写，但在有一个或以上大写字母时仍保持对大小写敏感\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">set\x3C/span>\x3Cspan style=\"color:#005CC5\"> nowrapscan\x3C/span>\x3Cspan style=\"color:#6A737D\">              \" 禁止在搜索到文件两端时重新搜索\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">set\x3C/span>\x3Cspan style=\"color:#005CC5\"> incsearch\x3C/span>\x3Cspan style=\"color:#6A737D\">               \" 输入搜索内容时就显示搜索结果\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">set\x3C/span>\x3Cspan style=\"color:#005CC5\"> hlsearch\x3C/span>\x3Cspan style=\"color:#6A737D\">                \" 搜索时高亮显示被找到的文本\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">set\x3C/span>\x3Cspan style=\"color:#005CC5\"> noerrorbells\x3C/span>\x3Cspan style=\"color:#6A737D\">            \" 关闭错误信息响铃\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">set\x3C/span>\x3Cspan style=\"color:#005CC5\"> novisualbell\x3C/span>\x3Cspan style=\"color:#6A737D\">            \" 关闭使用可视响铃代替呼叫\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">set\x3C/span>\x3Cspan style=\"color:#24292E\"> t_vb\x3C/span>\x3Cspan style=\"color:#D73A49\">=\x3C/span>\x3Cspan style=\"color:#6A737D\">                   \" 置空错误铃声的终端代码\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">set\x3C/span>\x3Cspan style=\"color:#005CC5\"> magic\x3C/span>\x3Cspan style=\"color:#6A737D\">                   \" 设置魔术\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">set\x3C/span>\x3Cspan style=\"color:#005CC5\"> hidden\x3C/span>\x3Cspan style=\"color:#6A737D\">                  \" 允许在有未保存的修改时切换缓冲区，此时的修改由 vim 负责保存\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">set\x3C/span>\x3Cspan style=\"color:#005CC5\"> guioptions\x3C/span>\x3Cspan style=\"color:#24292E\">-\x3C/span>\x3Cspan style=\"color:#D73A49\">=\x3C/span>\x3Cspan style=\"color:#24292E\">T\x3C/span>\x3Cspan style=\"color:#6A737D\">           \" 隐藏工具栏\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">set\x3C/span>\x3Cspan style=\"color:#005CC5\"> guioptions\x3C/span>\x3Cspan style=\"color:#24292E\">-\x3C/span>\x3Cspan style=\"color:#D73A49\">=\x3C/span>\x3Cspan style=\"color:#24292E\">m\x3C/span>\x3Cspan style=\"color:#6A737D\">           \" 隐藏菜单栏\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">set\x3C/span>\x3Cspan style=\"color:#005CC5\"> smartindent\x3C/span>\x3Cspan style=\"color:#6A737D\">             \" 开启新行时使用智能自动缩进\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">set\x3C/span>\x3Cspan style=\"color:#005CC5\"> backspace\x3C/span>\x3Cspan style=\"color:#D73A49\">=\x3C/span>\x3Cspan style=\"color:#24292E\">indent,\x3C/span>\x3Cspan style=\"color:#005CC5\">eol\x3C/span>\x3Cspan style=\"color:#24292E\">,start\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#6A737D\">                            \" 不设定在插入状态无法用退格键和 Delete 键删除回车符\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">set\x3C/span>\x3Cspan style=\"color:#005CC5\"> cmdheight\x3C/span>\x3Cspan style=\"color:#D73A49\">=\x3C/span>\x3Cspan style=\"color:#005CC5\">1\x3C/span>\x3Cspan style=\"color:#6A737D\">             \" 设定命令行的行数为 1\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">set\x3C/span>\x3Cspan style=\"color:#005CC5\"> laststatus\x3C/span>\x3Cspan style=\"color:#D73A49\">=\x3C/span>\x3Cspan style=\"color:#005CC5\">2\x3C/span>\x3Cspan style=\"color:#6A737D\">            \" 显示状态栏 (默认值为 1, 无法显示状态栏)\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">set\x3C/span>\x3Cspan style=\"color:#005CC5\"> statusline\x3C/span>\x3Cspan style=\"color:#D73A49\">=\\\x3C/span>\x3Cspan style=\"color:#24292E\"> %\x3C/span>\x3Cspan style=\"color:#24292E\">&#x3C;\x3C/span>\x3Cspan style=\"color:#24292E\">%F\x3C/span>\x3Cspan style=\"color:#005cc5\">[\x3C/span>\x3Cspan style=\"color:#24292E\">%1*%M%*%n%R%H\x3C/span>\x3Cspan style=\"color:#005cc5\">]\x3C/span>\x3Cspan style=\"color:#24292E\">%=\\ %y\x3C/span>\x3Cspan style=\"color:#D73A49\">\\\x3C/span>\x3Cspan style=\"color:#24292E\"> %\x3C/span>\x3Cspan style=\"color:#005CC5\">0\x3C/span>\x3Cspan style=\"color:#005cc5\">(\x3C/span>\x3Cspan style=\"color:#24292E\">%\x3C/span>\x3Cspan style=\"color:#e36209\">{\x3C/span>\x3Cspan style=\"color:#005CC5\">&#x26;fileformat\x3C/span>\x3Cspan style=\"color:#e36209\">}\x3C/span>\x3Cspan style=\"color:#D73A49\">\\\x3C/span>\x3Cspan style=\"color:#24292E\"> %\x3C/span>\x3Cspan style=\"color:#e36209\">{\x3C/span>\x3Cspan style=\"color:#005CC5\">&#x26;encoding\x3C/span>\x3Cspan style=\"color:#e36209\">}\x3C/span>\x3Cspan style=\"color:#D73A49\">\\\x3C/span>\x3Cspan style=\"color:#24292E\"> %c:%l/%L%\x3C/span>\x3Cspan style=\"color:#005cc5\">)\x3C/span>\x3Cspan style=\"color:#D73A49\">\\\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#6A737D\">                            \" 设置在状态行显示的信息\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#6A737D\">\"set foldenable              \" 开始折叠\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#6A737D\">\"\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#6A737D\">\"set foldmethod=syntax       \" 设置语法折叠\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#6A737D\">\"\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#6A737D\">\"set foldcolumn=0            \" 设置折叠区域的宽度\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#6A737D\">\"\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#6A737D\">\"setlocal foldlevel=1        \" 设置折叠层数为\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#6A737D\">\"\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#6A737D\">\"set foldclose=all           \" 设置为自动关闭折叠\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#6A737D\">\"\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#6A737D\">\"inoremap &#x3C;space> @=((foldclosed(line('.')) &#x3C; 0) ? 'zc' : 'zo')&#x3C;CR>\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#6A737D\">                            \" 用空格键来开关折叠\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">set\x3C/span>\x3Cspan style=\"color:#005CC5\"> whichwrap\x3C/span>\x3Cspan style=\"color:#D73A49\">+=\x3C/span>\x3Cspan style=\"color:#24292E\">&#x3C;\x3C/span>\x3Cspan style=\"color:#24292E\">,\x3C/span>\x3Cspan style=\"color:#24292E\">>\x3C/span>\x3Cspan style=\"color:#24292E\">,\x3C/span>\x3Cspan style=\"color:#005cc5\">[\x3C/span>\x3Cspan style=\"color:#24292E\">,\x3C/span>\x3Cspan style=\"color:#005cc5\">]\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">inoremap\x3C/span>\x3Cspan style=\"color:#24292E\"> \x3C/span>\x3Cspan style=\"color:rgba(255, 18, 18, 0.8)\">(\x3C/span>\x3Cspan style=\"color:#24292E\"> \x3C/span>\x3Cspan style=\"color:#e36209\">(\x3C/span>\x3Cspan style=\"color:#e36209\">)\x3C/span>\x3Cspan style=\"color:#24292E\">&#x3C;\x3C/span>\x3Cspan style=\"color:#005CC5\">LEFT\x3C/span>\x3Cspan style=\"color:#24292E\">>\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">inoremap\x3C/span>\x3Cspan style=\"color:#24292E\"> \x3C/span>\x3Cspan style=\"color:rgba(255, 18, 18, 0.8)\">{\x3C/span>\x3Cspan style=\"color:#24292E\"> \x3C/span>\x3Cspan style=\"color:#5a32a3\">{\x3C/span>\x3Cspan style=\"color:#5a32a3\">}\x3C/span>\x3Cspan style=\"color:#24292E\">&#x3C;\x3C/span>\x3Cspan style=\"color:#005CC5\">LEFT\x3C/span>\x3Cspan style=\"color:#24292E\">>\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">inoremap\x3C/span>\x3Cspan style=\"color:#24292E\"> \x3C/span>\x3Cspan style=\"color:rgba(255, 18, 18, 0.8)\">[\x3C/span>\x3Cspan style=\"color:#24292E\"> \x3C/span>\x3Cspan style=\"color:#005cc5\">[\x3C/span>\x3Cspan style=\"color:#005cc5\">]\x3C/span>\x3Cspan style=\"color:#24292E\">&#x3C;\x3C/span>\x3Cspan style=\"color:#005CC5\">LEFT\x3C/span>\x3Cspan style=\"color:#24292E\">>\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#6A737D\">\" 插件类快捷键\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">map\x3C/span>\x3Cspan style=\"color:#24292E\"> \x3C/span>\x3Cspan style=\"color:#24292E\">&#x3C;\x3C/span>\x3Cspan style=\"color:#005CC5\">c-b\x3C/span>\x3Cspan style=\"color:#24292E\">>\x3C/span>\x3Cspan style=\"color:#24292E\"> :NERDTreeToggle\x3C/span>\x3Cspan style=\"color:#24292E\">&#x3C;\x3C/span>\x3Cspan style=\"color:#005CC5\">CR\x3C/span>\x3Cspan style=\"color:#24292E\">>\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">inoremap\x3C/span>\x3Cspan style=\"color:#24292E\"> \x3C/span>\x3Cspan style=\"color:#24292E\">&#x3C;\x3C/span>\x3Cspan style=\"color:#005CC5\">silent\x3C/span>\x3Cspan style=\"color:#24292E\">>\x3C/span>\x3Cspan style=\"color:#24292E\">&#x3C;\x3C/span>\x3Cspan style=\"color:#005CC5\">expr\x3C/span>\x3Cspan style=\"color:#24292E\">>\x3C/span>\x3Cspan style=\"color:#24292E\">&#x3C;\x3C/span>\x3Cspan style=\"color:#005CC5\">Tab\x3C/span>\x3Cspan style=\"color:#24292E\">>\x3C/span>\x3Cspan style=\"color:#24292E\"> \x3C/span>\x3Cspan style=\"color:#6F42C1\">pumvisible\x3C/span>\x3Cspan style=\"color:#005cc5\">(\x3C/span>\x3Cspan style=\"color:#005cc5\">)\x3C/span>\x3Cspan style=\"color:#24292E\"> \x3C/span>\x3Cspan style=\"color:#D73A49\">?\x3C/span>\x3Cspan style=\"color:#032F62\"> \"&#x3C;C-y>\"\x3C/span>\x3Cspan style=\"color:#D73A49\"> : \x3C/span>\x3Cspan style=\"color:#6F42C1\">coc#pum#visible\x3C/span>\x3Cspan style=\"color:#005cc5\">(\x3C/span>\x3Cspan style=\"color:#005cc5\">)\x3C/span>\x3Cspan style=\"color:#24292E\"> \x3C/span>\x3Cspan style=\"color:#D73A49\">?\x3C/span>\x3Cspan style=\"color:#6F42C1\"> coc#_select_confirm\x3C/span>\x3Cspan style=\"color:#005cc5\">(\x3C/span>\x3Cspan style=\"color:#005cc5\">)\x3C/span>\x3Cspan style=\"color:#D73A49\"> : \x3C/span>\x3Cspan style=\"color:#032F62\">\"&#x3C;Tab>\"\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#6A737D\">\" Use vim-plug\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#6A737D\">\" Plugged Start\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#6A737D\">\" Vim-Plug Start\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">call\x3C/span>\x3Cspan style=\"color:#6F42C1\"> plug#begin\x3C/span>\x3Cspan style=\"color:#005cc5\">(\x3C/span>\x3Cspan style=\"color:#032F62\">'~/.vim/plugged'\x3C/span>\x3Cspan style=\"color:#005cc5\">)\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">Plug\x3C/span>\x3Cspan style=\"color:#032F62\"> 'itchyny/lightline.vim'\x3C/span>\x3Cspan style=\"color:#6A737D\">         \" lightline插件底部状态栏\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">Plug\x3C/span>\x3Cspan style=\"color:#032F62\"> 'scrooloose/nerdtree'\x3C/span>\x3Cspan style=\"color:#6A737D\">           \" NERDTree\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">Plug\x3C/span>\x3Cspan style=\"color:#032F62\"> 'Chiel92/vim-autoformat'\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">Plug\x3C/span>\x3Cspan style=\"color:#032F62\"> 'dense-analysis/ale'\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">Plug\x3C/span>\x3Cspan style=\"color:#032F62\"> 'neoclide/coc.nvim'\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#D73A49\">call\x3C/span>\x3Cspan style=\"color:#6F42C1\"> plug#end\x3C/span>\x3Cspan style=\"color:#005cc5\">(\x3C/span>\x3Cspan style=\"color:#005cc5\">)\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#6A737D\">\" Vim-Plug End\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#6A737D\">\" autocmd VimEnter * NERDTree\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\n\x3Cspan class=\"line\">\x3Cspan style=\"color:#6A737D\">\" Plugged End\x3C/span>\x3C/span>\n\x3Cspan class=\"line\">\x3C/span>\x3C/code>\x3C/pre>",headings:$R[11]=[$R[12]={depth:2,slug:"基础按键",text:"基础按键"},$R[13]={depth:2,slug:"基础命令",text:"基础命令"},$R[14]={depth:3,slug:"普通模式",text:"普通模式"},$R[15]={depth:3,slug:"可视模式",text:"可视模式"},$R[16]={depth:2,slug:"一个方便的vimrc",text:"一个方便的.vimrc"}]});$R[17]($R[6],$R[7]);_$HY.r["002008c_assets"]=($R[18]={"002008c003100":"/assets/_slug_-C2hyfQgn.js"});$R[17]($R[4],!0);</script><!--xs--><!--/--><link rel="stylesheet" href="/assets/virtual_solid-ssr-entry-client-C7IYfxd0.css"><link rel="modulepreload" href="/assets/web-DRaB6dpe.js"><link rel="modulepreload" href="/assets/preload-helper-BVWlJPfm.js"><link rel="modulepreload" href="/assets/dist-C_AoqmbB.js"><link rel="modulepreload" href="/assets/router-5VwtRl1p.js"><link rel="modulepreload" href="/assets/queries-zmOnGnhm.js"><link rel="modulepreload" href="/assets/settings-C-j4ZxVt.js"><link rel="modulepreload" href="/assets/_slug_-C2hyfQgn.js" fetchpriority="low"><link rel="modulepreload" href="/assets/InlineMarkdown-Z3QrOGWw.js" fetchpriority="low"><link rel="modulepreload" href="/assets/Comment-BUp3sgUb.js" fetchpriority="low"><link rel="modulepreload" href="/assets/Layout-CRSTbADB.js" fetchpriority="low"><link rel="modulepreload" href="/assets/RenderHTML-CtzP5MZ8.js" fetchpriority="low"><link rel="modulepreload" href="/assets/PostTags-CzzxwJJx.js" fetchpriority="low"><link rel="modulepreload" href="/assets/format-DFJQmLUz.js" fetchpriority="low"><link rel="modulepreload" href="/assets/Kicker-BisNdAuD.js" fetchpriority="low"><link rel="stylesheet" href="/assets/GitalkComments-BwIdKO_0.css"><link rel="modulepreload" href="/assets/GitalkComments-CY2hHlon.js" fetchpriority="low"><link rel="modulepreload" href="/assets/rolldown-runtime-XKyaHtl9.js" fetchpriority="low"><script type="module" src="/assets/virtual_solid-ssr-entry-client-wU4lfvY8.js" async></script></head><body><div _hk=0020081 class="min-h-screen"><!--$--><!--/--><a class="skip-link print:hidden" href="#content" aria-current="false">Skip to content</a><div class="_layout_1vl0j_3"><!--$--><aside _hk=0020083 class="_col_1vl0j_12 _left_1vl0j_56 print:hidden"><a href="/search" class="mb-4 flex w-full items-center gap-2 border-b border-rule pb-2 font-sans text-sm text-ink-faint transition-colors hover:border-accent hover:text-ink-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"><span class="i-lucide-search shrink-0" aria-hidden="true"></span>Search&#8230;</a><nav aria-label="Primary" class="grid gap-2.5 font-sans"><a _hk=002008400 href="/" class="flex w-fit items-center gap-2 transition-colors text-sm text-ink-soft hover:text-ink"><span class="i-lucide-house shrink-0" aria-hidden="true"></span><!--$-->Home<!--/--></a><a _hk=002008410 href="/archives" class="flex w-fit items-center gap-2 transition-colors text-sm text-ink-soft hover:text-ink"><span class="i-lucide-archive shrink-0" aria-hidden="true"></span><!--$-->Archives<!--/--></a><a _hk=002008420 href="/notes" class="flex w-fit items-center gap-2 transition-colors text-sm text-ink-soft hover:text-ink"><span class="i-lucide-notebook-text shrink-0" aria-hidden="true"></span><!--$-->Notes<!--/--></a><a _hk=002008430 href="/tags" class="flex w-fit items-center gap-2 transition-colors text-sm text-ink-soft hover:text-ink"><span class="i-lucide-tag shrink-0" aria-hidden="true"></span><!--$-->Tags<!--/--></a><a _hk=002008440 href="/categories" class="flex w-fit items-center gap-2 transition-colors text-sm text-ink-soft hover:text-ink"><span class="i-lucide-folder shrink-0" aria-hidden="true"></span><!--$-->Categories<!--/--></a><a _hk=002008450 href="/about" class="flex w-fit items-center gap-2 transition-colors text-sm text-ink-soft hover:text-ink"><span class="i-lucide-user shrink-0" aria-hidden="true"></span><!--$-->About<!--/--></a><a _hk=002008460 href="/links" class="flex w-fit items-center gap-2 transition-colors text-sm text-ink-soft hover:text-ink"><span class="i-lucide-users shrink-0" aria-hidden="true"></span><!--$-->Friends<!--/--></a><a _hk=002008470 href="/settings" class="flex w-fit items-center gap-2 transition-colors text-sm text-ink-soft hover:text-ink"><span class="i-lucide-settings shrink-0" aria-hidden="true"></span><!--$-->Settings<!--/--></a></nav></aside><!--/--><div class="min-w-0"><!--$--><header _hk=0020087 class="fixed inset-x-0 top-0 z-30 flex items-center gap-2.5 border-b border-rule bg-[color:var(--paper)]/92 px-5 py-3 font-sans text-sm backdrop-blur-sm transition-[translate] duration-200 md:px-6 print:hidden _header_1vl0j_31"><nav aria-label="Primary" class="flex flex-1 items-center gap-2.5"><!--$--><a _hk=002008800 href="/" class="w-fit transition-colors text-ink-soft hover:text-ink">Home</a><a _hk=002008810 href="/notes" class="w-fit transition-colors text-ink-soft hover:text-ink">Notes</a><a _hk=002008820 href="/about" class="w-fit transition-colors text-ink-soft hover:text-ink">About</a><!--/--><button class="w-fit transition-colors text-ink-soft hover:text-ink" type="button" aria-expanded="false">More</button><div class="shrink-1 grow-1"></div><a class="i-lucide-settings" title="Settings" href="/settings"><span class="sr-only">Settings</span></a><a class="i-lucide-search" title="Search" href="/search"><span class="sr-only">Search</span></a></nav><!--$--><!--/--><div id="kicker-root" class="min-w-0 flex-wrap items-center gap-2.5 hidden"></div></header><!--/--><main id="content" tabindex="-1" class="pb-20 pt-16 print:pt-0 print:pb-0"><article _hk=002008c003100331><header class="mb-8 border-b border-rule pb-7"><!--$--><!--/--><h1 class="text-2xl font-bold leading-snug text-balance md:text-3xl"><span _hk=002008c0031003341>Vim学习笔记</span></h1></header><!--$--><div _hk=002008c0031003351 class="markdown-body"><p>Vim 的学习笔记</p>
+<!-- more -->
+<hr>
+<h2 id="基础按键"><a href="#基础按键">基础按键</a></h2>
+<table>
+<thead>
+<tr>
+<th>按键</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>什么都不按 　　　　</td>
+<td>普通模式</td>
+</tr>
+<tr>
+<td><kbd>i</kbd></td>
+<td>输入模式</td>
+</tr>
+<tr>
+<td><kbd>Esc</kbd></td>
+<td>从输入模式退出</td>
+</tr>
+<tr>
+<td><kbd>：</kbd></td>
+<td>命令模式</td>
+</tr>
+<tr>
+<td><kbd>v</kbd></td>
+<td>可视模式</td>
+</tr>
+<tr>
+<td><kbd>↑</kbd></td>
+<td>上</td>
+</tr>
+<tr>
+<td><kbd>↓</kbd></td>
+<td>下</td>
+</tr>
+<tr>
+<td><kbd>←</kbd></td>
+<td>左</td>
+</tr>
+<tr>
+<td><kbd>→</kbd></td>
+<td>右</td>
+</tr>
+</tbody>
+</table>
+<h2 id="基础命令"><a href="#基础命令">基础命令</a></h2>
+<h3 id="普通模式"><a href="#普通模式">普通模式</a></h3>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>:open [file]</code></td>
+<td>打开文件</td>
+</tr>
+<tr>
+<td><code>:qa!</code></td>
+<td>强退</td>
+</tr>
+<tr>
+<td><code>:![command]</code></td>
+<td>在 shell 执行<code>[command]</code>这条命令</td>
+</tr>
+<tr>
+<td><code>:w</code></td>
+<td>保存</td>
+</tr>
+<tr>
+<td><code>:q</code></td>
+<td>退出</td>
+</tr>
+<tr>
+<td><code>:set</code></td>
+<td>设置</td>
+</tr>
+<tr>
+<td><code>:set guifont [font]</code></td>
+<td>设置字体为<code>[font]</code></td>
+</tr>
+<tr>
+<td><code>:set guifont [font]:h[number]</code>　　　　</td>
+<td>设置字体为<code>[font]</code>，字号为<code>[number]</code></td>
+</tr>
+<tr>
+<td><code>dd</code></td>
+<td>删除整行</td>
+</tr>
+<tr>
+<td><code>[number]dd</code></td>
+<td>删除下<code>[number]</code>行</td>
+</tr>
+<tr>
+<td><code>u</code></td>
+<td>撤销</td>
+</tr>
+<tr>
+<td><code>[number]=[方向键]</code></td>
+<td>向<code>[方向键]</code>方向<code>[number]</code>行自动缩进</td>
+</tr>
+<tr>
+<td><code>r</code></td>
+<td>用你下一个输入的字符替换后面一个字符</td>
+</tr>
+</tbody>
+</table>
+<h3 id="可视模式"><a href="#可视模式">可视模式</a></h3>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>y</code>　　　　</td>
+<td>复制</td>
+</tr>
+<tr>
+<td><code>p</code></td>
+<td>粘贴</td>
+</tr>
+</tbody>
+</table>
+<h2 id="一个方便的vimrc"><a href="#一个方便的vimrc">一个方便的.vimrc</a></h2>
+<pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">set</span><span style="color:#005CC5"> ts</span><span style="color:#D73A49">=</span><span style="color:#005CC5">4</span><span style="color:#032F62">                    "设置tab为4空格</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">set</span><span style="color:#005CC5"> expandtab</span><span style="color:#032F62">               "用空格替代tab</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">set</span><span style="color:#005CC5"> nocompatible</span><span style="color:#6A737D">            " 关闭 vi 兼容模式</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">syntax on</span><span style="color:#6A737D">                   " 自动语法高亮</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">set</span><span style="color:#005CC5"> number</span><span style="color:#6A737D">                  " 显示行号</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">set</span><span style="color:#005CC5"> cursorline</span><span style="color:#6A737D">              " 突出显示当前行</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">set</span><span style="color:#005CC5"> ruler</span><span style="color:#6A737D">                   " 打开状态栏标尺</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">set</span><span style="color:#005CC5"> shiftwidth</span><span style="color:#D73A49">=</span><span style="color:#005CC5">4</span><span style="color:#6A737D">            " 设定 &#x3C;&#x3C; 和 >> 命令移动时的宽度为 4</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">set</span><span style="color:#005CC5"> softtabstop</span><span style="color:#D73A49">=</span><span style="color:#005CC5">4</span><span style="color:#6A737D">           " 使得按退格键时可以一次删掉 4 个空格</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">colorscheme</span><span style="color:#24292E"> molokai</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">set</span><span style="color:#005CC5"> nobackup</span><span style="color:#6A737D">                " 覆盖文件时不备份</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">set</span><span style="color:#005CC5"> autochdir</span><span style="color:#6A737D">               " 自动切换当前目录为当前文件所在的目录</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">"filetype plugin indent on   " 开启插件</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">set</span><span style="color:#005CC5"> backupcopy</span><span style="color:#D73A49">=</span><span style="color:#24292E">yes</span><span style="color:#6A737D">          " 设置备份时的行为为覆盖</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">set</span><span style="color:#005CC5"> ignorecase</span><span style="color:#005CC5"> smartcase</span><span style="color:#6A737D">    " 搜索时忽略大小写，但在有一个或以上大写字母时仍保持对大小写敏感</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">set</span><span style="color:#005CC5"> nowrapscan</span><span style="color:#6A737D">              " 禁止在搜索到文件两端时重新搜索</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">set</span><span style="color:#005CC5"> incsearch</span><span style="color:#6A737D">               " 输入搜索内容时就显示搜索结果</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">set</span><span style="color:#005CC5"> hlsearch</span><span style="color:#6A737D">                " 搜索时高亮显示被找到的文本</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">set</span><span style="color:#005CC5"> noerrorbells</span><span style="color:#6A737D">            " 关闭错误信息响铃</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">set</span><span style="color:#005CC5"> novisualbell</span><span style="color:#6A737D">            " 关闭使用可视响铃代替呼叫</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">set</span><span style="color:#24292E"> t_vb</span><span style="color:#D73A49">=</span><span style="color:#6A737D">                   " 置空错误铃声的终端代码</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">set</span><span style="color:#005CC5"> magic</span><span style="color:#6A737D">                   " 设置魔术</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">set</span><span style="color:#005CC5"> hidden</span><span style="color:#6A737D">                  " 允许在有未保存的修改时切换缓冲区，此时的修改由 vim 负责保存</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">set</span><span style="color:#005CC5"> guioptions</span><span style="color:#24292E">-</span><span style="color:#D73A49">=</span><span style="color:#24292E">T</span><span style="color:#6A737D">           " 隐藏工具栏</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">set</span><span style="color:#005CC5"> guioptions</span><span style="color:#24292E">-</span><span style="color:#D73A49">=</span><span style="color:#24292E">m</span><span style="color:#6A737D">           " 隐藏菜单栏</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">set</span><span style="color:#005CC5"> smartindent</span><span style="color:#6A737D">             " 开启新行时使用智能自动缩进</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">set</span><span style="color:#005CC5"> backspace</span><span style="color:#D73A49">=</span><span style="color:#24292E">indent,</span><span style="color:#005CC5">eol</span><span style="color:#24292E">,start</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">                            " 不设定在插入状态无法用退格键和 Delete 键删除回车符</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">set</span><span style="color:#005CC5"> cmdheight</span><span style="color:#D73A49">=</span><span style="color:#005CC5">1</span><span style="color:#6A737D">             " 设定命令行的行数为 1</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">set</span><span style="color:#005CC5"> laststatus</span><span style="color:#D73A49">=</span><span style="color:#005CC5">2</span><span style="color:#6A737D">            " 显示状态栏 (默认值为 1, 无法显示状态栏)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">set</span><span style="color:#005CC5"> statusline</span><span style="color:#D73A49">=\</span><span style="color:#24292E"> %</span><span style="color:#24292E">&#x3C;</span><span style="color:#24292E">%F</span><span style="color:#005cc5">[</span><span style="color:#24292E">%1*%M%*%n%R%H</span><span style="color:#005cc5">]</span><span style="color:#24292E">%=\ %y</span><span style="color:#D73A49">\</span><span style="color:#24292E"> %</span><span style="color:#005CC5">0</span><span style="color:#005cc5">(</span><span style="color:#24292E">%</span><span style="color:#e36209">{</span><span style="color:#005CC5">&#x26;fileformat</span><span style="color:#e36209">}</span><span style="color:#D73A49">\</span><span style="color:#24292E"> %</span><span style="color:#e36209">{</span><span style="color:#005CC5">&#x26;encoding</span><span style="color:#e36209">}</span><span style="color:#D73A49">\</span><span style="color:#24292E"> %c:%l/%L%</span><span style="color:#005cc5">)</span><span style="color:#D73A49">\</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">                            " 设置在状态行显示的信息</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">"set foldenable              " 开始折叠</span></span>
+<span class="line"><span style="color:#6A737D">"</span></span>
+<span class="line"><span style="color:#6A737D">"set foldmethod=syntax       " 设置语法折叠</span></span>
+<span class="line"><span style="color:#6A737D">"</span></span>
+<span class="line"><span style="color:#6A737D">"set foldcolumn=0            " 设置折叠区域的宽度</span></span>
+<span class="line"><span style="color:#6A737D">"</span></span>
+<span class="line"><span style="color:#6A737D">"setlocal foldlevel=1        " 设置折叠层数为</span></span>
+<span class="line"><span style="color:#6A737D">"</span></span>
+<span class="line"><span style="color:#6A737D">"set foldclose=all           " 设置为自动关闭折叠</span></span>
+<span class="line"><span style="color:#6A737D">"</span></span>
+<span class="line"><span style="color:#6A737D">"inoremap &#x3C;space> @=((foldclosed(line('.')) &#x3C; 0) ? 'zc' : 'zo')&#x3C;CR></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">                            " 用空格键来开关折叠</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">set</span><span style="color:#005CC5"> whichwrap</span><span style="color:#D73A49">+=</span><span style="color:#24292E">&#x3C;</span><span style="color:#24292E">,</span><span style="color:#24292E">></span><span style="color:#24292E">,</span><span style="color:#005cc5">[</span><span style="color:#24292E">,</span><span style="color:#005cc5">]</span></span>
+<span class="line"><span style="color:#D73A49">inoremap</span><span style="color:#24292E"> </span><span style="color:rgba(255, 18, 18, 0.8)">(</span><span style="color:#24292E"> </span><span style="color:#e36209">(</span><span style="color:#e36209">)</span><span style="color:#24292E">&#x3C;</span><span style="color:#005CC5">LEFT</span><span style="color:#24292E">></span></span>
+<span class="line"><span style="color:#D73A49">inoremap</span><span style="color:#24292E"> </span><span style="color:rgba(255, 18, 18, 0.8)">{</span><span style="color:#24292E"> </span><span style="color:#5a32a3">{</span><span style="color:#5a32a3">}</span><span style="color:#24292E">&#x3C;</span><span style="color:#005CC5">LEFT</span><span style="color:#24292E">></span></span>
+<span class="line"><span style="color:#D73A49">inoremap</span><span style="color:#24292E"> </span><span style="color:rgba(255, 18, 18, 0.8)">[</span><span style="color:#24292E"> </span><span style="color:#005cc5">[</span><span style="color:#005cc5">]</span><span style="color:#24292E">&#x3C;</span><span style="color:#005CC5">LEFT</span><span style="color:#24292E">></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">" 插件类快捷键</span></span>
+<span class="line"><span style="color:#D73A49">map</span><span style="color:#24292E"> </span><span style="color:#24292E">&#x3C;</span><span style="color:#005CC5">c-b</span><span style="color:#24292E">></span><span style="color:#24292E"> :NERDTreeToggle</span><span style="color:#24292E">&#x3C;</span><span style="color:#005CC5">CR</span><span style="color:#24292E">></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">inoremap</span><span style="color:#24292E"> </span><span style="color:#24292E">&#x3C;</span><span style="color:#005CC5">silent</span><span style="color:#24292E">></span><span style="color:#24292E">&#x3C;</span><span style="color:#005CC5">expr</span><span style="color:#24292E">></span><span style="color:#24292E">&#x3C;</span><span style="color:#005CC5">Tab</span><span style="color:#24292E">></span><span style="color:#24292E"> </span><span style="color:#6F42C1">pumvisible</span><span style="color:#005cc5">(</span><span style="color:#005cc5">)</span><span style="color:#24292E"> </span><span style="color:#D73A49">?</span><span style="color:#032F62"> "&#x3C;C-y>"</span><span style="color:#D73A49"> : </span><span style="color:#6F42C1">coc#pum#visible</span><span style="color:#005cc5">(</span><span style="color:#005cc5">)</span><span style="color:#24292E"> </span><span style="color:#D73A49">?</span><span style="color:#6F42C1"> coc#_select_confirm</span><span style="color:#005cc5">(</span><span style="color:#005cc5">)</span><span style="color:#D73A49"> : </span><span style="color:#032F62">"&#x3C;Tab>"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">" Use vim-plug</span></span>
+<span class="line"><span style="color:#6A737D">" Plugged Start</span></span>
+<span class="line"><span style="color:#6A737D">" Vim-Plug Start</span></span>
+<span class="line"><span style="color:#D73A49">call</span><span style="color:#6F42C1"> plug#begin</span><span style="color:#005cc5">(</span><span style="color:#032F62">'~/.vim/plugged'</span><span style="color:#005cc5">)</span></span>
+<span class="line"><span style="color:#D73A49">Plug</span><span style="color:#032F62"> 'itchyny/lightline.vim'</span><span style="color:#6A737D">         " lightline插件底部状态栏</span></span>
+<span class="line"><span style="color:#D73A49">Plug</span><span style="color:#032F62"> 'scrooloose/nerdtree'</span><span style="color:#6A737D">           " NERDTree</span></span>
+<span class="line"><span style="color:#D73A49">Plug</span><span style="color:#032F62"> 'Chiel92/vim-autoformat'</span></span>
+<span class="line"><span style="color:#D73A49">Plug</span><span style="color:#032F62"> 'dense-analysis/ale'</span></span>
+<span class="line"><span style="color:#D73A49">Plug</span><span style="color:#032F62"> 'neoclide/coc.nvim'</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">call</span><span style="color:#6F42C1"> plug#end</span><span style="color:#005cc5">(</span><span style="color:#005cc5">)</span></span>
+<span class="line"><span style="color:#6A737D">" Vim-Plug End</span></span>
+<span class="line"><span style="color:#6A737D">" autocmd VimEnter * NERDTree</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">" Plugged End</span></span>
+<span class="line"></span></code></pre></div><!--/--><div class="mt-10 flex flex-wrap items-baseline gap-x-6 gap-y-2 border-t border-rule pt-4 font-sans text-xs text-ink-faint"><!--$--><span _hk=002008c0031003380 class="inline-flex items-center gap-1.5"><span class="i-lucide-creative-commons inline-block shrink-0" aria-hidden="true"></span><!--$--><a _hk=002008c00310033830 class="transition-colors hover:text-accent" href="https://creativecommons.org/licenses/by-sa/3.0/deed.en">CC BY-SA 3.0</a><!--/--></span><!--/--><div class="ml-auto flex flex-wrap items-baseline gap-x-4 gap-y-1"><time class="tabular-nums">October 7, 2018</time><!--$--><ul _hk=002008c00310033a1 class="flex flex-wrap gap-x-3 gap-y-1 text-sm text-accent text-xs"><li _hk=002008c00310033a200><a class="transition-colors hover:text-ink" href="/tags/Vim">#<!--$-->Vim<!--/--></a></li><li _hk=002008c00310033a210><a class="transition-colors hover:text-ink" href="/tags/Code">#<!--$-->Code<!--/--></a></li></ul><!--/--></div></div><!--$--><nav _hk=002008c00310033c aria-label="Previous and next posts" class="mt-10 grid gap-4 sm:grid-cols-2 sm:gap-8 print:hidden"><div></div><div class="sm:text-right"><a _hk=002008c00310033i0 class="group block" href="/blog/2020-03-26-ubuntu-wifi-unable-use"><span class="font-sans text-xs text-ink-faint">Next</span><span class="mt-1 block leading-snug font-bold text-ink-soft transition-colors group-hover:text-accent">2020-03-26-ubuntu-wifi-unable-use</span></a></div></nav><!--/--><!--$--><!--/--><p class="mt-10 text-center text-sm print:hidden"><a class="text-accent hover:underline" href="/">&#8592; Back to home</a></p></article></main><!--$--><footer _hk=002008d class="border-t border-rule py-10 text-center text-xs text-ink-faint print:hidden"><p><!--$-->Linca<!--/--> · <!--$-->Zero Calorie Drink Shop<!--/--></p></footer><!--/--></div><aside class="_col_1vl0j_12 _right_1vl0j_69 print:hidden"><nav _hk=002008l1 aria-labelledby="toc-heading" class="text-base"><p id="toc-heading" class="mb-3 font-sans text-ink-faint">Contents</p><ul class="grid gap-1"><li _hk=002008l200 class="" style="padding-left:12px"><a href="#基础按键" class="text-ink-soft hover:text-accent" data-active aria-current="page">基础按键</a></li><li _hk=002008l210 class="" style="padding-left:12px"><a href="#基础命令" class="text-ink-soft hover:text-accent" data-active aria-current="page">基础命令</a></li><li _hk=002008l220 class="" style="padding-left:24px"><a href="#普通模式" class="text-ink-soft hover:text-accent" data-active aria-current="page">普通模式</a></li><li _hk=002008l230 class="" style="padding-left:24px"><a href="#可视模式" class="text-ink-soft hover:text-accent" data-active aria-current="page">可视模式</a></li><li _hk=002008l240 class="" style="padding-left:12px"><a href="#一个方便的vimrc" class="text-ink-soft hover:text-accent" data-active aria-current="page">一个方便的.vimrc</a></li></ul></nav></aside></div></div><script>_$HY.s[""]=1,_$HY.sw&&_$HY.sw("")</script></body></html>

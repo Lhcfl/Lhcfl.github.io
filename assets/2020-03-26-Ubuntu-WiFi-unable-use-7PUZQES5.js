@@ -1,0 +1,2 @@
+var e={frontmatter:{date:`2020-03-26T11:31:00`,tags:[`Linux`,`Ubuntu`,`Solution`],thumbnail:`https://i.loli.net/2020/03/26/PADd1Rty4qflV7B.jpg`,copyright:`CC BY-SA 3.0`,categories:[]},titleHtml:``,html:`<p>联想电脑 wifi 无法使用，有时只需输入一条命令即可</p>
+<pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#6F42C1">sudo</span><span style="color:#032F62"> modprobe</span><span style="color:#005CC5"> -r</span><span style="color:#032F62"> ideapad_laptop</span></span></code></pre>`,headings:[]};export{e as default};

@@ -1,0 +1,1 @@
+import{E as e,L as t,N as n,T as r,a as i,f as a,u as o}from"./web-DRaB6dpe.js";var s=t(`<div>`);function c(t){return r(()=>r(()=>!!t.html)()?(()=>{var r=a(s);return o(()=>({e:e(t.class),t:t.html}),({e,t},a)=>{i(r,e,a?.e),t!==a?.t&&n(r,`innerHTML`,t)}),r})():void 0)}export{c as t};

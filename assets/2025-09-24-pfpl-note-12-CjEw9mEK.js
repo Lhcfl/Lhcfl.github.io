@@ -1,0 +1,14 @@
+var e={frontmatter:{title:`PFPL 笔记 - XII Symbolic Data`,date:`2025-09-24T16:46:01`,tags:[],categories:[`Practical Foundations for Programming Languages`],copyright:`CC BY-NC-SA 4.0`},titleHtml:`PFPL 笔记 - XII Symbolic Data`,html:`<p>笔记 12 Symbolic Data</p>
+<!-- more -->
+<h2 id="symbols"><a href="#symbols">Symbols</a></h2>
+<p>A symbol is an atomic datum with no internal structure.</p>
+<p>A symbol is just a name, or index, for a family of operation</p>
+<p>lzx 同学给出的例子</p>
+<pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#005cc5">(</span><span style="color:#24292E">define f </span><span style="color:#e36209">(</span><span style="color:#005CC5">+</span><span style="color:#005CC5"> 1</span><span style="color:#24292E"> a</span><span style="color:#e36209">)</span><span style="color:#005cc5">)</span><span style="color:#24292E"> </span><span style="color:#6A737D">; BOOM! </span></span>
+<span class="line"><span style="color:#005cc5">(</span><span style="color:#24292E">define f </span><span style="color:#e36209">(</span><span style="color:#24292E">mu </span><span style="color:#5a32a3">(</span><span style="color:#5a32a3">)</span><span style="color:#24292E"> </span><span style="color:#5a32a3">(</span><span style="color:#005CC5">+</span><span style="color:#005CC5"> 1</span><span style="color:#24292E"> a</span><span style="color:#5a32a3">)</span><span style="color:#e36209">)</span><span style="color:#005cc5">)</span><span style="color:#24292E"> </span><span style="color:#6A737D">; OK </span></span>
+<span class="line"><span style="color:#005cc5">(</span><span style="color:#24292E">f</span><span style="color:#005cc5">)</span><span style="color:#24292E"> </span><span style="color:#6A737D">; BOOM! </span></span>
+<span class="line"><span style="color:#005cc5">(</span><span style="color:#D73A49">let</span><span style="color:#24292E"> </span><span style="color:#e36209">(</span><span style="color:#5a32a3">(</span><span style="color:#24292E">a </span><span style="color:#005CC5">1</span><span style="color:#5a32a3">)</span><span style="color:#e36209">)</span><span style="color:#24292E"> </span><span style="color:#e36209">(</span><span style="color:#24292E">f</span><span style="color:#e36209">)</span><span style="color:#005cc5">)</span><span style="color:#24292E"> </span><span style="color:#6A737D">; 2</span></span></code></pre>
+<h2 id="fluid-binding"><a href="#fluid-binding">Fluid Binding</a></h2>
+<p>动态绑定</p>
+<p>put 用来给 a 绑定上</p>
+<p>get 用来获取 binding</p>`,headings:[{depth:2,slug:`symbols`,text:`Symbols`},{depth:2,slug:`fluid-binding`,text:`Fluid Binding`}]};export{e as default};

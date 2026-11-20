@@ -1,0 +1,3 @@
+var e={frontmatter:{title:`Windows 11 Chromium 渲染卡住的解决方案`,date:`2025-06-14T11:23:23`,tags:[`Windows`,`Solution`],copyright:`CC BY-SA 4.0`,categories:[]},titleHtml:`Windows 11 Chromium 渲染卡住的解决方案`,html:`<p>注册表打开：HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\Dwm 新增一个 OverlayTestMode 的 DWORD 项，值为 5 重启即可</p>
+<!-- more -->
+<p>source: <a href="https://www.bilibili.com/video/BV1SnNNeaEA9">https://www.bilibili.com/video/BV1SnNNeaEA9</a></p>`,headings:[]};export{e as default};
